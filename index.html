@@ -79,29 +79,6 @@
   .sync-status.live::before{background:#2f7a4d;}
   .sync-status.error::before{background:#8a2b2b;}
 
-  /* ---------- Main nav (Reference Library / Team Notes) ---------- */
-  .main-nav{
-    display:flex;
-    border-top:1px solid var(--line);
-    border-bottom:1px solid var(--line);
-  }
-  .main-nav-btn{
-    font-family:var(--font-display);
-    font-weight:600;
-    font-size:13px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    padding:16px 28px;
-    background:var(--white);
-    color:var(--silver);
-    border:none;
-    border-right:1px solid var(--line);
-    cursor:pointer;
-    transition:all 0.15s ease;
-  }
-  .main-nav-btn:hover{color:var(--oryx-blue);}
-  .main-nav-btn.active{color:var(--oryx-blue);background:var(--panel);box-shadow:inset 0 -2px 0 var(--oryx-blue);}
-
   .view{display:none;padding:0 48px 64px;}
   .view.active{display:block;}
 
@@ -130,15 +107,6 @@
   .tab:hover{border-color:var(--oryx-blue);}
   .tab.active{background:var(--oryx-blue);color:var(--white);border-color:var(--oryx-blue);}
 
-  .sub-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-top:24px;}
-  .sub-tab{
-    font-family:var(--font-display);font-weight:600;font-size:12px;letter-spacing:0.08em;
-    text-transform:uppercase;padding:12px 18px;background:none;border:none;
-    color:var(--silver);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;
-  }
-  .sub-tab:hover{color:var(--oryx-blue);}
-  .sub-tab.active{color:var(--oryx-blue);border-bottom-color:var(--oryx-blue);}
-
   /* ---------- Grid ---------- */
   .count-row{
     font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--silver);
@@ -164,10 +132,6 @@
   .card-footer{
     margin-top:auto;padding-top:10px;border-top:1px solid var(--line-soft);
     display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--silver);gap:8px;flex-wrap:wrap;
-  }
-  .card-badge{
-    font-family:var(--font-display);font-weight:600;font-size:10px;letter-spacing:0.05em;
-    text-transform:uppercase;background:var(--panel);color:var(--oryx-blue);padding:4px 8px;
   }
   .card-del{
     background:none;border:none;color:var(--silver);cursor:pointer;font-size:11px;letter-spacing:0.05em;
@@ -198,14 +162,36 @@
     font-size:12px;color:var(--silver);margin:0 0 24px;text-transform:uppercase;
     letter-spacing:0.08em;font-family:var(--font-display);
   }
-  .detail-block{margin-bottom:20px;}
-  .detail-label{
-    font-family:var(--font-display);font-weight:600;font-size:11px;letter-spacing:0.08em;
-    text-transform:uppercase;color:var(--silver);margin-bottom:6px;
+
+  /* ---------- Detail panel header ---------- */
+  #detailPanel{padding:0;}
+  .panel-header{
+    position:relative;overflow:hidden;background:var(--oryx-blue);color:var(--white);
+    margin:0 0 28px;padding:44px 32px 28px;
   }
-  .detail-value{font-size:14px;line-height:1.65;color:var(--black);white-space:pre-wrap;}
+  .panel-sweep{position:absolute;top:-30px;right:-30px;width:240px;height:150px;pointer-events:none;opacity:0.4;}
+  .panel-eyebrow{
+    position:relative;z-index:1;display:block;font-family:var(--font-display);font-weight:600;
+    font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.6);
+  }
+  .panel-header h2{
+    position:relative;z-index:1;font-family:var(--font-display);font-weight:700;font-size:27px;
+    line-height:1.28;color:var(--white);margin:10px 0 0;letter-spacing:0.005em;
+  }
+  .panel-body{padding:0 32px 32px;}
+  .close-x-light{color:rgba(255,255,255,0.65);}
+  .close-x-light:hover{color:var(--white);}
+
+  .detail-block{margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--line-soft);}
+  .detail-block:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+  .detail-label{
+    font-family:var(--font-display);font-weight:600;font-size:10.5px;letter-spacing:0.14em;
+    text-transform:uppercase;color:var(--oryx-blue);margin-bottom:8px;padding-left:13px;position:relative;
+  }
+  .detail-label::before{content:'';position:absolute;left:0;top:4px;width:6px;height:6px;background:var(--oryx-blue);}
+  .detail-value{font-size:14.5px;line-height:1.7;color:var(--black);white-space:pre-wrap;}
   .detail-value.mono{font-family:monospace;background:var(--panel);padding:10px 12px;font-size:13px;}
-  .detail-tip{background:var(--panel);border-left:3px solid var(--oryx-blue);padding:12px 14px;font-size:13.5px;line-height:1.6;}
+  .detail-tip{background:var(--panel);border-left:3px solid var(--oryx-blue);padding:14px 16px;font-size:13.5px;line-height:1.65;}
 
   label{
     display:block;font-family:var(--font-display);font-weight:600;font-size:11px;letter-spacing:0.06em;
@@ -252,34 +238,10 @@
       <span class="sync-status" id="syncStatus">Connecting…</span>
     </div>
   </div>
-  <div class="main-nav">
-    <button class="main-nav-btn active" data-view="library">Reference Library</button>
-    <button class="main-nav-btn" data-view="notes">Team Notes</button>
-  </div>
 </header>
 
-<!-- ===================== REFERENCE LIBRARY ===================== -->
-<div class="view active" id="view-library">
-  <div class="sub-tabs" id="libSubTabs">
-    <button class="sub-tab active" data-lib="skills">Skills</button>
-    <button class="sub-tab" data-lib="shortcuts">Shortcuts</button>
-    <button class="sub-tab" data-lib="tools">AI Tools</button>
-  </div>
-
-  <div class="controls">
-    <div class="search-wrap">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="libSearch" placeholder="Search the reference library…">
-    </div>
-    <div class="tabs" id="libFilterTabs"></div>
-  </div>
-
-  <div class="count-row" id="libCount"></div>
-  <div class="grid" id="libGrid"></div>
-</div>
-
 <!-- ===================== TEAM NOTES ===================== -->
-<div class="view" id="view-notes">
+<div class="view active" id="view-notes">
   <div class="controls" style="border-bottom:none;padding-top:24px;">
     <div class="search-wrap">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -301,7 +263,7 @@
   <div class="grid" id="grid"></div>
 </div>
 
-<!-- Detail panel (Reference Library) -->
+<!-- Detail panel (Team Notes) -->
 <div class="overlay" id="detailOverlay">
   <div class="panel" id="detailPanel"></div>
 </div>
@@ -326,9 +288,38 @@
     <input type="text" id="fTitle" placeholder="e.g. /compact — trim context mid-session">
     <div class="field-error" id="errTitle">Give it a title.</div>
 
-    <label for="fBody">Details</label>
-    <textarea id="fBody" placeholder="What it does, when to use it, gotchas…"></textarea>
-    <div class="field-error" id="errBody">Add a bit of detail.</div>
+    <div id="simpleFields">
+      <label for="fBody">Details</label>
+      <textarea id="fBody" placeholder="What it does, when to use it, gotchas…"></textarea>
+      <div class="field-error" id="errBody">Add a bit of detail.</div>
+    </div>
+
+    <div id="skillFields" style="display:none;">
+      <label for="fDepartment">Department</label>
+      <input type="text" id="fDepartment" placeholder="e.g. Sales and Marketing">
+
+      <label for="fPurpose">Purpose</label>
+      <textarea id="fPurpose" placeholder="What does this skill do?"></textarea>
+      <div class="field-error" id="errPurpose">Add a purpose.</div>
+
+      <label for="fSamplePrompt">Sample prompt</label>
+      <textarea id="fSamplePrompt" placeholder="An example prompt someone could paste in"></textarea>
+
+      <label for="fBestFor">Best for</label>
+      <textarea id="fBestFor" placeholder="When should someone reach for this?"></textarea>
+
+      <label for="fExampleOutput">Example output</label>
+      <textarea id="fExampleOutput" placeholder="Before/after or sample result"></textarea>
+
+      <label for="fNotes">Notes</label>
+      <textarea id="fNotes" placeholder="Gotchas, limitations, tips"></textarea>
+
+      <label for="fHowToAccess">How to access</label>
+      <textarea id="fHowToAccess" placeholder="Steps to find and run this skill"></textarea>
+
+      <label for="fOryxTip">How it helps Oryx Doors and Windows</label>
+      <textarea id="fOryxTip" placeholder="A concrete Oryx use case"></textarea>
+    </div>
 
     <label for="fLink">Link (optional)</label>
     <input type="text" id="fLink" placeholder="https://…">
@@ -342,10 +333,6 @@
     </div>
   </div>
 </div>
-
-<script>
-const REFERENCE_DATA = {"skills": [], "shortcuts": [], "tools": []};
-</script>
 
 <script>
 // ============= Firebase =============
@@ -372,202 +359,30 @@ function isValidLink(url){
   try{ const u = new URL(url); return u.protocol === 'http:' || u.protocol === 'https:'; }catch(e){ return false; }
 }
 
-// ============= Main nav (Reference Library / Team Notes) =============
-document.querySelectorAll('.main-nav-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.main-nav-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('view-' + btn.dataset.view).classList.add('active');
-  });
-});
-
-// ============= Reference Library =============
-let libType = 'skills';
-let libFilter = 'all';
-let libSearch = '';
-
-const libGrid = document.getElementById('libGrid');
-const libCount = document.getElementById('libCount');
-const libFilterTabs = document.getElementById('libFilterTabs');
-const libSearchInput = document.getElementById('libSearch');
-
-function departmentOptions(){
-  const set = new Set(REFERENCE_DATA.skills.map(s => s.department).filter(Boolean));
-  return Array.from(set);
+function panelSweepSvg(){
+  return `<svg class="panel-sweep" viewBox="0 0 240 150" xmlns="http://www.w3.org/2000/svg">
+    <path d="M240 6 C170 6 120 40 85 150" stroke="white" stroke-width="2" fill="none" opacity="0.6"/>
+    <path d="M240 20 C177 20 132 52 105 150" stroke="white" stroke-width="2" fill="none" opacity="0.3"/>
+  </svg>`;
 }
-function shortcutGroupOptions(){
-  const set = new Set(REFERENCE_DATA.shortcuts.map(s => s.group).filter(Boolean));
-  return Array.from(set);
+function panelHeader(eyebrow, title){
+  return `
+    <div class="panel-header">
+      ${panelSweepSvg()}
+      <button class="close-x close-x-light" id="detailClose">&times;</button>
+      <span class="panel-eyebrow">${escapeHtml(eyebrow)}</span>
+      <h2>${escapeHtml(title)}</h2>
+    </div>
+    <div class="panel-body">
+  `;
 }
 
-function renderLibFilterTabs(){
-  let opts = [];
-  if(libType === 'skills') opts = departmentOptions();
-  else if(libType === 'shortcuts') opts = shortcutGroupOptions();
-  else opts = [];
-
-  if(opts.length === 0){
-    libFilterTabs.innerHTML = '';
-    return;
-  }
-  const allBtn = `<button class="tab ${libFilter==='all'?'active':''}" data-filter="all">All</button>`;
-  const rest = opts.map(o => `<button class="tab ${libFilter===o?'active':''}" data-filter="${escapeHtml(o)}">${escapeHtml(o)}</button>`).join('');
-  libFilterTabs.innerHTML = allBtn + rest;
-  libFilterTabs.querySelectorAll('.tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      libFilter = btn.dataset.filter;
-      renderLibFilterTabs();
-      renderLib();
-    });
-  });
-}
-
-function renderLib(){
-  const term = libSearch.trim().toLowerCase();
-  let items = [];
-
-  if(libType === 'skills'){
-    items = REFERENCE_DATA.skills.filter(s => {
-      if(libFilter !== 'all' && s.department !== libFilter) return false;
-      if(!term) return true;
-      return (s.name + ' ' + s.purpose + ' ' + s.bestFor + ' ' + s.notes).toLowerCase().includes(term);
-    });
-  } else if(libType === 'shortcuts'){
-    items = REFERENCE_DATA.shortcuts.filter(s => {
-      if(libFilter !== 'all' && s.group !== libFilter) return false;
-      if(!term) return true;
-      return (s.label + ' ' + s.shortcut + ' ' + s.description).toLowerCase().includes(term);
-    });
-  } else {
-    items = REFERENCE_DATA.tools.filter(t => {
-      if(!term) return true;
-      return (t.tool + ' ' + t.purpose + ' ' + t.useCase).toLowerCase().includes(term);
-    });
-  }
-
-  libCount.textContent = items.length + (items.length === 1 ? ' entry' : ' entries');
-
-  if(items.length === 0){
-    libGrid.innerHTML = '<div class="empty">Nothing matches that search.</div>';
-    return;
-  }
-
-  if(libType === 'skills'){
-    libGrid.innerHTML = items.map((s, i) => `
-      <div class="card" data-lib="skills" data-idx="${i}">
-        <span class="card-tag">${escapeHtml(s.department)}</span>
-        <p class="card-title">${escapeHtml(s.name)}</p>
-        <p class="card-body">${escapeHtml(s.purpose)}</p>
-        <div class="card-footer">
-          <span class="card-badge">${escapeHtml(extractAccessTag(s.howToAccess) || 'Skills menu')}</span>
-        </div>
-      </div>
-    `).join('');
-  } else if(libType === 'shortcuts'){
-    libGrid.innerHTML = items.map((s, i) => `
-      <div class="card" data-lib="shortcuts" data-idx="${i}">
-        <span class="card-tag">${escapeHtml(s.group)}</span>
-        <p class="card-title">${escapeHtml(s.label)}</p>
-        <p class="card-body">${escapeHtml(s.description)}</p>
-        <div class="card-footer">
-          <span class="card-badge">${escapeHtml(s.shortcut)}</span>
-        </div>
-      </div>
-    `).join('');
-  } else {
-    libGrid.innerHTML = items.map((t, i) => `
-      <div class="card" data-lib="tools" data-idx="${i}">
-        <span class="card-tag">${escapeHtml(t.useCase)}</span>
-        <p class="card-title">${escapeHtml(t.tool)}</p>
-        <p class="card-body">${escapeHtml(t.purpose)}</p>
-        <div class="card-footer">
-          <span class="card-badge">${escapeHtml(t.pricing)}</span>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  // re-map indices back to filtered items for click handling
-  libGrid.querySelectorAll('.card').forEach((card, i) => {
-    card.addEventListener('click', () => openLibDetail(libType, items[i]));
-  });
-}
-
-function extractAccessTag(howToAccess){
-  if(!howToAccess) return '';
-  const match = howToAccess.match(/\/[a-z0-9-]+/i);
-  return match ? match[0] : '';
-}
-
-function openLibDetail(type, item){
-  const panel = document.getElementById('detailPanel');
-  let html = `<button class="close-x" id="detailClose">&times;</button>`;
-
-  if(type === 'skills'){
-    html += `
-      <h2>${escapeHtml(item.name)}</h2>
-      <p class="sub">${escapeHtml(item.department)}</p>
-      <div class="detail-block"><div class="detail-label">Purpose</div><div class="detail-value">${escapeHtml(item.purpose)}</div></div>
-      <div class="detail-block"><div class="detail-label">Sample prompt</div><div class="detail-value mono">${escapeHtml(item.samplePrompt)}</div></div>
-      <div class="detail-block"><div class="detail-label">Best for</div><div class="detail-value">${escapeHtml(item.bestFor)}</div></div>
-      <div class="detail-block"><div class="detail-label">Example output</div><div class="detail-value">${escapeHtml(item.exampleOutput)}</div></div>
-      <div class="detail-block"><div class="detail-label">How to access</div><div class="detail-value">${escapeHtml(item.howToAccess)}</div></div>
-      <div class="detail-block"><div class="detail-label">Notes</div><div class="detail-value">${escapeHtml(item.notes)}</div></div>
-      <div class="detail-block"><div class="detail-label">How it helps Oryx</div><div class="detail-tip">${escapeHtml(item.oryxTip)}</div></div>
-    `;
-  } else if(type === 'shortcuts'){
-    html += `
-      <h2>${escapeHtml(item.label)}</h2>
-      <p class="sub">${escapeHtml(item.group)}</p>
-      <div class="detail-block"><div class="detail-label">Shortcut</div><div class="detail-value mono">${escapeHtml(item.shortcut)}</div></div>
-      <div class="detail-block"><div class="detail-label">Description</div><div class="detail-value">${escapeHtml(item.description)}</div></div>
-      <div class="detail-block"><div class="detail-label">How to use it</div><div class="detail-value">${escapeHtml(item.howToUse)}</div></div>
-      <div class="detail-block"><div class="detail-label">Example</div><div class="detail-value">${escapeHtml(item.example)}</div></div>
-      <div class="detail-block"><div class="detail-label">Notes</div><div class="detail-value">${escapeHtml(item.notes)}</div></div>
-    `;
-  } else {
-    const linkHtml = item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener">${escapeHtml(item.link)}</a>` : 'Not provided';
-    html += `
-      <h2>${escapeHtml(item.tool)}</h2>
-      <p class="sub">${escapeHtml(item.useCase)}</p>
-      <div class="detail-block"><div class="detail-label">Purpose</div><div class="detail-value">${escapeHtml(item.purpose)}</div></div>
-      <div class="detail-block"><div class="detail-label">Pricing</div><div class="detail-value">${escapeHtml(item.pricing)}</div></div>
-      <div class="detail-block"><div class="detail-label">How to access</div><div class="detail-value">${escapeHtml(item.howToAccess)}</div></div>
-      <div class="detail-block"><div class="detail-label">Notes</div><div class="detail-value">${escapeHtml(item.notes)}</div></div>
-      <div class="detail-block"><div class="detail-label">How it helps Oryx</div><div class="detail-tip">${escapeHtml(item.oryxTip)}</div></div>
-      <div class="detail-block"><div class="detail-label">Link</div><div class="detail-value">${linkHtml}</div></div>
-    `;
-  }
-
-  panel.innerHTML = html;
-  document.getElementById('detailOverlay').classList.add('open');
-  document.getElementById('detailClose').addEventListener('click', closeLibDetail);
-}
 function closeLibDetail(){
   document.getElementById('detailOverlay').classList.remove('open');
 }
 document.getElementById('detailOverlay').addEventListener('click', (ev) => {
   if(ev.target.id === 'detailOverlay') closeLibDetail();
 });
-
-document.getElementById('libSubTabs').addEventListener('click', (ev) => {
-  const btn = ev.target.closest('.sub-tab');
-  if(!btn) return;
-  document.querySelectorAll('#libSubTabs .sub-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  libType = btn.dataset.lib;
-  libFilter = 'all';
-  renderLibFilterTabs();
-  renderLib();
-});
-libSearchInput.addEventListener('input', (ev) => {
-  libSearch = ev.target.value;
-  renderLib();
-});
-
-renderLibFilterTabs();
-renderLib();
 
 // ============= Team Notes (Firestore-backed) =============
 const CATEGORY_LABELS = {
@@ -622,11 +437,12 @@ function render(){
   grid.innerHTML = filtered.map(e => {
     const linkHtml = e.link ? `<div class="card-link"><a href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${escapeHtml(e.link)}</a></div>` : '';
     const dateStr = new Date(e.createdAt).toLocaleDateString(undefined, {month:'short', day:'numeric'});
+    const preview = e.category === 'skills' ? e.purpose : e.body;
     return `
-      <div class="card" style="cursor:default;">
-        <span class="card-tag">${escapeHtml(CATEGORY_LABELS[e.category] || e.category)}</span>
+      <div class="card" data-id="${e.id}">
+        <span class="card-tag">${escapeHtml(e.category === 'skills' && e.department ? e.department : (CATEGORY_LABELS[e.category] || e.category))}</span>
         <p class="card-title">${escapeHtml(e.title)}</p>
-        <p class="card-body">${escapeHtml(e.body)}</p>
+        <p class="card-body">${escapeHtml(preview)}</p>
         ${linkHtml}
         <div class="card-footer">
           <span>${escapeHtml(e.author || 'Anonymous')} · ${dateStr}</span>
@@ -635,6 +451,13 @@ function render(){
       </div>
     `;
   }).join('');
+
+  grid.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+      const entry = filtered.find(e => e.id === card.dataset.id);
+      if(entry) openNoteDetail(entry);
+    });
+  });
 
   grid.querySelectorAll('.card-del').forEach(btn => {
     btn.addEventListener('click', async (ev) => {
@@ -651,6 +474,44 @@ function render(){
       }
     });
   });
+}
+
+function openNoteDetail(entry){
+  const panel = document.getElementById('detailPanel');
+  const dateStr = new Date(entry.createdAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
+  const linkHtml = entry.link
+    ? `<a href="${escapeHtml(entry.link)}" target="_blank" rel="noopener">${escapeHtml(entry.link)}</a>`
+    : 'Not provided';
+
+  let html;
+  if(entry.category === 'skills'){
+    html = panelHeader(entry.department || CATEGORY_LABELS.skills, entry.title);
+    html += `
+      <div class="detail-block"><div class="detail-label">Purpose</div><div class="detail-value">${escapeHtml(entry.purpose)}</div></div>
+      <div class="detail-block"><div class="detail-label">Sample prompt</div><div class="detail-value mono">${escapeHtml(entry.samplePrompt)}</div></div>
+      <div class="detail-block"><div class="detail-label">Best for</div><div class="detail-value">${escapeHtml(entry.bestFor)}</div></div>
+      <div class="detail-block"><div class="detail-label">Example output</div><div class="detail-value">${escapeHtml(entry.exampleOutput)}</div></div>
+      <div class="detail-block"><div class="detail-label">How to access</div><div class="detail-value">${escapeHtml(entry.howToAccess)}</div></div>
+      <div class="detail-block"><div class="detail-label">Notes</div><div class="detail-value">${escapeHtml(entry.notes)}</div></div>
+      <div class="detail-block"><div class="detail-label">How it helps Oryx Doors and Windows</div><div class="detail-tip">${escapeHtml(entry.oryxTip)}</div></div>
+      <div class="detail-block"><div class="detail-label">Link</div><div class="detail-value">${linkHtml}</div></div>
+      <div class="detail-block"><div class="detail-label">Added by</div><div class="detail-value">${escapeHtml(entry.author || 'Anonymous')}</div></div>
+      <div class="detail-block"><div class="detail-label">Date added</div><div class="detail-value">${dateStr}</div></div>
+    `;
+  } else {
+    html = panelHeader(CATEGORY_LABELS[entry.category] || entry.category, entry.title);
+    html += `
+      <div class="detail-block"><div class="detail-label">Details</div><div class="detail-value">${escapeHtml(entry.body)}</div></div>
+      <div class="detail-block"><div class="detail-label">Link</div><div class="detail-value">${linkHtml}</div></div>
+      <div class="detail-block"><div class="detail-label">Added by</div><div class="detail-value">${escapeHtml(entry.author || 'Anonymous')}</div></div>
+      <div class="detail-block"><div class="detail-label">Date added</div><div class="detail-value">${dateStr}</div></div>
+    `;
+  }
+  html += `</div>`;
+
+  panel.innerHTML = html;
+  document.getElementById('detailOverlay').classList.add('open');
+  document.getElementById('detailClose').addEventListener('click', closeLibDetail);
 }
 
 tabsWrap.addEventListener('click', (ev) => {
@@ -672,11 +533,24 @@ const closePanel = document.getElementById('closePanel');
 const cancelAdd = document.getElementById('cancelAdd');
 const saveAdd = document.getElementById('saveAdd');
 
+const fCategory = document.getElementById('fCategory');
+const simpleFields = document.getElementById('simpleFields');
+const skillFields = document.getElementById('skillFields');
+const SKILL_FIELD_IDS = ['fDepartment','fPurpose','fSamplePrompt','fBestFor','fExampleOutput','fNotes','fHowToAccess','fOryxTip'];
+
+function toggleEntryFields(){
+  const isSkill = fCategory.value === 'skills';
+  simpleFields.style.display = isSkill ? 'none' : '';
+  skillFields.style.display = isSkill ? '' : 'none';
+}
+fCategory.addEventListener('change', toggleEntryFields);
+
 function openOverlay(){
   overlay.classList.add('open');
   let savedAuthor = '';
   try{ savedAuthor = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
   document.getElementById('fAuthor').value = savedAuthor;
+  toggleEntryFields();
 }
 function closeOverlay(){
   overlay.classList.remove('open');
@@ -685,6 +559,8 @@ function closeOverlay(){
   document.getElementById('fLink').value = '';
   document.getElementById('errTitle').style.display = 'none';
   document.getElementById('errBody').style.display = 'none';
+  document.getElementById('errPurpose').style.display = 'none';
+  SKILL_FIELD_IDS.forEach(id => { document.getElementById(id).value = ''; });
 }
 
 openAdd.addEventListener('click', openOverlay);
@@ -697,13 +573,26 @@ saveAdd.addEventListener('click', async () => {
   const body = document.getElementById('fBody').value.trim();
   const link = document.getElementById('fLink').value.trim();
   const author = document.getElementById('fAuthor').value.trim();
-  const category = document.getElementById('fCategory').value;
+  const category = fCategory.value;
+  const isSkill = category === 'skills';
+
+  const skillValues = {};
+  SKILL_FIELD_IDS.forEach(id => {
+    skillValues[id] = document.getElementById(id).value.trim();
+  });
 
   let valid = true;
   if(!title){ document.getElementById('errTitle').style.display = 'block'; valid = false; }
   else { document.getElementById('errTitle').style.display = 'none'; }
-  if(!body){ document.getElementById('errBody').style.display = 'block'; valid = false; }
-  else { document.getElementById('errBody').style.display = 'none'; }
+
+  if(isSkill){
+    if(!skillValues.fPurpose){ document.getElementById('errPurpose').style.display = 'block'; valid = false; }
+    else { document.getElementById('errPurpose').style.display = 'none'; }
+  } else {
+    if(!body){ document.getElementById('errBody').style.display = 'block'; valid = false; }
+    else { document.getElementById('errBody').style.display = 'none'; }
+  }
+
   if(link && !isValidLink(link)){
     alert('That link doesn\'t look valid. Include https:// or leave it blank.');
     valid = false;
@@ -713,12 +602,23 @@ saveAdd.addEventListener('click', async () => {
   saveAdd.disabled = true;
   saveAdd.textContent = 'Saving…';
 
+  const entryData = {
+    category, title, link,
+    author: author || 'Anonymous',
+    createdAt: Date.now(),
+    body: isSkill ? '' : body,
+    department: isSkill ? skillValues.fDepartment : '',
+    purpose: isSkill ? skillValues.fPurpose : '',
+    samplePrompt: isSkill ? skillValues.fSamplePrompt : '',
+    bestFor: isSkill ? skillValues.fBestFor : '',
+    exampleOutput: isSkill ? skillValues.fExampleOutput : '',
+    notes: isSkill ? skillValues.fNotes : '',
+    howToAccess: isSkill ? skillValues.fHowToAccess : '',
+    oryxTip: isSkill ? skillValues.fOryxTip : ''
+  };
+
   try{
-    await entriesCollection.add({
-      category, title, body, link,
-      author: author || 'Anonymous',
-      createdAt: Date.now()
-    });
+    await entriesCollection.add(entryData);
     if(author){
       try{ localStorage.setItem(AUTHOR_KEY, author); }catch(e){}
     }
