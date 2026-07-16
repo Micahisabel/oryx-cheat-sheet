@@ -35,9 +35,8 @@
   /* ---------- Header ---------- */
   header{
     position:relative;
-    padding:40px 48px 28px;
+    padding:40px 48px 0;
     overflow:hidden;
-    border-bottom:1px solid var(--line);
   }
   .sweep{
     position:absolute;
@@ -55,320 +54,185 @@
     justify-content:space-between;
     flex-wrap:wrap;
     gap:20px;
+    padding-bottom:24px;
   }
-  .brand-mark{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-  }
+  .brand-mark{display:flex;flex-direction:column;gap:6px;}
   .eyebrow{
-    font-family:var(--font-display);
-    font-weight:600;
-    font-size:12px;
-    letter-spacing:0.22em;
-    text-transform:uppercase;
-    color:var(--silver);
+    font-family:var(--font-display);font-weight:600;font-size:12px;
+    letter-spacing:0.22em;text-transform:uppercase;color:var(--silver);
   }
   h1{
-    font-family:var(--font-display);
-    font-weight:700;
-    font-size:34px;
-    letter-spacing:0.01em;
-    color:var(--oryx-blue);
-    margin:0;
+    font-family:var(--font-display);font-weight:700;font-size:34px;
+    letter-spacing:0.01em;color:var(--oryx-blue);margin:0;
   }
   .tagline{
-    font-size:13px;
-    letter-spacing:0.16em;
-    text-transform:uppercase;
-    font-family:var(--font-display);
-    font-weight:500;
-    color:var(--silver);
-    padding-top:10px;
-    border-top:1px solid var(--line);
-    margin-top:4px;
-    width:fit-content;
+    font-size:13px;letter-spacing:0.16em;text-transform:uppercase;
+    font-family:var(--font-display);font-weight:500;color:var(--silver);
+    padding-top:10px;border-top:1px solid var(--line);margin-top:4px;width:fit-content;
   }
-  .add-btn{
-    font-family:var(--font-display);
-    font-weight:600;
-    font-size:13px;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    background:var(--oryx-blue);
-    color:var(--white);
-    border:none;
-    padding:14px 22px;
-    cursor:pointer;
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    transition:background 0.15s ease;
-  }
-  .add-btn:hover{background:var(--oryx-blue-tint);}
   .sync-status{
-    font-size:11px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    font-family:var(--font-display);
-    font-weight:500;
-    color:var(--silver);
-    display:flex;
-    align-items:center;
-    gap:6px;
-    margin-top:2px;
+    font-size:11px;letter-spacing:0.08em;text-transform:uppercase;
+    font-family:var(--font-display);font-weight:500;color:var(--silver);
+    display:flex;align-items:center;gap:6px;margin-top:2px;
   }
-  .sync-status::before{
-    content:'';
-    width:6px;
-    height:6px;
-    border-radius:50%;
-    background:var(--silver);
-  }
+  .sync-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--silver);}
   .sync-status.live::before{background:#2f7a4d;}
   .sync-status.error::before{background:#8a2b2b;}
 
+  /* ---------- Main nav (Reference Library / Team Notes) ---------- */
+  .main-nav{
+    display:flex;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .main-nav-btn{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:16px 28px;
+    background:var(--white);
+    color:var(--silver);
+    border:none;
+    border-right:1px solid var(--line);
+    cursor:pointer;
+    transition:all 0.15s ease;
+  }
+  .main-nav-btn:hover{color:var(--oryx-blue);}
+  .main-nav-btn.active{color:var(--oryx-blue);background:var(--panel);box-shadow:inset 0 -2px 0 var(--oryx-blue);}
+
+  .view{display:none;padding:0 48px 64px;}
+  .view.active{display:block;}
+
   /* ---------- Controls ---------- */
   .controls{
-    padding:24px 48px;
+    padding:24px 0;
     display:flex;
     flex-wrap:wrap;
     gap:14px;
     align-items:center;
     border-bottom:1px solid var(--line);
   }
-  .search-wrap{
-    flex:1;
-    min-width:220px;
-    position:relative;
-  }
+  .search-wrap{flex:1;min-width:220px;position:relative;}
   .search-wrap input{
-    width:100%;
-    padding:12px 14px 12px 38px;
-    border:1px solid var(--line);
-    background:var(--panel);
-    font-family:var(--font-body);
-    font-size:14px;
-    color:var(--black);
+    width:100%;padding:12px 14px 12px 38px;border:1px solid var(--line);
+    background:var(--panel);font-family:var(--font-body);font-size:14px;color:var(--black);
   }
   .search-wrap input:focus{outline:none;border-color:var(--oryx-blue);}
-  .search-icon{
-    position:absolute;
-    left:12px;
-    top:50%;
-    transform:translateY(-50%);
-    width:16px;
-    height:16px;
-    color:var(--silver);
-  }
-  .tabs{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-  }
+  .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--silver);}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;}
   .tab{
-    font-family:var(--font-display);
-    font-weight:600;
-    font-size:11px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    padding:10px 14px;
-    border:1px solid var(--line);
-    background:var(--white);
-    color:var(--oryx-blue);
-    cursor:pointer;
-    transition:all 0.15s ease;
+    font-family:var(--font-display);font-weight:600;font-size:11px;letter-spacing:0.08em;
+    text-transform:uppercase;padding:10px 14px;border:1px solid var(--line);
+    background:var(--white);color:var(--oryx-blue);cursor:pointer;transition:all 0.15s ease;
   }
   .tab:hover{border-color:var(--oryx-blue);}
   .tab.active{background:var(--oryx-blue);color:var(--white);border-color:var(--oryx-blue);}
 
+  .sub-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-top:24px;}
+  .sub-tab{
+    font-family:var(--font-display);font-weight:600;font-size:12px;letter-spacing:0.08em;
+    text-transform:uppercase;padding:12px 18px;background:none;border:none;
+    color:var(--silver);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;
+  }
+  .sub-tab:hover{color:var(--oryx-blue);}
+  .sub-tab.active{color:var(--oryx-blue);border-bottom-color:var(--oryx-blue);}
+
   /* ---------- Grid ---------- */
-  main{padding:32px 48px 64px;}
   .count-row{
-    font-size:12px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:var(--silver);
-    font-family:var(--font-display);
-    font-weight:500;
-    margin-bottom:18px;
+    font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--silver);
+    font-family:var(--font-display);font-weight:500;margin:18px 0;
   }
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-    gap:20px;
-  }
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
   .card{
-    position:relative;
-    background:var(--white);
-    border:1px solid var(--line);
-    padding:20px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    transition:border-color 0.15s ease;
+    position:relative;background:var(--white);border:1px solid var(--line);padding:20px;
+    display:flex;flex-direction:column;gap:10px;transition:border-color 0.15s ease;cursor:pointer;
   }
   .card:hover{border-color:var(--oryx-blue);}
-  .card::before, .card::after,
-  .card .corner-br::before, .card .corner-br::after{
-    content:'';
-    position:absolute;
-    width:14px;
-    height:14px;
-    border:1px solid transparent;
-    transition:border-color 0.15s ease;
+  .card::before, .card::after{
+    content:'';position:absolute;width:14px;height:14px;border:1px solid transparent;transition:border-color 0.15s ease;
   }
   .card::before{top:-1px;left:-1px;border-top-color:var(--line);border-left-color:var(--line);}
   .card::after{top:-1px;right:-1px;border-top-color:var(--line);border-right-color:var(--line);}
   .card:hover::before{border-top-color:var(--oryx-blue);border-left-color:var(--oryx-blue);}
   .card:hover::after{border-top-color:var(--oryx-blue);border-right-color:var(--oryx-blue);}
-  .card-tag{
-    font-family:var(--font-display);
-    font-weight:600;
-    font-size:10px;
-    letter-spacing:0.1em;
-    text-transform:uppercase;
-    color:var(--oryx-blue);
-  }
-  .card-title{
-    font-family:var(--font-display);
-    font-weight:600;
-    font-size:16px;
-    color:var(--black);
-    margin:0;
-    line-height:1.3;
-  }
-  .card-body{
-    font-size:13.5px;
-    line-height:1.6;
-    color:#333;
-    white-space:pre-wrap;
-    margin:0;
-  }
-  .card-link{
-    font-size:12.5px;
-    word-break:break-all;
-  }
+  .card-tag{font-family:var(--font-display);font-weight:600;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--oryx-blue);}
+  .card-title{font-family:var(--font-display);font-weight:600;font-size:16px;color:var(--black);margin:0;line-height:1.3;}
+  .card-body{font-size:13.5px;line-height:1.6;color:#333;white-space:pre-wrap;margin:0;}
+  .card-link{font-size:12.5px;word-break:break-all;}
   .card-footer{
-    margin-top:auto;
-    padding-top:10px;
-    border-top:1px solid var(--line-soft);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    font-size:11px;
-    color:var(--silver);
+    margin-top:auto;padding-top:10px;border-top:1px solid var(--line-soft);
+    display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--silver);gap:8px;flex-wrap:wrap;
+  }
+  .card-badge{
+    font-family:var(--font-display);font-weight:600;font-size:10px;letter-spacing:0.05em;
+    text-transform:uppercase;background:var(--panel);color:var(--oryx-blue);padding:4px 8px;
   }
   .card-del{
-    background:none;
-    border:none;
-    color:var(--silver);
-    cursor:pointer;
-    font-size:11px;
-    letter-spacing:0.05em;
-    text-transform:uppercase;
-    font-family:var(--font-display);
-    padding:0;
+    background:none;border:none;color:var(--silver);cursor:pointer;font-size:11px;letter-spacing:0.05em;
+    text-transform:uppercase;font-family:var(--font-display);padding:0;
   }
   .card-del:hover{color:#8a2b2b;}
+  .empty{padding:60px 20px;text-align:center;color:var(--silver);font-size:14px;grid-column:1/-1;border:1px dashed var(--line);}
 
-  .empty{
-    padding:60px 20px;
-    text-align:center;
-    color:var(--silver);
-    font-size:14px;
-    grid-column:1/-1;
-    border:1px dashed var(--line);
+  .add-btn{
+    font-family:var(--font-display);font-weight:600;font-size:13px;letter-spacing:0.06em;
+    text-transform:uppercase;background:var(--oryx-blue);color:var(--white);border:none;
+    padding:14px 22px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background 0.15s ease;
   }
+  .add-btn:hover{background:var(--oryx-blue-tint);}
 
-  /* ---------- Modal ---------- */
+  /* ---------- Overlay / detail + add panel ---------- */
   .overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(2,42,58,0.35);
-    display:none;
-    align-items:flex-start;
-    justify-content:flex-end;
-    z-index:50;
+    position:fixed;inset:0;background:rgba(2,42,58,0.35);display:none;
+    align-items:flex-start;justify-content:flex-end;z-index:50;
   }
   .overlay.open{display:flex;}
   .panel{
-    background:var(--white);
-    width:420px;
-    max-width:100%;
-    height:100%;
-    overflow-y:auto;
-    padding:32px;
-    border-left:1px solid var(--line);
+    background:var(--white);width:460px;max-width:100%;height:100%;overflow-y:auto;
+    padding:32px;border-left:1px solid var(--line);
   }
-  .panel h2{
-    font-family:var(--font-display);
-    font-size:20px;
-    color:var(--oryx-blue);
-    margin:0 0 4px;
-  }
+  .panel h2{font-family:var(--font-display);font-size:20px;color:var(--oryx-blue);margin:0 0 4px;}
   .panel .sub{
-    font-size:12px;
-    color:var(--silver);
-    margin:0 0 24px;
-    text-transform:uppercase;
-    letter-spacing:0.08em;
-    font-family:var(--font-display);
+    font-size:12px;color:var(--silver);margin:0 0 24px;text-transform:uppercase;
+    letter-spacing:0.08em;font-family:var(--font-display);
   }
+  .detail-block{margin-bottom:20px;}
+  .detail-label{
+    font-family:var(--font-display);font-weight:600;font-size:11px;letter-spacing:0.08em;
+    text-transform:uppercase;color:var(--silver);margin-bottom:6px;
+  }
+  .detail-value{font-size:14px;line-height:1.65;color:var(--black);white-space:pre-wrap;}
+  .detail-value.mono{font-family:monospace;background:var(--panel);padding:10px 12px;font-size:13px;}
+  .detail-tip{background:var(--panel);border-left:3px solid var(--oryx-blue);padding:12px 14px;font-size:13.5px;line-height:1.6;}
+
   label{
-    display:block;
-    font-family:var(--font-display);
-    font-weight:600;
-    font-size:11px;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    color:var(--oryx-blue);
-    margin:18px 0 6px;
+    display:block;font-family:var(--font-display);font-weight:600;font-size:11px;letter-spacing:0.06em;
+    text-transform:uppercase;color:var(--oryx-blue);margin:18px 0 6px;
   }
   input[type=text], select, textarea{
-    width:100%;
-    padding:11px 12px;
-    border:1px solid var(--line);
-    background:var(--panel);
-    font-family:var(--font-body);
-    font-size:14px;
-    color:var(--black);
+    width:100%;padding:11px 12px;border:1px solid var(--line);background:var(--panel);
+    font-family:var(--font-body);font-size:14px;color:var(--black);
   }
   input[type=text]:focus, select:focus, textarea:focus{outline:none;border-color:var(--oryx-blue);}
   textarea{resize:vertical;min-height:100px;}
-  .panel-actions{
-    display:flex;
-    gap:10px;
-    margin-top:28px;
-  }
+  .panel-actions{display:flex;gap:10px;margin-top:28px;}
   .btn-primary, .btn-ghost{
-    font-family:var(--font-display);
-    font-weight:600;
-    font-size:12px;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    padding:12px 18px;
-    cursor:pointer;
-    border:1px solid var(--oryx-blue);
+    font-family:var(--font-display);font-weight:600;font-size:12px;letter-spacing:0.06em;
+    text-transform:uppercase;padding:12px 18px;cursor:pointer;border:1px solid var(--oryx-blue);
   }
   .btn-primary{background:var(--oryx-blue);color:var(--white);flex:1;}
   .btn-primary:hover{background:var(--oryx-blue-tint);}
   .btn-ghost{background:var(--white);color:var(--oryx-blue);}
   .close-x{
-    position:absolute;
-    top:28px;
-    right:28px;
-    background:none;
-    border:none;
-    cursor:pointer;
-    color:var(--silver);
-    font-size:20px;
-    line-height:1;
+    position:absolute;top:28px;right:28px;background:none;border:none;cursor:pointer;
+    color:var(--silver);font-size:20px;line-height:1;
   }
   .field-error{font-size:12px;color:#8a2b2b;margin-top:6px;display:none;}
 
   @media(max-width:640px){
-    header, .controls, main{padding-left:20px;padding-right:20px;}
+    header, .view{padding-left:20px;padding-right:20px;}
     .panel{width:100%;}
   }
 </style>
@@ -387,30 +251,62 @@
       <span class="tagline">Skills &amp; Commands &amp; Tips</span>
       <span class="sync-status" id="syncStatus">Connecting…</span>
     </div>
-    <button class="add-btn" id="openAdd">+ Add Entry</button>
+  </div>
+  <div class="main-nav">
+    <button class="main-nav-btn active" data-view="library">Reference Library</button>
+    <button class="main-nav-btn" data-view="notes">Team Notes</button>
   </div>
 </header>
 
-<div class="controls">
-  <div class="search-wrap">
-    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="searchInput" placeholder="Search entries…">
+<!-- ===================== REFERENCE LIBRARY ===================== -->
+<div class="view active" id="view-library">
+  <div class="sub-tabs" id="libSubTabs">
+    <button class="sub-tab active" data-lib="skills">Skills</button>
+    <button class="sub-tab" data-lib="shortcuts">Shortcuts</button>
+    <button class="sub-tab" data-lib="tools">AI Tools</button>
   </div>
-  <div class="tabs" id="tabs">
-    <button class="tab active" data-cat="all">All</button>
-    <button class="tab" data-cat="commands">Commands</button>
-    <button class="tab" data-cat="prompting">Prompting</button>
-    <button class="tab" data-cat="skills">Skills &amp; Workflows</button>
-    <button class="tab" data-cat="resources">Resources</button>
-    <button class="tab" data-cat="discoveries">Discoveries</button>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="libSearch" placeholder="Search the reference library…">
+    </div>
+    <div class="tabs" id="libFilterTabs"></div>
   </div>
+
+  <div class="count-row" id="libCount"></div>
+  <div class="grid" id="libGrid"></div>
 </div>
 
-<main>
+<!-- ===================== TEAM NOTES ===================== -->
+<div class="view" id="view-notes">
+  <div class="controls" style="border-bottom:none;padding-top:24px;">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search team notes…">
+    </div>
+    <button class="add-btn" id="openAdd">+ Add Entry</button>
+  </div>
+  <div class="controls" style="padding-top:0;">
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-cat="all">All</button>
+      <button class="tab" data-cat="commands">Commands</button>
+      <button class="tab" data-cat="prompting">Prompting</button>
+      <button class="tab" data-cat="skills">Skills &amp; Workflows</button>
+      <button class="tab" data-cat="resources">Resources</button>
+      <button class="tab" data-cat="discoveries">Discoveries</button>
+    </div>
+  </div>
   <div class="count-row" id="countRow">Loading entries…</div>
   <div class="grid" id="grid"></div>
-</main>
+</div>
 
+<!-- Detail panel (Reference Library) -->
+<div class="overlay" id="detailOverlay">
+  <div class="panel" id="detailPanel"></div>
+</div>
+
+<!-- Add entry panel (Team Notes) -->
 <div class="overlay" id="overlay">
   <div class="panel">
     <button class="close-x" id="closePanel">&times;</button>
@@ -448,7 +344,11 @@
 </div>
 
 <script>
-// Paste your Firebase config here — from Firebase console > Project settings > Your apps
+const REFERENCE_DATA = {"skills": [], "shortcuts": [], "tools": []};
+</script>
+
+<script>
+// ============= Firebase =============
 const firebaseConfig = {
   apiKey: "AIzaSyAyux2Zu-651KTK7w8BowxbV9Hjb6t_2UE",
   authDomain: "oryx-cheat-sheet.firebaseapp.com",
@@ -457,13 +357,219 @@ const firebaseConfig = {
   messagingSenderId: "449130107014",
   appId: "1:449130107014:web:6539982ce0bdc1fb910107"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const entriesCollection = db.collection('entries');
-
 const AUTHOR_KEY = 'oryx-cheatsheet-author-name';
 const syncStatusEl = document.getElementById('syncStatus');
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str == null ? '' : String(str);
+  return d.innerHTML;
+}
+function isValidLink(url){
+  try{ const u = new URL(url); return u.protocol === 'http:' || u.protocol === 'https:'; }catch(e){ return false; }
+}
+
+// ============= Main nav (Reference Library / Team Notes) =============
+document.querySelectorAll('.main-nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.main-nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + btn.dataset.view).classList.add('active');
+  });
+});
+
+// ============= Reference Library =============
+let libType = 'skills';
+let libFilter = 'all';
+let libSearch = '';
+
+const libGrid = document.getElementById('libGrid');
+const libCount = document.getElementById('libCount');
+const libFilterTabs = document.getElementById('libFilterTabs');
+const libSearchInput = document.getElementById('libSearch');
+
+function departmentOptions(){
+  const set = new Set(REFERENCE_DATA.skills.map(s => s.department).filter(Boolean));
+  return Array.from(set);
+}
+function shortcutGroupOptions(){
+  const set = new Set(REFERENCE_DATA.shortcuts.map(s => s.group).filter(Boolean));
+  return Array.from(set);
+}
+
+function renderLibFilterTabs(){
+  let opts = [];
+  if(libType === 'skills') opts = departmentOptions();
+  else if(libType === 'shortcuts') opts = shortcutGroupOptions();
+  else opts = [];
+
+  if(opts.length === 0){
+    libFilterTabs.innerHTML = '';
+    return;
+  }
+  const allBtn = `<button class="tab ${libFilter==='all'?'active':''}" data-filter="all">All</button>`;
+  const rest = opts.map(o => `<button class="tab ${libFilter===o?'active':''}" data-filter="${escapeHtml(o)}">${escapeHtml(o)}</button>`).join('');
+  libFilterTabs.innerHTML = allBtn + rest;
+  libFilterTabs.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      libFilter = btn.dataset.filter;
+      renderLibFilterTabs();
+      renderLib();
+    });
+  });
+}
+
+function renderLib(){
+  const term = libSearch.trim().toLowerCase();
+  let items = [];
+
+  if(libType === 'skills'){
+    items = REFERENCE_DATA.skills.filter(s => {
+      if(libFilter !== 'all' && s.department !== libFilter) return false;
+      if(!term) return true;
+      return (s.name + ' ' + s.purpose + ' ' + s.bestFor + ' ' + s.notes).toLowerCase().includes(term);
+    });
+  } else if(libType === 'shortcuts'){
+    items = REFERENCE_DATA.shortcuts.filter(s => {
+      if(libFilter !== 'all' && s.group !== libFilter) return false;
+      if(!term) return true;
+      return (s.label + ' ' + s.shortcut + ' ' + s.description).toLowerCase().includes(term);
+    });
+  } else {
+    items = REFERENCE_DATA.tools.filter(t => {
+      if(!term) return true;
+      return (t.tool + ' ' + t.purpose + ' ' + t.useCase).toLowerCase().includes(term);
+    });
+  }
+
+  libCount.textContent = items.length + (items.length === 1 ? ' entry' : ' entries');
+
+  if(items.length === 0){
+    libGrid.innerHTML = '<div class="empty">Nothing matches that search.</div>';
+    return;
+  }
+
+  if(libType === 'skills'){
+    libGrid.innerHTML = items.map((s, i) => `
+      <div class="card" data-lib="skills" data-idx="${i}">
+        <span class="card-tag">${escapeHtml(s.department)}</span>
+        <p class="card-title">${escapeHtml(s.name)}</p>
+        <p class="card-body">${escapeHtml(s.purpose)}</p>
+        <div class="card-footer">
+          <span class="card-badge">${escapeHtml(extractAccessTag(s.howToAccess) || 'Skills menu')}</span>
+        </div>
+      </div>
+    `).join('');
+  } else if(libType === 'shortcuts'){
+    libGrid.innerHTML = items.map((s, i) => `
+      <div class="card" data-lib="shortcuts" data-idx="${i}">
+        <span class="card-tag">${escapeHtml(s.group)}</span>
+        <p class="card-title">${escapeHtml(s.label)}</p>
+        <p class="card-body">${escapeHtml(s.description)}</p>
+        <div class="card-footer">
+          <span class="card-badge">${escapeHtml(s.shortcut)}</span>
+        </div>
+      </div>
+    `).join('');
+  } else {
+    libGrid.innerHTML = items.map((t, i) => `
+      <div class="card" data-lib="tools" data-idx="${i}">
+        <span class="card-tag">${escapeHtml(t.useCase)}</span>
+        <p class="card-title">${escapeHtml(t.tool)}</p>
+        <p class="card-body">${escapeHtml(t.purpose)}</p>
+        <div class="card-footer">
+          <span class="card-badge">${escapeHtml(t.pricing)}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // re-map indices back to filtered items for click handling
+  libGrid.querySelectorAll('.card').forEach((card, i) => {
+    card.addEventListener('click', () => openLibDetail(libType, items[i]));
+  });
+}
+
+function extractAccessTag(howToAccess){
+  if(!howToAccess) return '';
+  const match = howToAccess.match(/\/[a-z0-9-]+/i);
+  return match ? match[0] : '';
+}
+
+function openLibDetail(type, item){
+  const panel = document.getElementById('detailPanel');
+  let html = `<button class="close-x" id="detailClose">&times;</button>`;
+
+  if(type === 'skills'){
+    html += `
+      <h2>${escapeHtml(item.name)}</h2>
+      <p class="sub">${escapeHtml(item.department)}</p>
+      <div class="detail-block"><div class="detail-label">Purpose</div><div class="detail-value">${escapeHtml(item.purpose)}</div></div>
+      <div class="detail-block"><div class="detail-label">Sample prompt</div><div class="detail-value mono">${escapeHtml(item.samplePrompt)}</div></div>
+      <div class="detail-block"><div class="detail-label">Best for</div><div class="detail-value">${escapeHtml(item.bestFor)}</div></div>
+      <div class="detail-block"><div class="detail-label">Example output</div><div class="detail-value">${escapeHtml(item.exampleOutput)}</div></div>
+      <div class="detail-block"><div class="detail-label">How to access</div><div class="detail-value">${escapeHtml(item.howToAccess)}</div></div>
+      <div class="detail-block"><div class="detail-label">Notes</div><div class="detail-value">${escapeHtml(item.notes)}</div></div>
+      <div class="detail-block"><div class="detail-label">How it helps Oryx</div><div class="detail-tip">${escapeHtml(item.oryxTip)}</div></div>
+    `;
+  } else if(type === 'shortcuts'){
+    html += `
+      <h2>${escapeHtml(item.label)}</h2>
+      <p class="sub">${escapeHtml(item.group)}</p>
+      <div class="detail-block"><div class="detail-label">Shortcut</div><div class="detail-value mono">${escapeHtml(item.shortcut)}</div></div>
+      <div class="detail-block"><div class="detail-label">Description</div><div class="detail-value">${escapeHtml(item.description)}</div></div>
+      <div class="detail-block"><div class="detail-label">How to use it</div><div class="detail-value">${escapeHtml(item.howToUse)}</div></div>
+      <div class="detail-block"><div class="detail-label">Example</div><div class="detail-value">${escapeHtml(item.example)}</div></div>
+      <div class="detail-block"><div class="detail-label">Notes</div><div class="detail-value">${escapeHtml(item.notes)}</div></div>
+    `;
+  } else {
+    const linkHtml = item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener">${escapeHtml(item.link)}</a>` : 'Not provided';
+    html += `
+      <h2>${escapeHtml(item.tool)}</h2>
+      <p class="sub">${escapeHtml(item.useCase)}</p>
+      <div class="detail-block"><div class="detail-label">Purpose</div><div class="detail-value">${escapeHtml(item.purpose)}</div></div>
+      <div class="detail-block"><div class="detail-label">Pricing</div><div class="detail-value">${escapeHtml(item.pricing)}</div></div>
+      <div class="detail-block"><div class="detail-label">How to access</div><div class="detail-value">${escapeHtml(item.howToAccess)}</div></div>
+      <div class="detail-block"><div class="detail-label">Notes</div><div class="detail-value">${escapeHtml(item.notes)}</div></div>
+      <div class="detail-block"><div class="detail-label">How it helps Oryx</div><div class="detail-tip">${escapeHtml(item.oryxTip)}</div></div>
+      <div class="detail-block"><div class="detail-label">Link</div><div class="detail-value">${linkHtml}</div></div>
+    `;
+  }
+
+  panel.innerHTML = html;
+  document.getElementById('detailOverlay').classList.add('open');
+  document.getElementById('detailClose').addEventListener('click', closeLibDetail);
+}
+function closeLibDetail(){
+  document.getElementById('detailOverlay').classList.remove('open');
+}
+document.getElementById('detailOverlay').addEventListener('click', (ev) => {
+  if(ev.target.id === 'detailOverlay') closeLibDetail();
+});
+
+document.getElementById('libSubTabs').addEventListener('click', (ev) => {
+  const btn = ev.target.closest('.sub-tab');
+  if(!btn) return;
+  document.querySelectorAll('#libSubTabs .sub-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  libType = btn.dataset.lib;
+  libFilter = 'all';
+  renderLibFilterTabs();
+  renderLib();
+});
+libSearchInput.addEventListener('input', (ev) => {
+  libSearch = ev.target.value;
+  renderLib();
+});
+
+renderLibFilterTabs();
+renderLib();
+
+// ============= Team Notes (Firestore-backed) =============
 const CATEGORY_LABELS = {
   commands: 'Commands / CLI',
   prompting: 'Prompting technique',
@@ -480,21 +586,6 @@ const grid = document.getElementById('grid');
 const countRow = document.getElementById('countRow');
 const tabsWrap = document.getElementById('tabs');
 const overlay = document.getElementById('overlay');
-
-function escapeHtml(str){
-  const d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
-}
-
-function isValidLink(url){
-  try{
-    const u = new URL(url);
-    return u.protocol === 'http:' || u.protocol === 'https:';
-  }catch(e){
-    return false;
-  }
-}
 
 function listenForEntries(){
   entriesCollection.orderBy('createdAt', 'desc').onSnapshot(
@@ -532,7 +623,7 @@ function render(){
     const linkHtml = e.link ? `<div class="card-link"><a href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${escapeHtml(e.link)}</a></div>` : '';
     const dateStr = new Date(e.createdAt).toLocaleDateString(undefined, {month:'short', day:'numeric'});
     return `
-      <div class="card">
+      <div class="card" style="cursor:default;">
         <span class="card-tag">${escapeHtml(CATEGORY_LABELS[e.category] || e.category)}</span>
         <p class="card-title">${escapeHtml(e.title)}</p>
         <p class="card-body">${escapeHtml(e.body)}</p>
@@ -546,7 +637,8 @@ function render(){
   }).join('');
 
   grid.querySelectorAll('.card-del').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (ev) => {
+      ev.stopPropagation();
       const id = btn.dataset.id;
       btn.disabled = true;
       btn.textContent = 'Removing…';
