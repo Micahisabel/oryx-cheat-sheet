@@ -85,21 +85,15 @@
     border-top:1px solid var(--line);
     border-bottom:1px solid var(--line);
   }
-  .main-nav-btn{
-    font-family:var(--font-display);
-    font-weight:600;
-    font-size:13px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    padding:16px 28px;
-    background:var(--white);
-    color:var(--silver);
-    border:none;
-    border-right:1px solid var(--line);
-    cursor:pointer;
-    transition:all 0.15s ease;
+  .main-nav-btn,.tab,.sub-tab{
+    font-family:var(--font-display);font-weight:600;letter-spacing:0.08em;
+    text-transform:uppercase;cursor:pointer;transition:all 0.15s ease;
   }
-  .main-nav-btn:hover{color:var(--oryx-blue);}
+  .main-nav-btn{
+    font-size:13px;padding:16px 28px;background:var(--white);color:var(--silver);
+    border:none;border-right:1px solid var(--line);
+  }
+  .main-nav-btn:hover,.sub-tab:hover{color:var(--oryx-blue);}
   .main-nav-btn.active{color:var(--oryx-blue);background:var(--panel);box-shadow:inset 0 -2px 0 var(--oryx-blue);}
 
   .view{display:none;padding:0 48px 64px;}
@@ -123,20 +117,17 @@
   .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--silver);}
   .tabs{display:flex;flex-wrap:wrap;gap:8px;}
   .tab{
-    font-family:var(--font-display);font-weight:600;font-size:11px;letter-spacing:0.08em;
-    text-transform:uppercase;padding:10px 14px;border:1px solid var(--line);
-    background:var(--white);color:var(--oryx-blue);cursor:pointer;transition:all 0.15s ease;
+    font-size:11px;padding:10px 14px;border:1px solid var(--line);
+    background:var(--white);color:var(--oryx-blue);
   }
   .tab:hover{border-color:var(--oryx-blue);}
   .tab.active{background:var(--oryx-blue);color:var(--white);border-color:var(--oryx-blue);}
 
   .sub-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-top:24px;}
   .sub-tab{
-    font-family:var(--font-display);font-weight:600;font-size:12px;letter-spacing:0.08em;
-    text-transform:uppercase;padding:12px 18px;background:none;border:none;
-    color:var(--silver);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;
+    font-size:12px;padding:12px 18px;background:none;border:none;
+    color:var(--silver);border-bottom:2px solid transparent;margin-bottom:-1px;
   }
-  .sub-tab:hover{color:var(--oryx-blue);}
   .sub-tab.active{color:var(--oryx-blue);border-bottom-color:var(--oryx-blue);}
 
   /* ---------- Grid ---------- */
@@ -440,6 +431,12 @@ function panelHeader(eyebrow, title){
     <div class="panel-body">
   `;
 }
+function detailBlock(label, value, valueClass){
+  return `<div class="detail-block"><div class="detail-label">${escapeHtml(label)}</div><div class="${valueClass || 'detail-value'}">${escapeHtml(value)}</div></div>`;
+}
+function detailBlockHtml(label, valueHtml, valueClass){
+  return `<div class="detail-block"><div class="detail-label">${escapeHtml(label)}</div><div class="${valueClass || 'detail-value'}">${valueHtml}</div></div>`;
+}
 
 function closeLibDetail(){
   document.getElementById('detailOverlay').classList.remove('open');
@@ -582,35 +579,29 @@ function openLibDetail(type, item){
 
   if(type === 'skills'){
     html += panelHeader(item.department, item.name);
-    html += `
-      <div class="detail-block"><div class="detail-label">Purpose</div><div class="detail-value">${escapeHtml(item.purpose)}</div></div>
-      <div class="detail-block"><div class="detail-label">Sample prompt</div><div class="detail-value mono">${escapeHtml(item.samplePrompt)}</div></div>
-      <div class="detail-block"><div class="detail-label">Best for</div><div class="detail-value">${escapeHtml(item.bestFor)}</div></div>
-      <div class="detail-block"><div class="detail-label">Example output</div><div class="detail-value">${escapeHtml(item.exampleOutput)}</div></div>
-      <div class="detail-block"><div class="detail-label">How to access</div><div class="detail-value">${escapeHtml(item.howToAccess)}</div></div>
-      <div class="detail-block"><div class="detail-label">Notes</div><div class="detail-value">${escapeHtml(item.notes)}</div></div>
-      <div class="detail-block"><div class="detail-label">How it helps Oryx</div><div class="detail-tip">${escapeHtml(item.oryxTip)}</div></div>
-    `;
+    html += detailBlock('Purpose', item.purpose)
+      + detailBlock('Sample prompt', item.samplePrompt, 'detail-value mono')
+      + detailBlock('Best for', item.bestFor)
+      + detailBlock('Example output', item.exampleOutput)
+      + detailBlock('How to access', item.howToAccess)
+      + detailBlock('Notes', item.notes)
+      + detailBlock('How it helps Oryx', item.oryxTip, 'detail-tip');
   } else if(type === 'shortcuts'){
     html += panelHeader(item.group, item.label);
-    html += `
-      <div class="detail-block"><div class="detail-label">Shortcut</div><div class="detail-value mono">${escapeHtml(item.shortcut)}</div></div>
-      <div class="detail-block"><div class="detail-label">Description</div><div class="detail-value">${escapeHtml(item.description)}</div></div>
-      <div class="detail-block"><div class="detail-label">How to use it</div><div class="detail-value">${escapeHtml(item.howToUse)}</div></div>
-      <div class="detail-block"><div class="detail-label">Example</div><div class="detail-value">${escapeHtml(item.example)}</div></div>
-      <div class="detail-block"><div class="detail-label">Notes</div><div class="detail-value">${escapeHtml(item.notes)}</div></div>
-    `;
+    html += detailBlock('Shortcut', item.shortcut, 'detail-value mono')
+      + detailBlock('Description', item.description)
+      + detailBlock('How to use it', item.howToUse)
+      + detailBlock('Example', item.example)
+      + detailBlock('Notes', item.notes);
   } else {
     const linkHtml = item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener">${escapeHtml(item.link)}</a>` : 'Not provided';
     html += panelHeader(item.useCase, item.tool);
-    html += `
-      <div class="detail-block"><div class="detail-label">Purpose</div><div class="detail-value">${escapeHtml(item.purpose)}</div></div>
-      <div class="detail-block"><div class="detail-label">Pricing</div><div class="detail-value">${escapeHtml(item.pricing)}</div></div>
-      <div class="detail-block"><div class="detail-label">How to access</div><div class="detail-value">${escapeHtml(item.howToAccess)}</div></div>
-      <div class="detail-block"><div class="detail-label">Notes</div><div class="detail-value">${escapeHtml(item.notes)}</div></div>
-      <div class="detail-block"><div class="detail-label">How it helps Oryx</div><div class="detail-tip">${escapeHtml(item.oryxTip)}</div></div>
-      <div class="detail-block"><div class="detail-label">Link</div><div class="detail-value">${linkHtml}</div></div>
-    `;
+    html += detailBlock('Purpose', item.purpose)
+      + detailBlock('Pricing', item.pricing)
+      + detailBlock('How to access', item.howToAccess)
+      + detailBlock('Notes', item.notes)
+      + detailBlock('How it helps Oryx', item.oryxTip, 'detail-tip')
+      + detailBlockHtml('Link', linkHtml);
   }
   html += `</div>`;
 
@@ -736,29 +727,24 @@ function openNoteDetail(entry){
     ? `<a href="${escapeHtml(entry.link)}" target="_blank" rel="noopener">${escapeHtml(entry.link)}</a>`
     : 'Not provided';
 
+  const meta = detailBlockHtml('Link', linkHtml)
+    + detailBlock('Added by', entry.author || 'Anonymous')
+    + detailBlock('Date added', dateStr);
+
   let html;
   if(entry.category === 'skills'){
     html = panelHeader(entry.department || CATEGORY_LABELS.skills, entry.title);
-    html += `
-      <div class="detail-block"><div class="detail-label">Purpose</div><div class="detail-value">${escapeHtml(entry.purpose)}</div></div>
-      <div class="detail-block"><div class="detail-label">Sample prompt</div><div class="detail-value mono">${escapeHtml(entry.samplePrompt)}</div></div>
-      <div class="detail-block"><div class="detail-label">Best for</div><div class="detail-value">${escapeHtml(entry.bestFor)}</div></div>
-      <div class="detail-block"><div class="detail-label">Example output</div><div class="detail-value">${escapeHtml(entry.exampleOutput)}</div></div>
-      <div class="detail-block"><div class="detail-label">How to access</div><div class="detail-value">${escapeHtml(entry.howToAccess)}</div></div>
-      <div class="detail-block"><div class="detail-label">Notes</div><div class="detail-value">${escapeHtml(entry.notes)}</div></div>
-      <div class="detail-block"><div class="detail-label">How it helps Oryx Doors and Windows</div><div class="detail-tip">${escapeHtml(entry.oryxTip)}</div></div>
-      <div class="detail-block"><div class="detail-label">Link</div><div class="detail-value">${linkHtml}</div></div>
-      <div class="detail-block"><div class="detail-label">Added by</div><div class="detail-value">${escapeHtml(entry.author || 'Anonymous')}</div></div>
-      <div class="detail-block"><div class="detail-label">Date added</div><div class="detail-value">${dateStr}</div></div>
-    `;
+    html += detailBlock('Purpose', entry.purpose)
+      + detailBlock('Sample prompt', entry.samplePrompt, 'detail-value mono')
+      + detailBlock('Best for', entry.bestFor)
+      + detailBlock('Example output', entry.exampleOutput)
+      + detailBlock('How to access', entry.howToAccess)
+      + detailBlock('Notes', entry.notes)
+      + detailBlock('How it helps Oryx Doors and Windows', entry.oryxTip, 'detail-tip')
+      + meta;
   } else {
     html = panelHeader(CATEGORY_LABELS[entry.category] || entry.category, entry.title);
-    html += `
-      <div class="detail-block"><div class="detail-label">Details</div><div class="detail-value">${escapeHtml(entry.body)}</div></div>
-      <div class="detail-block"><div class="detail-label">Link</div><div class="detail-value">${linkHtml}</div></div>
-      <div class="detail-block"><div class="detail-label">Added by</div><div class="detail-value">${escapeHtml(entry.author || 'Anonymous')}</div></div>
-      <div class="detail-block"><div class="detail-label">Date added</div><div class="detail-value">${dateStr}</div></div>
-    `;
+    html += detailBlock('Details', entry.body) + meta;
   }
   html += `</div>`;
 
