@@ -82,22 +82,10 @@
   .sync-status.live::before{background:#4caf7d;}
   .sync-status.error::before{background:#c15656;}
 
-  /* ---------- Main nav (Reference Library / Team Notes) ---------- */
-  .main-nav{
-    display:flex;
-    border-top:1px solid rgba(255,255,255,0.16);
-  }
-  .main-nav-btn,.tab,.sub-tab{
+  .tab{
     font-family:var(--font-display);font-weight:600;letter-spacing:0.08em;
     text-transform:uppercase;cursor:pointer;transition:all 0.15s ease;
   }
-  .main-nav-btn{
-    font-size:13px;padding:16px 28px;background:transparent;color:var(--silver);
-    border:none;border-right:1px solid rgba(255,255,255,0.16);
-  }
-  .main-nav-btn:hover{color:var(--white);}
-  .sub-tab:hover{color:var(--oryx-blue);}
-  .main-nav-btn.active{color:var(--white);background:var(--oryx-blue-tint);box-shadow:inset 0 -2px 0 var(--white);}
 
   .view{display:none;padding:0 48px 64px;}
   .view.active{display:block;}
@@ -125,13 +113,6 @@
   }
   .tab:hover{border-color:var(--oryx-blue);}
   .tab.active{background:var(--oryx-blue);color:var(--white);border-color:var(--oryx-blue);}
-
-  .sub-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-top:24px;}
-  .sub-tab{
-    font-size:12px;padding:12px 18px;background:none;border:none;
-    color:var(--silver);border-bottom:2px solid transparent;margin-bottom:-1px;
-  }
-  .sub-tab.active{color:var(--oryx-blue);border-bottom-color:var(--oryx-blue);}
 
   /* ---------- Grid ---------- */
   .count-row{
@@ -268,38 +249,14 @@
       <span class="sync-status" id="syncStatus">Connecting…</span>
     </div>
   </div>
-  <div class="main-nav">
-    <button class="main-nav-btn active" data-view="library">Reference Library</button>
-    <button class="main-nav-btn" data-view="notes">Team Notes</button>
-  </div>
 </header>
 
-<!-- ===================== REFERENCE LIBRARY ===================== -->
-<div class="view active" id="view-library">
-  <div class="sub-tabs" id="libSubTabs">
-    <button class="sub-tab active" data-lib="skills">Skills</button>
-    <button class="sub-tab" data-lib="shortcuts">Shortcuts</button>
-    <button class="sub-tab" data-lib="tools">AI Tools</button>
-  </div>
-
-  <div class="controls">
-    <div class="search-wrap">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="libSearch" placeholder="Search the reference library…">
-    </div>
-    <div class="tabs" id="libFilterTabs"></div>
-  </div>
-
-  <div class="count-row" id="libCount"></div>
-  <div class="grid" id="libGrid"></div>
-</div>
-
-<!-- ===================== TEAM NOTES ===================== -->
-<div class="view" id="view-notes">
+<!-- ===================== KNOWLEDGE BASE ===================== -->
+<div class="view active" id="view-notes">
   <div class="controls" style="border-bottom:none;padding-top:24px;">
     <div class="search-wrap">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="searchInput" placeholder="Search team notes…">
+      <input type="text" id="searchInput" placeholder="Search the knowledge base…">
     </div>
     <button class="add-btn" id="openAdd">+ Add Entry</button>
   </div>
@@ -317,12 +274,12 @@
   <div class="grid" id="grid"></div>
 </div>
 
-<!-- Detail panel (Team Notes) -->
+<!-- Detail panel (Knowledge Base) -->
 <div class="overlay" id="detailOverlay">
   <div class="panel" id="detailPanel"></div>
 </div>
 
-<!-- Add entry panel (Team Notes) -->
+<!-- Add entry panel (Knowledge Base) -->
 <div class="overlay" id="overlay">
   <div class="panel">
     <button class="close-x" id="closePanel">&times;</button>
@@ -389,10 +346,6 @@
 </div>
 
 <script>
-const REFERENCE_DATA = {"skills": [], "shortcuts": [], "tools": []};
-</script>
-
-<script>
 // ============= Firebase =============
 const firebaseConfig = {
   apiKey: "AIzaSyAyux2Zu-651KTK7w8BowxbV9Hjb6t_2UE",
@@ -441,197 +394,14 @@ function detailBlockHtml(label, valueHtml, valueClass){
   return `<div class="detail-block"><div class="detail-label">${escapeHtml(label)}</div><div class="${valueClass || 'detail-value'}">${valueHtml}</div></div>`;
 }
 
-function closeLibDetail(){
+function closeDetail(){
   document.getElementById('detailOverlay').classList.remove('open');
 }
 document.getElementById('detailOverlay').addEventListener('click', (ev) => {
-  if(ev.target.id === 'detailOverlay') closeLibDetail();
+  if(ev.target.id === 'detailOverlay') closeDetail();
 });
 
-// ============= Main nav (Reference Library / Team Notes) =============
-document.querySelectorAll('.main-nav-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.main-nav-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('view-' + btn.dataset.view).classList.add('active');
-  });
-});
-
-// ============= Reference Library =============
-let libType = 'skills';
-let libFilter = 'all';
-let libSearch = '';
-
-const libGrid = document.getElementById('libGrid');
-const libCount = document.getElementById('libCount');
-const libFilterTabs = document.getElementById('libFilterTabs');
-const libSearchInput = document.getElementById('libSearch');
-
-function departmentOptions(){
-  const set = new Set(REFERENCE_DATA.skills.map(s => s.department).filter(Boolean));
-  return Array.from(set);
-}
-function shortcutGroupOptions(){
-  const set = new Set(REFERENCE_DATA.shortcuts.map(s => s.group).filter(Boolean));
-  return Array.from(set);
-}
-
-function renderLibFilterTabs(){
-  let opts = [];
-  if(libType === 'skills') opts = departmentOptions();
-  else if(libType === 'shortcuts') opts = shortcutGroupOptions();
-  else opts = [];
-
-  if(opts.length === 0){
-    libFilterTabs.innerHTML = '';
-    return;
-  }
-  const allBtn = `<button class="tab ${libFilter==='all'?'active':''}" data-filter="all">All</button>`;
-  const rest = opts.map(o => `<button class="tab ${libFilter===o?'active':''}" data-filter="${escapeHtml(o)}">${escapeHtml(o)}</button>`).join('');
-  libFilterTabs.innerHTML = allBtn + rest;
-  libFilterTabs.querySelectorAll('.tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      libFilter = btn.dataset.filter;
-      renderLibFilterTabs();
-      renderLib();
-    });
-  });
-}
-
-function renderLib(){
-  const term = libSearch.trim().toLowerCase();
-  let items = [];
-
-  if(libType === 'skills'){
-    items = REFERENCE_DATA.skills.filter(s => {
-      if(libFilter !== 'all' && s.department !== libFilter) return false;
-      if(!term) return true;
-      return (s.name + ' ' + s.purpose + ' ' + s.bestFor + ' ' + s.notes).toLowerCase().includes(term);
-    });
-  } else if(libType === 'shortcuts'){
-    items = REFERENCE_DATA.shortcuts.filter(s => {
-      if(libFilter !== 'all' && s.group !== libFilter) return false;
-      if(!term) return true;
-      return (s.label + ' ' + s.shortcut + ' ' + s.description).toLowerCase().includes(term);
-    });
-  } else {
-    items = REFERENCE_DATA.tools.filter(t => {
-      if(!term) return true;
-      return (t.tool + ' ' + t.purpose + ' ' + t.useCase).toLowerCase().includes(term);
-    });
-  }
-
-  libCount.textContent = items.length + (items.length === 1 ? ' entry' : ' entries');
-
-  if(items.length === 0){
-    libGrid.innerHTML = '<div class="empty">Nothing matches that search.</div>';
-    return;
-  }
-
-  if(libType === 'skills'){
-    libGrid.innerHTML = items.map((s, i) => `
-      <div class="card" data-lib="skills" data-idx="${i}">
-        <span class="card-tag">${escapeHtml(s.department)}</span>
-        <p class="card-title">${escapeHtml(s.name)}</p>
-        <p class="card-body">${escapeHtml(s.purpose)}</p>
-        <div class="card-footer">
-          <span class="card-badge">${escapeHtml(extractAccessTag(s.howToAccess) || 'Skills menu')}</span>
-        </div>
-      </div>
-    `).join('');
-  } else if(libType === 'shortcuts'){
-    libGrid.innerHTML = items.map((s, i) => `
-      <div class="card" data-lib="shortcuts" data-idx="${i}">
-        <span class="card-tag">${escapeHtml(s.group)}</span>
-        <p class="card-title">${escapeHtml(s.label)}</p>
-        <p class="card-body">${escapeHtml(s.description)}</p>
-        <div class="card-footer">
-          <span class="card-badge">${escapeHtml(s.shortcut)}</span>
-        </div>
-      </div>
-    `).join('');
-  } else {
-    libGrid.innerHTML = items.map((t, i) => `
-      <div class="card" data-lib="tools" data-idx="${i}">
-        <span class="card-tag">${escapeHtml(t.useCase)}</span>
-        <p class="card-title">${escapeHtml(t.tool)}</p>
-        <p class="card-body">${escapeHtml(t.purpose)}</p>
-        <div class="card-footer">
-          <span class="card-badge">${escapeHtml(t.pricing)}</span>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  // re-map indices back to filtered items for click handling
-  libGrid.querySelectorAll('.card').forEach((card, i) => {
-    card.addEventListener('click', () => openLibDetail(libType, items[i]));
-  });
-}
-
-function extractAccessTag(howToAccess){
-  if(!howToAccess) return '';
-  const match = howToAccess.match(/\/[a-z0-9-]+/i);
-  return match ? match[0] : '';
-}
-
-function openLibDetail(type, item){
-  const panel = document.getElementById('detailPanel');
-  let html = '';
-
-  if(type === 'skills'){
-    html += panelHeader(item.department, item.name);
-    html += detailBlock('Purpose', item.purpose)
-      + detailBlock('Sample prompt', item.samplePrompt, 'detail-value mono')
-      + detailBlock('Best for', item.bestFor)
-      + detailBlock('Example output', item.exampleOutput)
-      + detailBlock('How to access', item.howToAccess)
-      + detailBlock('Notes', item.notes)
-      + detailBlock('How it helps Oryx', item.oryxTip, 'detail-tip');
-  } else if(type === 'shortcuts'){
-    html += panelHeader(item.group, item.label);
-    html += detailBlock('Shortcut', item.shortcut, 'detail-value mono')
-      + detailBlock('Description', item.description)
-      + detailBlock('How to use it', item.howToUse)
-      + detailBlock('Example', item.example)
-      + detailBlock('Notes', item.notes);
-  } else {
-    const linkHtml = item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener">${escapeHtml(item.link)}</a>` : 'Not provided';
-    html += panelHeader(item.useCase, item.tool);
-    html += detailBlock('Purpose', item.purpose)
-      + detailBlock('Pricing', item.pricing)
-      + detailBlock('How to access', item.howToAccess)
-      + detailBlock('Notes', item.notes)
-      + detailBlock('How it helps Oryx', item.oryxTip, 'detail-tip')
-      + detailBlockHtml('Link', linkHtml);
-  }
-  html += `</div>`;
-
-  panel.innerHTML = html;
-  document.getElementById('detailOverlay').classList.add('open');
-  document.getElementById('detailClose').addEventListener('click', closeLibDetail);
-}
-
-document.getElementById('libSubTabs').addEventListener('click', (ev) => {
-  const btn = ev.target.closest('.sub-tab');
-  if(!btn) return;
-  document.querySelectorAll('#libSubTabs .sub-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  libType = btn.dataset.lib;
-  libFilter = 'all';
-  renderLibFilterTabs();
-  renderLib();
-});
-libSearchInput.addEventListener('input', (ev) => {
-  libSearch = ev.target.value;
-  renderLib();
-});
-
-renderLibFilterTabs();
-renderLib();
-
-// ============= Team Notes (Firestore-backed) =============
+// ============= Knowledge Base (Firestore-backed) =============
 const CATEGORY_LABELS = {
   commands: 'Commands / CLI',
   prompting: 'Prompting technique',
@@ -753,7 +523,7 @@ function openNoteDetail(entry){
 
   panel.innerHTML = html;
   document.getElementById('detailOverlay').classList.add('open');
-  document.getElementById('detailClose').addEventListener('click', closeLibDetail);
+  document.getElementById('detailClose').addEventListener('click', closeDetail);
 }
 
 tabsWrap.addEventListener('click', (ev) => {
