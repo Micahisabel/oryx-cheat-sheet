@@ -136,6 +136,22 @@
   .card-title{font-family:var(--font-display);font-weight:600;font-size:16px;color:var(--black);margin:0;line-height:1.3;}
   .card-body{font-size:13.5px;line-height:1.6;color:#333;white-space:pre-wrap;margin:0;}
   .card-link{font-size:12.5px;word-break:break-all;}
+  .link-thumb-wrap{position:relative;width:100%;aspect-ratio:16/9;background:var(--panel);overflow:hidden;}
+  .link-thumb{width:100%;height:100%;object-fit:cover;display:block;}
+  .link-thumb-badge-wrap{
+    width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;
+    background:var(--oryx-blue);
+  }
+  .link-thumb-badge{
+    font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:0.08em;
+    text-transform:uppercase;color:var(--white);
+  }
+  .link-play-icon{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:44px;height:44px;border-radius:50%;background:rgba(2,42,58,0.75);
+    display:flex;align-items:center;justify-content:center;pointer-events:none;
+  }
+  .link-play-icon svg{width:16px;height:16px;fill:var(--white);}
   .card-footer{
     margin-top:auto;padding-top:10px;border-top:1px solid var(--line-soft);
     display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--silver);gap:8px;flex-wrap:wrap;
@@ -435,6 +451,59 @@ function listenForEntries(){
   );
 }
 
+function detectPlatform(url){
+  try{
+    const host = new URL(url).hostname.replace(/^www\./, '');
+    if(host.includes('youtube.com') || host.includes('youtu.be')) return 'youtube';
+    if(host.includes('tiktok.com')) return 'tiktok';
+    if(host.includes('instagram.com')) return 'instagram';
+    if(host.includes('facebook.com') || host.includes('fb.watch')) return 'facebook';
+  }catch(e){ /* not a valid URL */ }
+  return null;
+}
+
+function youTubeThumbUrl(url){
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([a-zA-Z0-9_-]{6,})/);
+  return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null;
+}
+
+const PLAY_ICON_SVG = '<span class="link-play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>';
+
+function linkThumbHtml(link){
+  const platform = detectPlatform(link);
+  if(!platform) return '';
+
+  if(platform === 'youtube'){
+    const thumb = youTubeThumbUrl(link);
+    if(thumb){
+      return `<div class="link-thumb-wrap"><img class="link-thumb" src="${thumb}" alt="Video thumbnail" loading="lazy">${PLAY_ICON_SVG}</div>`;
+    }
+  }
+
+  if(platform === 'tiktok'){
+    return `<div class="link-thumb-wrap" data-thumb-platform="tiktok" data-thumb-url="${escapeHtml(link)}"><div class="link-thumb-badge-wrap"><span class="link-thumb-badge">TikTok</span></div></div>`;
+  }
+
+  // Instagram / Facebook thumbnails require an authenticated Meta Graph API call —
+  // not available from the browser, so we show a platform badge instead.
+  const label = platform === 'instagram' ? 'Instagram' : 'Facebook';
+  return `<div class="link-thumb-badge-wrap"><span class="link-thumb-badge">${label}</span></div>`;
+}
+
+function hydrateTikTokThumbs(root){
+  root.querySelectorAll('[data-thumb-platform="tiktok"]').forEach(async (el) => {
+    const link = el.dataset.thumbUrl;
+    try{
+      const res = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(link)}`);
+      if(!res.ok) return;
+      const data = await res.json();
+      if(data.thumbnail_url){
+        el.innerHTML = `<img class="link-thumb" src="${data.thumbnail_url}" alt="Video thumbnail" loading="lazy">${PLAY_ICON_SVG}`;
+      }
+    }catch(e){ /* leave the TikTok badge in place */ }
+  });
+}
+
 function render(){
   const term = searchTerm.trim().toLowerCase();
   const filtered = entries.filter(e => {
@@ -452,11 +521,13 @@ function render(){
   }
 
   grid.innerHTML = filtered.map(e => {
+    const thumbHtml = e.link ? linkThumbHtml(e.link) : '';
     const linkHtml = e.link ? `<div class="card-link"><a href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${escapeHtml(e.link)}</a></div>` : '';
     const dateStr = new Date(e.createdAt).toLocaleDateString(undefined, {month:'short', day:'numeric'});
     const preview = e.category === 'skills' ? e.purpose : e.body;
     return `
       <div class="card" data-id="${e.id}">
+        ${thumbHtml}
         <span class="card-tag">${escapeHtml(e.category === 'skills' && e.department ? e.department : (CATEGORY_LABELS[e.category] || e.category))}</span>
         <p class="card-title">${escapeHtml(e.title)}</p>
         <p class="card-body">${escapeHtml(preview)}</p>
@@ -468,6 +539,8 @@ function render(){
       </div>
     `;
   }).join('');
+
+  hydrateTikTokThumbs(grid);
 
   grid.querySelectorAll('.card').forEach(card => {
     card.addEventListener('click', () => {
@@ -499,8 +572,9 @@ function openNoteDetail(entry){
   const linkHtml = entry.link
     ? `<a href="${escapeHtml(entry.link)}" target="_blank" rel="noopener">${escapeHtml(entry.link)}</a>`
     : 'Not provided';
+  const thumbHtml = entry.link ? linkThumbHtml(entry.link) : '';
 
-  const meta = detailBlockHtml('Link', linkHtml)
+  const meta = (thumbHtml ? thumbHtml : '') + detailBlockHtml('Link', linkHtml)
     + detailBlock('Added by', entry.author || 'Anonymous')
     + detailBlock('Date added', dateStr);
 
@@ -522,6 +596,7 @@ function openNoteDetail(entry){
   html += `</div>`;
 
   panel.innerHTML = html;
+  hydrateTikTokThumbs(panel);
   document.getElementById('detailOverlay').classList.add('open');
   document.getElementById('detailClose').addEventListener('click', closeDetail);
 }
