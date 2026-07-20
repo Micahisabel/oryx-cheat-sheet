@@ -945,6 +945,18 @@ function updateDepartmentOptions(){
   if(depts.includes(current)) departmentSelect.value = current;
 }
 
+let knownEntryIds = null;
+
+function notifyNewDiscovery(e){
+  if(!isAdmin || !('Notification' in window) || Notification.permission !== 'granted') return;
+  const logoEl = document.querySelector('.logo-img');
+  const n = new Notification(`New discovery from ${e.author || 'Anonymous'}`, {
+    body: (e.title || '').slice(0, 150),
+    icon: logoEl ? logoEl.src : undefined
+  });
+  n.onclick = () => { window.focus(); n.close(); };
+}
+
 function listenForEntries(){
   entriesCollection.orderBy('createdAt', 'desc').onSnapshot(
     (snapshot) => {
@@ -952,6 +964,14 @@ function listenForEntries(){
       syncStatusEl.textContent = 'Live · synced with team';
       syncStatusEl.className = 'sync-status live';
       render();
+
+      const currentEntryIds = new Set(entries.map(e => e.id));
+      if(knownEntryIds !== null){
+        entries
+          .filter(e => e.category === 'discoveries' && !knownEntryIds.has(e.id))
+          .forEach(notifyNewDiscovery);
+      }
+      knownEntryIds = currentEntryIds;
     },
     (err) => {
       console.error('Firestore sync error:', err);
@@ -1478,6 +1498,9 @@ adminToggle.addEventListener('click', () => {
     isAdmin = true;
     try{ localStorage.setItem(ADMIN_KEY, '1'); }catch(e){}
     applyAdminUI();
+    if('Notification' in window && Notification.permission === 'default'){
+      Notification.requestPermission();
+    }
   }else{
     alert('That passcode is not correct.');
   }
@@ -1593,12 +1616,32 @@ saveSuggestBtn.addEventListener('click', () => {
 });
 
 // ---- Review queue (admin) ----
+let knownSuggestionIds = null;
+
+function notifyNewSuggestion(s){
+  if(!isAdmin || !('Notification' in window) || Notification.permission !== 'granted') return;
+  const logoEl = document.querySelector('.logo-img');
+  const n = new Notification(`New suggestion from ${s.name || 'Anonymous'}`, {
+    body: `${s.type || 'Request'}: ${s.title || s.text || ''}`.slice(0, 150),
+    icon: logoEl ? logoEl.src : undefined
+  });
+  n.onclick = () => { window.focus(); n.close(); };
+}
+
 function listenForSuggestions(){
   suggestionsCollection.orderBy('createdAt', 'desc').onSnapshot(
     (snap) => {
       suggestions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       reviewCount.textContent = suggestions.length;
       renderReviewList();
+
+      const currentIds = new Set(suggestions.map(s => s.id));
+      if(knownSuggestionIds !== null){
+        suggestions
+          .filter(s => !knownSuggestionIds.has(s.id))
+          .forEach(notifyNewSuggestion);
+      }
+      knownSuggestionIds = currentIds;
     },
     (err) => { console.error('Suggestions sync error:', err); }
   );
