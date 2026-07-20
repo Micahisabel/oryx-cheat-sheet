@@ -809,7 +809,7 @@ function buildSkillMarkdown(entry){
   };
 
   if(isRichCategory(entry.category)){
-    section('Purpose', entry.purpose);
+    section('Purpose', entry.purpose || entry.body);
     section('Best For', entry.bestFor);
     section('Sample Prompts', entry.samplePrompt);
     section('Example Output', entry.exampleOutput);
@@ -850,7 +850,7 @@ const CATEGORY_LABELS = {
 };
 
 // Categories that use the full detail template (Purpose, Best For, Sample Prompts, etc.)
-const RICH_CATEGORIES = ['skills', 'agents', 'mcps', 'plugins'];
+const RICH_CATEGORIES = ['skills', 'commands', 'agents', 'mcps', 'plugins'];
 function isRichCategory(cat){ return RICH_CATEGORIES.includes(cat); }
 
 const TAG_LIST = ['ai-maestro', 'ai-research', 'analytics', 'business-marketing', 'career', 'creative-design', 'database', 'development'];
@@ -1019,7 +1019,7 @@ function render(){
     const thumbHtml = e.link ? linkThumbHtml(e.link) : '';
     const linkHtml = e.link ? `<div class="card-link"><a href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${escapeHtml(e.link)}</a></div>` : '';
     const dateStr = new Date(e.createdAt).toLocaleDateString(undefined, {month:'short', day:'numeric'});
-    const preview = isRichCategory(e.category) ? e.purpose : e.body;
+    const preview = isRichCategory(e.category) ? (e.purpose || e.body) : e.body;
     const tagChipHtml = e.tag ? `<span class="card-tag-chip">${escapeHtml(e.tag)}</span>` : '';
     return `
       <div class="card" data-id="${e.id}">
@@ -1096,7 +1096,7 @@ function openNoteDetail(entry){
   }
 
   if(isRichCategory(entry.category)){
-    html += optionalBlock('Purpose', entry.purpose)
+    html += optionalBlock('Purpose', entry.purpose || entry.body)
       + optionalBlock('Best For', entry.bestFor)
       + optionalBlock('Sample Prompts', entry.samplePrompt, 'detail-value mono')
       + optionalBlock('Example Output', entry.exampleOutput)
@@ -1177,22 +1177,21 @@ function buildAiPrompt(desc){
   return `You are helping build a knowledge-base entry for Oryx Doors & Windows, a Dubai-based premium aluminium doors, windows, and shading company. Read the input at the bottom and turn it into a structured entry.
 
 Return ONLY a JSON object — no explanation, no markdown code fences — with these exact keys:
-- "category": one of "skills", "commands", "agents", "mcps", "plugins", "discoveries"
+- "category": one of "skills", "commands", "agents", "mcps", "plugins" (never "discoveries" — that category is submitted separately by team members and doesn't go through this form)
 - "platform": "claude" or "chatgpt"
 - "title": a short, clear name
-- "department": the Oryx department it best fits (e.g. Sales and Marketing, Customer Service, Operations, HR, Finance, IT), or "" if not applicable
+- "department": the Oryx department it best fits (e.g. Sales and Marketing, Customer Service, Operations, HR, Finance, IT)
 - "purpose": what it does, in 1-2 sentences
 - "bestFor": when someone should use it
 - "samplePrompt": a reusable example prompt someone could paste in
 - "exampleOutput": a short example of the result
 - "notes": tips, gotchas, or limitations
-- "howToAccess": brief steps to run or use it in Claude
+- "howToAccess": brief steps to install and use it in Claude
 - "oryxTip": how this specifically helps Oryx Doors & Windows
-- "body": use this ONLY for non-skill entries; leave "" for skills
 
 Rules:
-- If it is a reusable skill or workflow, set "category" to "skills", fill the skill fields, and leave "body" as "".
-- Otherwise pick the best category, put the explanation in "body", and leave the skill fields as "".
+- Do not include a link field — this is handled separately in the system, not generated here.
+- "Added by" and "date added" are also handled separately, not generated here.
 - Use UK English spelling. Be accurate — do not invent figures, prices, or claims.
 
 INPUT:
@@ -1258,7 +1257,7 @@ document.getElementById('aiFill').addEventListener('click', () => {
   const data = parseAiResult(aiResult.value);
   if(!data){ setAiStatus('Could not read that. Paste the full answer, including the { } part.'); return; }
 
-  const cats = ['skills','commands','agents','mcps','plugins','discoveries'];
+  const cats = ['skills','commands','agents','mcps','plugins'];
   if(data.category && cats.includes(data.category)) fCategory.value = data.category;
   if(data.platform === 'claude' || data.platform === 'chatgpt') document.getElementById('fPlatform').value = data.platform;
   if(data.title) document.getElementById('fTitle').value = data.title;
