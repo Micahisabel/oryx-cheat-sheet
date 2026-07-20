@@ -1284,6 +1284,8 @@ function openOverlay(){
 function closeOverlay(){
   overlay.classList.remove('open');
   document.getElementById('fPlatform').value = 'claude';
+  document.getElementById('fCategory').value = 'skills';
+  toggleEntryFields();
   document.getElementById('fTitle').value = '';
   document.getElementById('fBody').value = '';
   document.getElementById('fLink').value = '';
