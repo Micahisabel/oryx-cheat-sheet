@@ -131,6 +131,58 @@
 
   .hub-main{flex:1;min-width:0;padding:24px 32px 64px;}
 
+  /* ---------- Filter toolbar (search + department + advanced) ---------- */
+  .filter-toolbar{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;
+  }
+  .filter-search{
+    flex:1;min-width:200px;display:flex;align-items:center;gap:10px;
+    background:var(--panel);border:1px solid var(--line-soft);border-radius:10px;
+    padding:0 14px;
+  }
+  .filter-search svg{width:16px;height:16px;flex-shrink:0;fill:none;stroke:var(--silver);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .filter-search input{
+    width:100%;border:none;background:none;outline:none;padding:11px 0;
+    font-family:var(--font-body);font-size:14px;color:var(--black);
+  }
+  .filter-search input::placeholder{color:var(--silver);}
+  .filter-select{
+    width:auto;flex-shrink:0;border:1px solid var(--line-soft);border-radius:10px;background:var(--panel);
+    color:var(--black);font-family:var(--font-body);font-weight:500;font-size:14px;
+    padding:11px 14px;cursor:pointer;
+  }
+  .filter-select:focus{outline:none;}
+  .filter-adv-btn{
+    flex-shrink:0;display:flex;align-items:center;gap:8px;border:none;border-radius:10px;
+    background:var(--oryx-blue);color:var(--white);font-family:var(--font-display);font-weight:600;
+    font-size:13px;padding:11px 16px;cursor:pointer;white-space:nowrap;
+  }
+  .filter-adv-btn:hover{background:var(--oryx-blue-tint);}
+  .filter-adv-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+
+  .adv-filters-panel{
+    background:var(--panel);border:1px solid var(--line-soft);border-radius:12px;
+    padding:16px;margin:-10px 0 20px;
+  }
+  .adv-filters-label{
+    font-family:var(--font-display);font-weight:600;font-size:11px;letter-spacing:0.1em;
+    text-transform:uppercase;color:var(--silver);margin-bottom:12px;
+  }
+  .tag-pill-row{display:flex;flex-wrap:wrap;gap:10px;}
+  .tag-pill{
+    font-family:'Courier New',monospace;font-size:13px;color:var(--black);
+    background:var(--white);border:1px solid var(--line-soft);border-radius:8px;
+    padding:8px 16px;cursor:pointer;transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .tag-pill:hover{border-color:var(--oryx-blue);}
+  .tag-pill.active{background:var(--oryx-blue);color:var(--white);border-color:var(--oryx-blue);}
+
+  .card-tag-chip{
+    display:inline-block;font-family:'Courier New',monospace;font-size:12px;color:var(--black);
+    background:var(--panel);border:1px solid var(--line-soft);border-radius:8px;
+    padding:4px 12px;margin-top:10px;
+  }
+
   /* ---------- Skill detail full page ---------- */
   .skill-page{
     position:fixed;inset:0;z-index:70;background:var(--white);
@@ -457,6 +509,22 @@
         <button class="cat-tab" data-cat="discoveries"><span class="cat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg></span>Discoveries<span class="cat-badge" data-count-for="discoveries">0</span></button>
       </nav>
 
+      <div class="filter-toolbar">
+        <div class="filter-search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" id="searchInput" placeholder="Search components, commands, tags, prompts…">
+        </div>
+        <select class="filter-select" id="departmentSelect">
+          <option value="all">All Departments</option>
+        </select>
+        <button class="filter-adv-btn" id="advFiltersBtn"><svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Advanced Filters</button>
+      </div>
+
+      <div class="adv-filters-panel" id="advFiltersPanel" style="display:none;">
+        <div class="adv-filters-label">Categories</div>
+        <div class="tag-pill-row" id="tagPillRow"></div>
+      </div>
+
       <div class="count-row" id="countRow">Loading entries…</div>
       <div class="grid" id="grid"></div>
     </main>
@@ -548,6 +616,19 @@
       <label for="fOryxTip">How it helps Oryx Doors and Windows <span class="optional-tag">(optional)</span></label>
       <textarea id="fOryxTip" placeholder="A concrete Oryx use case"></textarea>
     </div>
+
+    <label for="fTag">Tag <span class="optional-tag">(optional, used for Advanced Filters)</span></label>
+    <select id="fTag">
+      <option value="">No tag</option>
+      <option value="ai-maestro">ai-maestro</option>
+      <option value="ai-research">ai-research</option>
+      <option value="analytics">analytics</option>
+      <option value="business-marketing">business-marketing</option>
+      <option value="career">career</option>
+      <option value="creative-design">creative-design</option>
+      <option value="database">database</option>
+      <option value="development">development</option>
+    </select>
 
     <label for="fLink">Link <span class="optional-tag">(optional)</span></label>
     <input type="text" id="fLink" placeholder="https://…">
@@ -762,15 +843,55 @@ const CATEGORY_LABELS = {
 const RICH_CATEGORIES = ['skills', 'agents', 'mcps', 'plugins'];
 function isRichCategory(cat){ return RICH_CATEGORIES.includes(cat); }
 
+const TAG_LIST = ['ai-maestro', 'ai-research', 'analytics', 'business-marketing', 'career', 'creative-design', 'database', 'development'];
+
 let entries = [];
 let activeCat = 'all';
 let activePlatform = 'all';
+let searchTerm = '';
+let activeDepartment = 'all';
+let activeTag = 'all';
 
 const grid = document.getElementById('grid');
 const countRow = document.getElementById('countRow');
 const sideNav = document.getElementById('sideNav');
 const platformNav = document.getElementById('platformNav');
 const overlay = document.getElementById('overlay');
+const searchInput = document.getElementById('searchInput');
+const departmentSelect = document.getElementById('departmentSelect');
+const advFiltersPanel = document.getElementById('advFiltersPanel');
+const tagPillRow = document.getElementById('tagPillRow');
+
+searchInput.addEventListener('input', () => {
+  searchTerm = searchInput.value.trim().toLowerCase();
+  render();
+});
+
+departmentSelect.addEventListener('change', () => {
+  activeDepartment = departmentSelect.value;
+  render();
+});
+
+document.getElementById('advFiltersBtn').addEventListener('click', () => {
+  advFiltersPanel.style.display = advFiltersPanel.style.display === 'none' ? '' : 'none';
+});
+
+tagPillRow.innerHTML = TAG_LIST.map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('');
+tagPillRow.addEventListener('click', (ev) => {
+  const btn = ev.target.closest('.tag-pill');
+  if(!btn) return;
+  activeTag = activeTag === btn.dataset.tag ? 'all' : btn.dataset.tag;
+  tagPillRow.querySelectorAll('.tag-pill').forEach(p => p.classList.toggle('active', p.dataset.tag === activeTag));
+  render();
+});
+
+function updateDepartmentOptions(){
+  const depts = Array.from(new Set(entries.map(e => e.department).filter(Boolean))).sort();
+  const current = departmentSelect.value;
+  departmentSelect.innerHTML = '<option value="all">All Departments</option>' +
+    depts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+  if(depts.includes(current)) departmentSelect.value = current;
+}
 
 function listenForEntries(){
   entriesCollection.orderBy('createdAt', 'desc').onSnapshot(
@@ -842,11 +963,21 @@ function hydrateTikTokThumbs(root){
 }
 
 function render(){
+  updateDepartmentOptions();
+
   const filtered = entries.filter(e => {
     const catMatch = activeCat === 'all' || e.category === activeCat;
     if(!catMatch) return false;
     const platformMatch = activePlatform === 'all' || (e.platform || 'claude') === activePlatform;
-    return platformMatch;
+    if(!platformMatch) return false;
+    const deptMatch = activeDepartment === 'all' || e.department === activeDepartment;
+    if(!deptMatch) return false;
+    const tagMatch = activeTag === 'all' || e.tag === activeTag;
+    if(!tagMatch) return false;
+    if(!searchTerm) return true;
+    const haystack = [e.title, e.body, e.purpose, e.bestFor, e.notes, e.department]
+      .filter(Boolean).join(' ').toLowerCase();
+    return haystack.includes(searchTerm);
   }).sort((a,b) => b.createdAt - a.createdAt);
 
   countRow.textContent = filtered.length + (filtered.length === 1 ? ' entry' : ' entries');
@@ -879,12 +1010,14 @@ function render(){
     const linkHtml = e.link ? `<div class="card-link"><a href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${escapeHtml(e.link)}</a></div>` : '';
     const dateStr = new Date(e.createdAt).toLocaleDateString(undefined, {month:'short', day:'numeric'});
     const preview = isRichCategory(e.category) ? e.purpose : e.body;
+    const tagChipHtml = e.tag ? `<span class="card-tag-chip">${escapeHtml(e.tag)}</span>` : '';
     return `
       <div class="card" data-id="${e.id}">
         ${thumbHtml}
         <span class="card-tag">${escapeHtml(isRichCategory(e.category) && e.department ? e.department : (CATEGORY_LABELS[e.category] || e.category))}</span>
         <p class="card-title">${escapeHtml(e.title)}</p>
         <p class="card-body">${escapeHtml(preview)}</p>
+        ${tagChipHtml}
         ${linkHtml}
         <div class="card-footer">
           <span>${escapeHtml(e.author || 'Anonymous')} · ${dateStr}</span>
@@ -1144,6 +1277,7 @@ function closeOverlay(){
   document.getElementById('fTitle').value = '';
   document.getElementById('fBody').value = '';
   document.getElementById('fLink').value = '';
+  document.getElementById('fTag').value = '';
   document.getElementById('errTitle').style.display = 'none';
   document.getElementById('errBody').style.display = 'none';
   document.getElementById('errPurpose').style.display = 'none';
@@ -1196,6 +1330,7 @@ saveAdd.addEventListener('click', async () => {
 
   const entryData = {
     category, title, link,
+    tag: document.getElementById('fTag').value,
     platform: document.getElementById('fPlatform').value,
     author: author || 'Anonymous',
     suggestedBy: currentSuggestedBy || '',
