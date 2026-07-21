@@ -1459,12 +1459,15 @@ platformNav.addEventListener('click', (ev) => {
   if(activePlatform === 'all'){
     activeCat = 'all';
     sideNav.style.display = '';
+    departmentSelect.style.display = '';
     sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
   } else if(activePlatform === 'other'){
     activeCat = 'other-tools';
     sideNav.style.display = 'none';
+    departmentSelect.style.display = 'none';
   } else {
     sideNav.style.display = '';
+    departmentSelect.style.display = '';
   }
   currentPage = 1;
   render();
