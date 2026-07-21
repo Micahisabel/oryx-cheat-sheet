@@ -1460,6 +1460,9 @@ platformNav.addEventListener('click', (ev) => {
   if(activePlatform === 'all'){
     activeCat = 'all';
     sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  } else if(activePlatform === 'other'){
+    activeCat = 'other-tools';
+    sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === 'other-tools'));
   }
   currentPage = 1;
   render();
