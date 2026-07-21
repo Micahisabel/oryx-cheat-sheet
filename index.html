@@ -528,7 +528,7 @@
           <button class="platform-expand-btn" data-expand="chatgpt" aria-label="Expand ChatGPT Engine"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
         </div>
         <div class="platform-submenu" id="chatgptSubmenu" style="display:none;">
-          <div class="platform-submenu-empty">No shortcuts yet</div>
+          <button class="platform-submenu-item" id="chatgptShortcutsBtn"><span class="submenu-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/></svg></span>ChatGPT Shortcuts</button>
         </div>
         <button class="platform-item" data-platform="other">
           <span class="platform-item-label"><span class="platform-icon"><svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.9L19 10l-4.9 2.1L12 17l-2.1-4.9L5 10l4.9-2.1z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg></span>Other AI Tools</span>
@@ -542,13 +542,18 @@
         <button class="shortcuts-back-btn" id="exitShortcuts"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg> Back to Library</button>
         <div class="shortcuts-banner-right">
           <button class="shortcuts-create-btn" id="openAddShortcut" style="display:none;">+ Create</button>
-          <span class="shortcuts-banner-label">Claude Shortcuts</span>
+          <span class="shortcuts-banner-label" id="shortcutsBannerLabel">Claude Shortcuts</span>
         </div>
       </div>
       <nav class="cat-tabbar" id="shortcutNav" style="display:none;">
         <button class="cat-tab active" data-cat="shortcut-desktop">Claude Desktop<span class="cat-badge" data-count-for="shortcut-desktop">0</span></button>
         <button class="cat-tab" data-cat="shortcut-code">Claude Code<span class="cat-badge" data-count-for="shortcut-code">0</span></button>
         <button class="cat-tab" data-cat="shortcut-slash">Slash Commands<span class="cat-badge" data-count-for="shortcut-slash">0</span></button>
+      </nav>
+      <nav class="cat-tabbar" id="chatgptShortcutNav" style="display:none;">
+        <button class="cat-tab active" data-cat="chatgpt-shortcut-desktop">ChatGPT Desktop<span class="cat-badge" data-count-for="chatgpt-shortcut-desktop">0</span></button>
+        <button class="cat-tab" data-cat="chatgpt-shortcut-code">ChatGPT Code<span class="cat-badge" data-count-for="chatgpt-shortcut-code">0</span></button>
+        <button class="cat-tab" data-cat="chatgpt-shortcut-slash">Slash Commands<span class="cat-badge" data-count-for="chatgpt-shortcut-slash">0</span></button>
       </nav>
       <nav class="cat-tabbar" id="sideNav">
         <button class="cat-tab active" data-cat="skills"><span class="cat-icon"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.9L21 11l-6.6 2.1L12 20l-2.4-6.9L3 11l6.6-2.1z"/></svg></span>Skills<span class="cat-badge" data-count-for="skills">0</span></button>
@@ -692,7 +697,7 @@
 <div class="overlay" id="shortcutOverlay">
   <div class="panel">
     <button class="close-x" id="closeShortcutPanel">&times;</button>
-    <h2>Add a Claude shortcut</h2>
+    <h2 id="shortcutPanelTitle">Add a Claude shortcut</h2>
     <p class="sub">Visible to the whole team</p>
 
     <label for="scCategory">Type</label>
@@ -943,6 +948,9 @@ const CATEGORY_LABELS = {
   'shortcut-desktop': 'Claude Desktop',
   'shortcut-code': 'Claude Code',
   'shortcut-slash': 'Slash Command',
+  'chatgpt-shortcut-desktop': 'ChatGPT Desktop',
+  'chatgpt-shortcut-code': 'ChatGPT Code',
+  'chatgpt-shortcut-slash': 'Slash Command',
   // legacy labels kept so older entries still display a clean tag
   prompting: 'Prompting Technique',
   resources: 'Resource'
@@ -957,7 +965,10 @@ const CATEGORY_PLURAL_LABELS = {
   discoveries: 'Discoveries',
   'shortcut-desktop': 'Claude Shortcuts',
   'shortcut-code': 'Claude Shortcuts',
-  'shortcut-slash': 'Claude Shortcuts'
+  'shortcut-slash': 'Claude Shortcuts',
+  'chatgpt-shortcut-desktop': 'ChatGPT Shortcuts',
+  'chatgpt-shortcut-code': 'ChatGPT Shortcuts',
+  'chatgpt-shortcut-slash': 'ChatGPT Shortcuts'
 };
 
 const CATEGORY_ICON_PATHS = {
@@ -978,7 +989,9 @@ function cardPlaceholderHtml(category){
 const RICH_CATEGORIES = ['skills', 'commands', 'agents', 'mcps', 'plugins'];
 function isRichCategory(cat){ return RICH_CATEGORIES.includes(cat); }
 
-const SHORTCUT_CATEGORIES = ['shortcut-desktop', 'shortcut-code', 'shortcut-slash'];
+const CLAUDE_SHORTCUT_CATS = ['shortcut-desktop', 'shortcut-code', 'shortcut-slash'];
+const CHATGPT_SHORTCUT_CATS = ['chatgpt-shortcut-desktop', 'chatgpt-shortcut-code', 'chatgpt-shortcut-slash'];
+const SHORTCUT_CATEGORIES = [...CLAUDE_SHORTCUT_CATS, ...CHATGPT_SHORTCUT_CATS];
 function isShortcutCategory(cat){ return SHORTCUT_CATEGORIES.includes(cat); }
 function shortcutBadgeHtml(key){
   if(!key) return '';
@@ -992,6 +1005,7 @@ let searchTerm = '';
 let activeDepartment = 'all';
 let currentPage = 1;
 let viewMode = 'library';
+let shortcutGroup = 'claude';
 const PAGE_SIZE = 8;
 
 const grid = document.getElementById('grid');
@@ -999,25 +1013,33 @@ const pagination = document.getElementById('pagination');
 const countRow = document.getElementById('countRow');
 const sideNav = document.getElementById('sideNav');
 const shortcutNav = document.getElementById('shortcutNav');
+const chatgptShortcutNav = document.getElementById('chatgptShortcutNav');
 const shortcutsBanner = document.getElementById('shortcutsBanner');
+const shortcutsBannerLabel = document.getElementById('shortcutsBannerLabel');
 const platformNav = document.getElementById('platformNav');
 const overlay = document.getElementById('overlay');
 const searchInput = document.getElementById('searchInput');
 const departmentSelect = document.getElementById('departmentSelect');
 
-function enterShortcutsMode(){
+function enterShortcutsMode(group){
   viewMode = 'shortcuts';
-  activeCat = 'shortcut-desktop';
+  shortcutGroup = group;
+  const cats = group === 'chatgpt' ? CHATGPT_SHORTCUT_CATS : CLAUDE_SHORTCUT_CATS;
+  const nav = group === 'chatgpt' ? chatgptShortcutNav : shortcutNav;
+  const otherNav = group === 'chatgpt' ? shortcutNav : chatgptShortcutNav;
+  activeCat = cats[0];
   activeDepartment = 'all';
   currentPage = 1;
   sideNav.style.display = 'none';
   departmentSelect.style.display = 'none';
-  shortcutNav.style.display = 'flex';
+  nav.style.display = 'flex';
+  otherNav.style.display = 'none';
   shortcutsBanner.style.display = 'flex';
-  shortcutNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
+  shortcutsBannerLabel.textContent = group === 'chatgpt' ? 'ChatGPT Shortcuts' : 'Claude Shortcuts';
+  nav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
   document.querySelectorAll('.platform-submenu-item').forEach(b => b.classList.remove('active'));
-  const claudeShortcutsBtn = document.getElementById('claudeShortcutsBtn');
-  if(claudeShortcutsBtn) claudeShortcutsBtn.classList.add('active');
+  const activeSubmenuBtn = document.getElementById(group === 'chatgpt' ? 'chatgptShortcutsBtn' : 'claudeShortcutsBtn');
+  if(activeSubmenuBtn) activeSubmenuBtn.classList.add('active');
   updateAddShortcutVisibility();
   render();
 }
@@ -1028,6 +1050,7 @@ function exitShortcutsMode(){
   sideNav.style.display = '';
   departmentSelect.style.display = '';
   shortcutNav.style.display = 'none';
+  chatgptShortcutNav.style.display = 'none';
   shortcutsBanner.style.display = 'none';
   sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
   document.querySelectorAll('.platform-submenu-item').forEach(b => b.classList.remove('active'));
@@ -1056,7 +1079,16 @@ if(claudeShortcutsBtn){
   claudeShortcutsBtn.addEventListener('click', (ev) => {
     ev.stopPropagation();
     platformNav.querySelectorAll('.platform-item').forEach(t => t.classList.remove('active'));
-    enterShortcutsMode();
+    enterShortcutsMode('claude');
+  });
+}
+
+const chatgptShortcutsBtn = document.getElementById('chatgptShortcutsBtn');
+if(chatgptShortcutsBtn){
+  chatgptShortcutsBtn.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    platformNav.querySelectorAll('.platform-item').forEach(t => t.classList.remove('active'));
+    enterShortcutsMode('chatgpt');
   });
 }
 
@@ -1068,15 +1100,17 @@ document.getElementById('exitShortcuts').addEventListener('click', () => {
   exitShortcutsMode();
 });
 
-shortcutNav.addEventListener('click', (ev) => {
+function handleShortcutTabClick(nav, ev){
   const btn = ev.target.closest('.cat-tab');
   if(!btn) return;
-  shortcutNav.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  nav.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   activeCat = btn.dataset.cat;
   currentPage = 1;
   render();
-});
+}
+shortcutNav.addEventListener('click', (ev) => handleShortcutTabClick(shortcutNav, ev));
+chatgptShortcutNav.addEventListener('click', (ev) => handleShortcutTabClick(chatgptShortcutNav, ev));
 
 searchInput.addEventListener('input', () => {
   searchTerm = searchInput.value.trim().toLowerCase();
@@ -1204,11 +1238,11 @@ function render(){
     if(el) el.textContent = platformCounts[p];
   });
 
-  const shortcutCounts = { 'shortcut-desktop': 0, 'shortcut-code': 0, 'shortcut-slash': 0 };
+  const shortcutCounts = {};
+  SHORTCUT_CATEGORIES.forEach(c => { shortcutCounts[c] = 0; });
   shortcutEntries.forEach(e => { if(shortcutCounts[e.category] !== undefined) shortcutCounts[e.category]++; });
   Object.keys(shortcutCounts).forEach(cat => {
-    const el = shortcutNav.querySelector(`[data-count-for="${cat}"]`);
-    if(el) el.textContent = shortcutCounts[cat];
+    document.querySelectorAll(`[data-count-for="${cat}"]`).forEach(el => { el.textContent = shortcutCounts[cat]; });
   });
 
   let filtered;
@@ -1414,6 +1448,7 @@ platformNav.addEventListener('click', (ev) => {
     sideNav.style.display = '';
     departmentSelect.style.display = '';
     shortcutNav.style.display = 'none';
+    chatgptShortcutNav.style.display = 'none';
     shortcutsBanner.style.display = 'none';
     document.querySelectorAll('.platform-submenu-item').forEach(b => b.classList.remove('active'));
   }
@@ -1599,7 +1634,11 @@ const saveAddShortcut = document.getElementById('saveAddShortcut');
 
 function openShortcutOverlay(){
   shortcutOverlay.classList.add('open');
-  document.getElementById('scCategory').value = activeCat;
+  const cats = shortcutGroup === 'chatgpt' ? CHATGPT_SHORTCUT_CATS : CLAUDE_SHORTCUT_CATS;
+  const scCategory = document.getElementById('scCategory');
+  scCategory.innerHTML = cats.map(c => `<option value="${c}">${CATEGORY_LABELS[c]}</option>`).join('');
+  scCategory.value = activeCat;
+  document.getElementById('shortcutPanelTitle').textContent = shortcutGroup === 'chatgpt' ? 'Add a ChatGPT shortcut' : 'Add a Claude shortcut';
   let savedAuthor = '';
   try{ savedAuthor = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
   document.getElementById('scAuthor').value = savedAuthor;
@@ -1647,7 +1686,7 @@ saveAddShortcut.addEventListener('click', async () => {
     example: document.getElementById('scExample').value.trim(),
     notes: document.getElementById('scNotes').value.trim(),
     link: '', tag: '', body: '', department: '',
-    platform: 'claude',
+    platform: shortcutGroup === 'chatgpt' ? 'chatgpt' : 'claude',
     author: author || 'Anonymous',
     suggestedBy: '',
     createdAt: Date.now()
