@@ -280,6 +280,7 @@
     width:100%;height:64px;display:flex;align-items:center;justify-content:center;
     background:var(--oryx-blue);
   }
+  .card-thumb-link{display:block;cursor:pointer;}
   .card-placeholder svg{width:26px;height:26px;fill:none;stroke:rgba(255,255,255,0.7);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
   .link-play-icon{
     position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -1098,7 +1099,8 @@ function render(){
   }
 
   grid.innerHTML = pageItems.map(e => {
-    const thumbHtml = e.link ? linkThumbHtml(e.link) : cardPlaceholderHtml(e.category);
+    const thumbInner = e.link ? linkThumbHtml(e.link) : cardPlaceholderHtml(e.category);
+    const thumbHtml = e.link ? `<a class="card-thumb-link" href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${thumbInner}</a>` : thumbInner;
     const linkHtml = e.link ? `<div class="card-link"><a href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${escapeHtml(e.link)}</a></div>` : '';
     const dateStr = new Date(e.createdAt).toLocaleDateString(undefined, {month:'short', day:'numeric'});
     const preview = isRichCategory(e.category) ? (e.purpose || e.body) : e.body;
@@ -1126,6 +1128,10 @@ function render(){
       const entry = filtered.find(e => e.id === card.dataset.id);
       if(entry) openNoteDetail(entry);
     });
+  });
+
+  grid.querySelectorAll('.card-thumb-link').forEach(link => {
+    link.addEventListener('click', (ev) => ev.stopPropagation());
   });
 
   grid.querySelectorAll('.card-del').forEach(btn => {
