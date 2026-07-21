@@ -563,7 +563,6 @@
         <button class="cat-tab" data-cat="mcps"><span class="cat-icon"><svg viewBox="0 0 24 24"><path d="M9 2v6M15 2v6M6 8h12v3a6 6 0 0 1-12 0zM12 17v5"/></svg></span>MCPs<span class="cat-badge" data-count-for="mcps">0</span></button>
         <button class="cat-tab" data-cat="plugins"><span class="cat-icon"><svg viewBox="0 0 24 24"><path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4a2 2 0 0 0-2 2v3.8h1.5a2.7 2.7 0 0 1 0 5.4H2V20a2 2 0 0 0 2 2h3.8v-1.5a2.7 2.7 0 0 1 5.4 0V22H17a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"/></svg></span>Plugins<span class="cat-badge" data-count-for="plugins">0</span></button>
         <button class="cat-tab" data-cat="discoveries"><span class="cat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg></span>Discoveries<span class="cat-badge" data-count-for="discoveries">0</span></button>
-        <button class="cat-tab" data-cat="other-tools"><span class="cat-icon"><svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.9L19 10l-4.9 2.1L12 17l-2.1-4.9L5 10l4.9-2.1z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg></span>Other AI Tools<span class="cat-badge" data-count-for="other-tools">0</span></button>
       </nav>
 
       <div class="filter-toolbar">
@@ -1459,10 +1458,13 @@ platformNav.addEventListener('click', (ev) => {
   }
   if(activePlatform === 'all'){
     activeCat = 'all';
+    sideNav.style.display = '';
     sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
   } else if(activePlatform === 'other'){
     activeCat = 'other-tools';
-    sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === 'other-tools'));
+    sideNav.style.display = 'none';
+  } else {
+    sideNav.style.display = '';
   }
   currentPage = 1;
   render();
