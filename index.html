@@ -1159,7 +1159,8 @@ function openNoteDetail(entry){
   const dateStr = new Date(entry.createdAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
   const pm = platformMeta(entry.platform);
   const catLabel = CATEGORY_LABELS[entry.category] || entry.category;
-  const thumbHtml = entry.link ? linkThumbHtml(entry.link) : '';
+  const thumbInner = entry.link ? linkThumbHtml(entry.link) : '';
+  const thumbHtml = entry.link ? `<a class="card-thumb-link" href="${escapeHtml(entry.link)}" target="_blank" rel="noopener">${thumbInner}</a>` : '';
   const linkHtml = entry.link
     ? `<a href="${escapeHtml(entry.link)}" target="_blank" rel="noopener">${escapeHtml(entry.link)}</a>`
     : 'Not provided';
