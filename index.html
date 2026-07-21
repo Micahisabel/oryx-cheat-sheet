@@ -107,6 +107,35 @@
   }
   .platform-item.active .platform-badge{background:rgba(255,255,255,0.25);color:var(--white);}
 
+  .platform-row{display:flex;align-items:stretch;gap:6px;}
+  .platform-row .platform-item{flex:1;}
+  .platform-expand-btn{
+    flex-shrink:0;width:36px;border:1px solid transparent;border-radius:14px;background:none;
+    color:rgba(255,255,255,0.6);cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:background 0.15s ease, color 0.15s ease;
+  }
+  .platform-expand-btn:hover{background:rgba(255,255,255,0.06);color:var(--white);}
+  .platform-expand-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.15s ease;}
+  .platform-expand-btn.open svg{transform:rotate(180deg);}
+  .platform-submenu{display:flex;flex-direction:column;gap:4px;padding:2px 0 2px 14px;margin:-2px 0 4px;}
+  .platform-submenu-item{
+    display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid transparent;border-radius:10px;
+    background:rgba(255,255,255,0.04);cursor:pointer;text-align:left;font-family:var(--font-body);font-weight:500;
+    font-size:13px;color:rgba(255,255,255,0.75);width:100%;transition:background 0.15s ease, color 0.15s ease;
+  }
+  .platform-submenu-item:hover{background:rgba(255,255,255,0.08);color:var(--white);}
+  .platform-submenu-item.active{background:rgba(255,255,255,0.14);color:var(--white);}
+  .submenu-icon{width:15px;height:15px;flex-shrink:0;display:block;}
+  .submenu-icon svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .platform-submenu-empty{padding:10px 14px;font-family:var(--font-body);font-size:13px;color:rgba(255,255,255,0.35);font-style:italic;}
+
+  .shortcuts-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+  .shortcuts-back-btn{display:flex;align-items:center;gap:8px;border:none;background:none;cursor:pointer;
+    font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--oryx-blue);padding:6px 0;}
+  .shortcuts-back-btn:hover{text-decoration:underline;}
+  .shortcuts-banner-label{font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--silver);}
+  .shortcut-key-text{font-family:'Courier New',monospace;color:var(--white);font-size:14px;font-weight:600;padding:0 12px;text-align:center;}
+
   /* ---------- Category tab bar (Oryx blue, icon + badge) ---------- */
   .cat-tabbar{
     display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;
@@ -474,14 +503,26 @@
           <span class="platform-item-label"><span class="platform-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>All Platforms</span>
           <span class="platform-badge" data-platform-count="all">0</span>
         </button>
-        <button class="platform-item" data-platform="claude">
-          <span class="platform-item-label"><span class="platform-icon"><svg viewBox="0 0 24 24"><path d="M12 2v5M12 17v5M2 12h5M17 12h5M4.9 4.9l3.6 3.6M15.5 15.5l3.6 3.6M19.1 4.9l-3.6 3.6M8.5 15.5l-3.6 3.6"/></svg></span>Claude Hub</span>
-          <span class="platform-badge" data-platform-count="claude">0</span>
-        </button>
-        <button class="platform-item" data-platform="chatgpt">
-          <span class="platform-item-label"><span class="platform-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>ChatGPT Engine</span>
-          <span class="platform-badge" data-platform-count="chatgpt">0</span>
-        </button>
+        <div class="platform-row">
+          <button class="platform-item" data-platform="claude">
+            <span class="platform-item-label"><span class="platform-icon"><svg viewBox="0 0 24 24"><path d="M12 2v5M12 17v5M2 12h5M17 12h5M4.9 4.9l3.6 3.6M15.5 15.5l3.6 3.6M19.1 4.9l-3.6 3.6M8.5 15.5l-3.6 3.6"/></svg></span>Claude Hub</span>
+            <span class="platform-badge" data-platform-count="claude">0</span>
+          </button>
+          <button class="platform-expand-btn" data-expand="claude" aria-label="Expand Claude Hub"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        </div>
+        <div class="platform-submenu" id="claudeSubmenu" style="display:none;">
+          <button class="platform-submenu-item" id="claudeShortcutsBtn"><span class="submenu-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/></svg></span>Claude Shortcuts</button>
+        </div>
+        <div class="platform-row">
+          <button class="platform-item" data-platform="chatgpt">
+            <span class="platform-item-label"><span class="platform-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>ChatGPT Engine</span>
+            <span class="platform-badge" data-platform-count="chatgpt">0</span>
+          </button>
+          <button class="platform-expand-btn" data-expand="chatgpt" aria-label="Expand ChatGPT Engine"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        </div>
+        <div class="platform-submenu" id="chatgptSubmenu" style="display:none;">
+          <div class="platform-submenu-empty">No shortcuts yet</div>
+        </div>
         <button class="platform-item" data-platform="other">
           <span class="platform-item-label"><span class="platform-icon"><svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.9L19 10l-4.9 2.1L12 17l-2.1-4.9L5 10l4.9-2.1z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg></span>Other AI Tools</span>
           <span class="platform-badge" data-platform-count="other">0</span>
@@ -490,6 +531,15 @@
     </aside>
 
     <main class="hub-main">
+      <div class="shortcuts-banner" id="shortcutsBanner" style="display:none;">
+        <button class="shortcuts-back-btn" id="exitShortcuts"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg> Back to Library</button>
+        <span class="shortcuts-banner-label">Claude Shortcuts</span>
+      </div>
+      <nav class="cat-tabbar" id="shortcutNav" style="display:none;">
+        <button class="cat-tab active" data-cat="shortcut-desktop">Claude Desktop<span class="cat-badge" data-count-for="shortcut-desktop">0</span></button>
+        <button class="cat-tab" data-cat="shortcut-code">Claude Code<span class="cat-badge" data-count-for="shortcut-code">0</span></button>
+        <button class="cat-tab" data-cat="shortcut-slash">Slash Commands<span class="cat-badge" data-count-for="shortcut-slash">0</span></button>
+      </nav>
       <nav class="cat-tabbar" id="sideNav">
         <button class="cat-tab active" data-cat="skills"><span class="cat-icon"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.9L21 11l-6.6 2.1L12 20l-2.4-6.9L3 11l6.6-2.1z"/></svg></span>Skills<span class="cat-badge" data-count-for="skills">0</span></button>
         <button class="cat-tab" data-cat="commands"><span class="cat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg></span>Commands<span class="cat-badge" data-count-for="commands">0</span></button>
@@ -801,6 +851,12 @@ function buildSkillMarkdown(entry){
     section('Notes', entry.notes);
     section('How to Install and Use It in Claude', entry.howToAccess);
     section('How This Helps Oryx Doors & Windows', entry.oryxTip);
+  } else if(isShortcutCategory(entry.category)){
+    section('Shortcut / Command', entry.shortcutKey);
+    section('Purpose', entry.purpose);
+    section('How to Use It', entry.howToUse);
+    section('Example', entry.example);
+    section('Notes', entry.notes);
   } else {
     section('Details', entry.body);
   }
@@ -829,6 +885,9 @@ const CATEGORY_LABELS = {
   mcps: 'MCP',
   plugins: 'Plugin',
   discoveries: 'Discovery',
+  'shortcut-desktop': 'Claude Desktop',
+  'shortcut-code': 'Claude Code',
+  'shortcut-slash': 'Slash Command',
   // legacy labels kept so older entries still display a clean tag
   prompting: 'Prompting Technique',
   resources: 'Resource'
@@ -840,7 +899,10 @@ const CATEGORY_PLURAL_LABELS = {
   agents: 'AI Agents',
   mcps: 'MCPs',
   plugins: 'Plugins',
-  discoveries: 'Discoveries'
+  discoveries: 'Discoveries',
+  'shortcut-desktop': 'Claude Shortcuts',
+  'shortcut-code': 'Claude Shortcuts',
+  'shortcut-slash': 'Claude Shortcuts'
 };
 
 const CATEGORY_ICON_PATHS = {
@@ -861,22 +923,98 @@ function cardPlaceholderHtml(category){
 const RICH_CATEGORIES = ['skills', 'commands', 'agents', 'mcps', 'plugins'];
 function isRichCategory(cat){ return RICH_CATEGORIES.includes(cat); }
 
+const SHORTCUT_CATEGORIES = ['shortcut-desktop', 'shortcut-code', 'shortcut-slash'];
+function isShortcutCategory(cat){ return SHORTCUT_CATEGORIES.includes(cat); }
+function shortcutBadgeHtml(key){
+  if(!key) return '';
+  return `<div class="card-placeholder"><span class="shortcut-key-text">${escapeHtml(key)}</span></div>`;
+}
+
 let entries = [];
 let activeCat = 'skills';
 let activePlatform = 'all';
 let searchTerm = '';
 let activeDepartment = 'all';
 let currentPage = 1;
+let viewMode = 'library';
 const PAGE_SIZE = 8;
 
 const grid = document.getElementById('grid');
 const pagination = document.getElementById('pagination');
 const countRow = document.getElementById('countRow');
 const sideNav = document.getElementById('sideNav');
+const shortcutNav = document.getElementById('shortcutNav');
+const shortcutsBanner = document.getElementById('shortcutsBanner');
 const platformNav = document.getElementById('platformNav');
 const overlay = document.getElementById('overlay');
 const searchInput = document.getElementById('searchInput');
 const departmentSelect = document.getElementById('departmentSelect');
+
+function enterShortcutsMode(){
+  viewMode = 'shortcuts';
+  activeCat = 'shortcut-desktop';
+  activeDepartment = 'all';
+  currentPage = 1;
+  sideNav.style.display = 'none';
+  departmentSelect.style.display = 'none';
+  shortcutNav.style.display = 'flex';
+  shortcutsBanner.style.display = 'flex';
+  shortcutNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
+  document.querySelectorAll('.platform-submenu-item').forEach(b => b.classList.remove('active'));
+  const claudeShortcutsBtn = document.getElementById('claudeShortcutsBtn');
+  if(claudeShortcutsBtn) claudeShortcutsBtn.classList.add('active');
+  render();
+}
+
+function exitShortcutsMode(){
+  viewMode = 'library';
+  activeCat = 'skills';
+  sideNav.style.display = '';
+  departmentSelect.style.display = '';
+  shortcutNav.style.display = 'none';
+  shortcutsBanner.style.display = 'none';
+  sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
+  document.querySelectorAll('.platform-submenu-item').forEach(b => b.classList.remove('active'));
+  render();
+}
+
+document.querySelectorAll('.platform-expand-btn').forEach(btn => {
+  btn.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    const target = document.getElementById(btn.dataset.expand + 'Submenu');
+    if(!target) return;
+    const isOpen = target.style.display !== 'none';
+    target.style.display = isOpen ? 'none' : 'flex';
+    btn.classList.toggle('open', !isOpen);
+  });
+});
+
+const claudeShortcutsBtn = document.getElementById('claudeShortcutsBtn');
+if(claudeShortcutsBtn){
+  claudeShortcutsBtn.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    platformNav.querySelectorAll('.platform-item').forEach(t => t.classList.remove('active'));
+    enterShortcutsMode();
+  });
+}
+
+document.getElementById('exitShortcuts').addEventListener('click', () => {
+  const allBtn = platformNav.querySelector('[data-platform="all"]');
+  platformNav.querySelectorAll('.platform-item').forEach(t => t.classList.remove('active'));
+  if(allBtn) allBtn.classList.add('active');
+  activePlatform = 'all';
+  exitShortcutsMode();
+});
+
+shortcutNav.addEventListener('click', (ev) => {
+  const btn = ev.target.closest('.cat-tab');
+  if(!btn) return;
+  shortcutNav.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  activeCat = btn.dataset.cat;
+  currentPage = 1;
+  render();
+});
 
 searchInput.addEventListener('input', () => {
   searchTerm = searchInput.value.trim().toLowerCase();
@@ -990,32 +1128,12 @@ function hydrateTikTokThumbs(root){
 function render(){
   updateDepartmentOptions();
 
-  const filtered = entries.filter(e => {
-    const catMatch = activeCat === 'all' || e.category === activeCat;
-    if(!catMatch) return false;
-    const platformMatch = activePlatform === 'all' || (e.platform || 'claude') === activePlatform;
-    if(!platformMatch) return false;
-    const deptMatch = activeDepartment === 'all' || e.department === activeDepartment;
-    if(!deptMatch) return false;
-    if(!searchTerm) return true;
-    const haystack = [e.title, e.body, e.purpose, e.bestFor, e.notes, e.department]
-      .filter(Boolean).join(' ').toLowerCase();
-    return haystack.includes(searchTerm);
-  }).sort((a,b) => b.createdAt - a.createdAt);
+  const libraryEntries = entries.filter(e => !isShortcutCategory(e.category));
+  const shortcutEntries = entries.filter(e => isShortcutCategory(e.category));
 
-  countRow.textContent = filtered.length + (filtered.length === 1 ? ' entry' : ' entries');
-
-  document.getElementById('totalCount').textContent = entries.length;
-  const platformFilteredEntries = activePlatform === 'all' ? entries : entries.filter(e => (e.platform || 'claude') === activePlatform);
-  const counts = { all: platformFilteredEntries.length, skills: 0, commands: 0, agents: 0, mcps: 0, plugins: 0, discoveries: 0 };
-  platformFilteredEntries.forEach(e => { if(counts[e.category] !== undefined) counts[e.category]++; });
-  Object.keys(counts).forEach(cat => {
-    const el = sideNav.querySelector(`[data-count-for="${cat}"]`);
-    if(el) el.textContent = counts[cat];
-  });
-
-  const platformCounts = { all: entries.length, claude: 0, chatgpt: 0, other: 0 };
-  entries.forEach(e => {
+  document.getElementById('totalCount').textContent = libraryEntries.length;
+  const platformCounts = { all: libraryEntries.length, claude: 0, chatgpt: 0, other: 0 };
+  libraryEntries.forEach(e => {
     const p = e.platform || 'claude';
     if(platformCounts[p] !== undefined) platformCounts[p]++;
   });
@@ -1023,6 +1141,47 @@ function render(){
     const el = platformNav.querySelector(`[data-platform-count="${p}"]`);
     if(el) el.textContent = platformCounts[p];
   });
+
+  const shortcutCounts = { 'shortcut-desktop': 0, 'shortcut-code': 0, 'shortcut-slash': 0 };
+  shortcutEntries.forEach(e => { if(shortcutCounts[e.category] !== undefined) shortcutCounts[e.category]++; });
+  Object.keys(shortcutCounts).forEach(cat => {
+    const el = shortcutNav.querySelector(`[data-count-for="${cat}"]`);
+    if(el) el.textContent = shortcutCounts[cat];
+  });
+
+  let filtered;
+  if(viewMode === 'shortcuts'){
+    filtered = shortcutEntries.filter(e => {
+      if(e.category !== activeCat) return false;
+      if(!searchTerm) return true;
+      const haystack = [e.title, e.shortcutKey, e.purpose, e.howToUse, e.example, e.notes]
+        .filter(Boolean).join(' ').toLowerCase();
+      return haystack.includes(searchTerm);
+    }).sort((a,b) => b.createdAt - a.createdAt);
+  } else {
+    filtered = libraryEntries.filter(e => {
+      const catMatch = activeCat === 'all' || e.category === activeCat;
+      if(!catMatch) return false;
+      const platformMatch = activePlatform === 'all' || (e.platform || 'claude') === activePlatform;
+      if(!platformMatch) return false;
+      const deptMatch = activeDepartment === 'all' || e.department === activeDepartment;
+      if(!deptMatch) return false;
+      if(!searchTerm) return true;
+      const haystack = [e.title, e.body, e.purpose, e.bestFor, e.notes, e.department]
+        .filter(Boolean).join(' ').toLowerCase();
+      return haystack.includes(searchTerm);
+    }).sort((a,b) => b.createdAt - a.createdAt);
+
+    const platformFilteredEntries = activePlatform === 'all' ? libraryEntries : libraryEntries.filter(e => (e.platform || 'claude') === activePlatform);
+    const counts = { all: platformFilteredEntries.length, skills: 0, commands: 0, agents: 0, mcps: 0, plugins: 0, discoveries: 0 };
+    platformFilteredEntries.forEach(e => { if(counts[e.category] !== undefined) counts[e.category]++; });
+    Object.keys(counts).forEach(cat => {
+      const el = sideNav.querySelector(`[data-count-for="${cat}"]`);
+      if(el) el.textContent = counts[cat];
+    });
+  }
+
+  countRow.textContent = filtered.length + (filtered.length === 1 ? ' entry' : ' entries');
 
   if(filtered.length === 0){
     grid.innerHTML = '<div class="empty">No entries here yet. Be the first to add one.</div>';
@@ -1051,11 +1210,11 @@ function render(){
 
   grid.innerHTML = pageItems.map(e => {
     let thumbInner = e.link ? linkThumbHtml(e.link) : '';
-    if(!thumbInner) thumbInner = cardPlaceholderHtml(e.category);
+    if(!thumbInner) thumbInner = isShortcutCategory(e.category) ? shortcutBadgeHtml(e.shortcutKey) : cardPlaceholderHtml(e.category);
     const thumbHtml = e.link ? `<a class="card-thumb-link" href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${thumbInner}</a>` : thumbInner;
     const linkHtml = e.link ? `<div class="card-link"><a href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${escapeHtml(e.link)}</a></div>` : '';
     const dateStr = new Date(e.createdAt).toLocaleDateString(undefined, {month:'short', day:'numeric'});
-    const preview = isRichCategory(e.category) ? (e.purpose || e.body) : e.body;
+    const preview = (isRichCategory(e.category) || isShortcutCategory(e.category)) ? (e.purpose || e.body) : e.body;
     const tagChipHtml = e.tag ? `<span class="card-tag-chip">${escapeHtml(e.tag)}</span>` : '';
     const platformTagLabel = e.platform === 'other' ? 'Other AI Tools' : platformMeta(e.platform).label;
     const cardTagLabel = isRichCategory(e.category) && e.department ? e.department : (e.category === 'discoveries' ? platformTagLabel : (CATEGORY_LABELS[e.category] || e.category));
@@ -1148,6 +1307,12 @@ function openNoteDetail(entry){
       + detailBlock('How to Download', DOWNLOAD_HELP_TEXT)
       + detailBlock('How to Install and Use It in Claude', entry.howToAccess && entry.howToAccess.trim() ? entry.howToAccess : INSTALL_HELP_TEXT)
       + optionalBlock('How This Helps Oryx Doors & Windows', entry.oryxTip, 'detail-tip');
+  } else if(isShortcutCategory(entry.category)){
+    html += optionalBlock('Shortcut / Command', entry.shortcutKey, 'detail-value mono')
+      + optionalBlock('Purpose', entry.purpose)
+      + optionalBlock('How to Use It', entry.howToUse)
+      + optionalBlock('Example', entry.example, 'detail-value mono')
+      + optionalBlock('Notes', entry.notes);
   } else {
     html += optionalBlock('Details', entry.body)
       + detailBlock('How to Download', DOWNLOAD_HELP_TEXT);
@@ -1181,6 +1346,15 @@ platformNav.addEventListener('click', (ev) => {
   platformNav.querySelectorAll('.platform-item').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   activePlatform = btn.dataset.platform;
+  const wasInShortcuts = viewMode === 'shortcuts';
+  if(wasInShortcuts){
+    viewMode = 'library';
+    sideNav.style.display = '';
+    departmentSelect.style.display = '';
+    shortcutNav.style.display = 'none';
+    shortcutsBanner.style.display = 'none';
+    document.querySelectorAll('.platform-submenu-item').forEach(b => b.classList.remove('active'));
+  }
   if(activePlatform === 'all'){
     activeCat = 'all';
     sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
