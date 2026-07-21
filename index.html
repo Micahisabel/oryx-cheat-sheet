@@ -570,9 +570,6 @@
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           <input type="text" id="searchInput" placeholder="Search components, commands, tags, prompts…">
         </div>
-        <select class="filter-select" id="departmentSelect">
-          <option value="all">All Departments</option>
-        </select>
       </div>
 
       <div class="count-row" id="countRow">Loading entries…</div>
@@ -1006,7 +1003,6 @@ let entries = [];
 let activeCat = 'skills';
 let activePlatform = 'all';
 let searchTerm = '';
-let activeDepartment = 'all';
 let currentPage = 1;
 let viewMode = 'library';
 let shortcutGroup = 'claude';
@@ -1023,7 +1019,6 @@ const shortcutsBannerLabel = document.getElementById('shortcutsBannerLabel');
 const platformNav = document.getElementById('platformNav');
 const overlay = document.getElementById('overlay');
 const searchInput = document.getElementById('searchInput');
-const departmentSelect = document.getElementById('departmentSelect');
 
 function enterShortcutsMode(group){
   viewMode = 'shortcuts';
@@ -1032,10 +1027,8 @@ function enterShortcutsMode(group){
   const nav = group === 'chatgpt' ? chatgptShortcutNav : shortcutNav;
   const otherNav = group === 'chatgpt' ? shortcutNav : chatgptShortcutNav;
   activeCat = cats[0];
-  activeDepartment = 'all';
   currentPage = 1;
   sideNav.style.display = 'none';
-  departmentSelect.style.display = 'none';
   nav.style.display = 'flex';
   otherNav.style.display = 'none';
   shortcutsBanner.style.display = 'flex';
@@ -1052,7 +1045,6 @@ function exitShortcutsMode(){
   viewMode = 'library';
   activeCat = 'skills';
   sideNav.style.display = '';
-  departmentSelect.style.display = '';
   shortcutNav.style.display = 'none';
   chatgptShortcutNav.style.display = 'none';
   shortcutsBanner.style.display = 'none';
@@ -1121,20 +1113,6 @@ searchInput.addEventListener('input', () => {
   currentPage = 1;
   render();
 });
-
-departmentSelect.addEventListener('change', () => {
-  activeDepartment = departmentSelect.value;
-  currentPage = 1;
-  render();
-});
-
-function updateDepartmentOptions(){
-  const depts = Array.from(new Set(entries.map(e => e.department).filter(Boolean))).sort();
-  const current = departmentSelect.value;
-  departmentSelect.innerHTML = '<option value="all">All Departments</option>' +
-    depts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
-  if(depts.includes(current)) departmentSelect.value = current;
-}
 
 let knownEntryIds = null;
 
@@ -1226,8 +1204,6 @@ function hydrateTikTokThumbs(root){
 }
 
 function render(){
-  updateDepartmentOptions();
-
   const libraryEntries = entries.filter(e => !isShortcutCategory(e.category));
   const shortcutEntries = entries.filter(e => isShortcutCategory(e.category));
 
@@ -1264,8 +1240,6 @@ function render(){
       if(!catMatch) return false;
       const platformMatch = activePlatform === 'all' || (e.platform || 'claude') === activePlatform;
       if(!platformMatch) return false;
-      const deptMatch = activeDepartment === 'all' || e.department === activeDepartment;
-      if(!deptMatch) return false;
       if(!searchTerm) return true;
       const haystack = [e.title, e.body, e.purpose, e.bestFor, e.notes, e.department]
         .filter(Boolean).join(' ').toLowerCase();
@@ -1450,7 +1424,6 @@ platformNav.addEventListener('click', (ev) => {
   if(wasInShortcuts){
     viewMode = 'library';
     sideNav.style.display = '';
-    departmentSelect.style.display = '';
     shortcutNav.style.display = 'none';
     chatgptShortcutNav.style.display = 'none';
     shortcutsBanner.style.display = 'none';
@@ -1459,15 +1432,12 @@ platformNav.addEventListener('click', (ev) => {
   if(activePlatform === 'all'){
     activeCat = 'all';
     sideNav.style.display = '';
-    departmentSelect.style.display = '';
     sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
   } else if(activePlatform === 'other'){
     activeCat = 'other-tools';
     sideNav.style.display = 'none';
-    departmentSelect.style.display = 'none';
   } else {
     sideNav.style.display = '';
-    departmentSelect.style.display = '';
   }
   currentPage = 1;
   render();
