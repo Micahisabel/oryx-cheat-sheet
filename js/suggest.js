@@ -74,6 +74,17 @@ async function submitDiscovery(){
   }
 }
 
+function notifySlackOfRequest(s){
+  // Posts to the Apps Script relay, which holds the real Slack webhook server-side.
+  // no-cors + text/plain avoids Apps Script/Slack's lack of CORS support; fire-and-forget, never blocks the UI.
+  fetch(NOTIFY_ENDPOINT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(s)
+  }).catch(() => {});
+}
+
 async function submitRequest(){
   const title = document.getElementById('sTitle').value.trim();
   const text = document.getElementById('sText').value.trim();
@@ -92,6 +103,7 @@ async function submitRequest(){
     await suggestionsCollection.add({
       title, text, type, platform, name, status: 'pending', createdAt: Date.now()
     });
+    notifySlackOfRequest({ title, text, type, platform, name });
     try{ localStorage.setItem(AUTHOR_KEY, name); }catch(e){}
     closeSuggestPanel();
     alert('Thanks! Your request has been sent to the admin.');
