@@ -18,3 +18,5 @@ const shortcutsBannerLabel = document.getElementById('shortcutsBannerLabel');
 const platformNav = document.getElementById('platformNav');
 const overlay = document.getElementById('overlay');
 const searchInput = document.getElementById('searchInput');
+const recentStrip = document.getElementById('recentStrip');
+const recentRow = document.getElementById('recentRow');

@@ -93,9 +93,63 @@ function hydrateTikTokThumbs(root){
   });
 }
 
+const RECENT_STRIP_MAX = 5;
+const RECENT_STRIP_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+
+function relativeDateLabel(ts){
+  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const diffDays = Math.round((startOfDay(new Date()) - startOfDay(new Date(ts))) / (24 * 60 * 60 * 1000));
+  if(diffDays <= 0) return 'Today';
+  if(diffDays === 1) return 'Yesterday';
+  return `${diffDays} days ago`;
+}
+
+function renderRecentStrip(libraryEntries){
+  const now = Date.now();
+  const recent = libraryEntries
+    .filter(e => e.createdAt && (now - e.createdAt) <= RECENT_STRIP_WINDOW_MS)
+    .sort((a,b) => b.createdAt - a.createdAt)
+    .slice(0, RECENT_STRIP_MAX);
+
+  if(!recent.length){
+    recentStrip.style.display = 'none';
+    recentRow.innerHTML = '';
+    return;
+  }
+
+  recentStrip.style.display = '';
+  recentRow.innerHTML = recent.map(e => {
+    const desc = (isRichCategory(e.category) || isShortcutCategory(e.category)) ? (e.purpose || e.body) : e.body;
+    const platformLabel = e.platform === 'other' ? 'Other AI Tools' : platformMeta(e.platform).label;
+    return `
+      <div class="recent-card" data-id="${e.id}">
+        <span class="recent-badge">New</span>
+        <p class="recent-title">${escapeHtml(e.title)}</p>
+        <p class="recent-desc">${escapeHtml(desc || '')}</p>
+        <div class="recent-footer">
+          <span class="card-tag-chip recent-platform-tag">${escapeHtml(platformLabel)}</span>
+          <span class="recent-date">${relativeDateLabel(e.createdAt)}</span>
+        </div>
+      </div>`;
+  }).join('');
+
+  recentRow.querySelectorAll('.recent-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const entry = recent.find(e => e.id === card.dataset.id);
+      if(entry) openNoteDetail(entry);
+    });
+  });
+}
+
 function render(){
   const libraryEntries = entries.filter(e => !isShortcutCategory(e.category));
   const shortcutEntries = entries.filter(e => isShortcutCategory(e.category));
+
+  if(viewMode === 'shortcuts'){
+    recentStrip.style.display = 'none';
+  }else{
+    renderRecentStrip(libraryEntries);
+  }
 
   document.getElementById('totalCount').textContent = libraryEntries.length;
   const platformCounts = { all: libraryEntries.length, claude: 0, chatgpt: 0, other: 0 };
