@@ -79,6 +79,17 @@ function linkThumbHtml(link){
   return `<div class="link-thumb-badge-wrap"><span class="link-thumb-badge">${label}</span></div>`;
 }
 
+function faviconBadgeHtml(link, category){
+  let domain;
+  try{ domain = new URL(link).hostname; }catch(e){ return ''; }
+  const fallbackPath = CATEGORY_ICON_PATHS[category] || '';
+  const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`;
+  return `<div class="card-placeholder">
+    <img class="card-favicon-img" src="${faviconUrl}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='';">
+    <svg viewBox="0 0 24 24" style="display:none">${fallbackPath}</svg>
+  </div>`;
+}
+
 function hydrateTikTokThumbs(root){
   root.querySelectorAll('[data-thumb-platform="tiktok"]').forEach(async (el) => {
     const link = el.dataset.thumbUrl;
@@ -228,6 +239,7 @@ function render(){
 
   grid.innerHTML = pageItems.map(e => {
     let thumbInner = e.link ? linkThumbHtml(e.link) : '';
+    if(!thumbInner && e.category === 'other-tools' && e.link) thumbInner = faviconBadgeHtml(e.link, e.category);
     if(!thumbInner) thumbInner = isShortcutCategory(e.category) ? shortcutBadgeHtml(e.shortcutKey) : cardPlaceholderHtml(e.category);
     const thumbHtml = e.link ? `<a class="card-thumb-link" href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${thumbInner}</a>` : thumbInner;
     const linkHtml = e.link ? `<div class="card-link"><a href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${escapeHtml(e.link)}</a></div>` : '';
