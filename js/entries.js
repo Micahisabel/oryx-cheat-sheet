@@ -287,6 +287,7 @@ function render(){
   grid.querySelectorAll('.card-del').forEach(btn => {
     btn.addEventListener('click', async (ev) => {
       ev.stopPropagation();
+      if(!confirm('Remove this entry? This cannot be undone.')) return;
       const id = btn.dataset.id;
       btn.disabled = true;
       btn.textContent = 'Removing…';
