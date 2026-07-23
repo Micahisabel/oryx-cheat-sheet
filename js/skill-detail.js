@@ -58,10 +58,15 @@ function openNoteDetail(entry){
       + detailBlock(isLinkResource ? 'How to Use' : 'How to Download', isLinkResource ? USE_LINK_HELP_TEXT : DOWNLOAD_HELP_TEXT);
   }
 
+  const lastEditedStr = entry.lastEditedBy
+    ? `${entry.lastEditedBy} · ${new Date(entry.lastEditedAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'})}`
+    : '';
+
   html += detailBlockHtml('Link', linkHtml)
     + optionalBlock('Suggested by', entry.suggestedBy)
     + detailBlock('Added by', entry.author || 'Anonymous')
-    + detailBlock('Date added', dateStr);
+    + detailBlock('Date added', dateStr)
+    + optionalBlock('Last edited by', lastEditedStr);
 
   if(!isLinkResource){
     html += `

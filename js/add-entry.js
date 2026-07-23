@@ -237,7 +237,14 @@ saveAdd.addEventListener('click', async () => {
     howToAccess: isSkill ? skillValues.fHowToAccess : '',
     oryxTip: isSkill ? skillValues.fOryxTip : ''
   };
-  if(!isEditing) entryData.createdAt = Date.now();
+  if(!isEditing){
+    entryData.createdAt = Date.now();
+  }else{
+    let editorName = '';
+    try{ editorName = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
+    entryData.lastEditedBy = editorName || author || 'Anonymous';
+    entryData.lastEditedAt = Date.now();
+  }
 
   try{
     if(isEditing){

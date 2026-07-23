@@ -33,6 +33,14 @@ adminToggle.addEventListener('click', () => {
   if(code === ADMIN_PASSCODE){
     isAdmin = true;
     try{ localStorage.setItem(ADMIN_KEY, '1'); }catch(e){}
+    let adminName = '';
+    try{ adminName = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
+    if(!adminName){
+      const name = prompt('One more thing — what\'s your name? This is stamped on entries you edit, so the team knows who made each change.');
+      if(name && name.trim()){
+        try{ localStorage.setItem(AUTHOR_KEY, name.trim()); }catch(e){}
+      }
+    }
     applyAdminUI();
     if('Notification' in window && Notification.permission === 'default'){
       Notification.requestPermission();
