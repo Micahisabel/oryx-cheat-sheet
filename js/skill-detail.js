@@ -35,6 +35,8 @@ function openNoteDetail(entry){
     html += `<div class="skill-thumb">${thumbHtml}</div>`;
   }
 
+  const isLinkResource = entry.category === 'discoveries' || entry.category === 'other-tools';
+
   if(isRichCategory(entry.category)){
     html += optionalBlock('Purpose', entry.purpose || entry.body)
       + optionalBlock('Best For', entry.bestFor)
@@ -52,7 +54,6 @@ function openNoteDetail(entry){
       + optionalBlock('Example', entry.example, 'detail-value mono')
       + optionalBlock('Notes', entry.notes);
   } else {
-    const isLinkResource = entry.category === 'discoveries' || entry.category === 'other-tools';
     html += optionalBlock('Details', entry.body)
       + detailBlock(isLinkResource ? 'How to Use' : 'How to Download', isLinkResource ? USE_LINK_HELP_TEXT : DOWNLOAD_HELP_TEXT);
   }
@@ -62,13 +63,15 @@ function openNoteDetail(entry){
     + detailBlock('Added by', entry.author || 'Anonymous')
     + detailBlock('Date added', dateStr);
 
-  html += `
+  if(!isLinkResource){
+    html += `
       <div class="skill-download-bar">
         <h3>Download this entry</h3>
         <p>Save this entry as a Markdown (.md) file to keep, share, or upload into Claude.</p>
         <button class="download-btn" id="downloadSkill">${DOWNLOAD_ICON_SVG} Download ${escapeHtml(CATEGORY_LABELS[entry.category] || 'Entry')} (.md)</button>
-      </div>
-    </div>`;
+      </div>`;
+  }
+  html += `</div>`;
 
   inner.innerHTML = html;
   hydrateTikTokThumbs(inner);
@@ -76,5 +79,6 @@ function openNoteDetail(entry){
   page.classList.add('open');
   page.scrollTop = 0;
   document.getElementById('skillBack').addEventListener('click', closeDetail);
-  document.getElementById('downloadSkill').addEventListener('click', () => downloadSkillMd(entry));
+  const downloadBtn = document.getElementById('downloadSkill');
+  if(downloadBtn) downloadBtn.addEventListener('click', () => downloadSkillMd(entry));
 }
