@@ -62,7 +62,7 @@ function openNoteDetail(entry){
     ? `${entry.lastEditedBy} · ${new Date(entry.lastEditedAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'})}`
     : '';
 
-  html += detailBlockHtml('Link', linkHtml)
+  html += (entry.link ? detailBlockHtml('Link', linkHtml) : '')
     + optionalBlock('Suggested by', entry.suggestedBy)
     + detailBlock('Added by', entry.author || 'Anonymous')
     + detailBlock('Date added', dateStr)
