@@ -161,6 +161,8 @@ function openEditEntry(entry){
   editingEntryId = entry.id;
   overlayHeading.textContent = 'Edit entry';
   saveAdd.textContent = 'Save changes';
+  currentSuggestionId = null;
+  currentSuggestedBy = entry.suggestedBy || '';
 
   document.getElementById('fPlatform').value = entry.platform || 'claude';
   fCategory.value = entry.category;
