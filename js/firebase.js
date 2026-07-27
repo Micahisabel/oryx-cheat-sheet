@@ -13,7 +13,7 @@ const entriesCollection = db.collection('entries');
 const suggestionsCollection = db.collection('suggestions');
 const AUTHOR_KEY = 'oryx-cheatsheet-author-name';
 const ADMIN_KEY = 'oryx-cheatsheet-admin';
-const ADMIN_PASSCODE = 'OryxAdmin2026';   // soft gate — change this to your team's passcode
+const configCollection = db.collection('config');
 // Google Apps Script Web App that forwards new requests to Slack — the real Slack webhook
 // lives only inside that script, never in this public client-side file.
 const NOTIFY_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbzhbtDMsdzrpXhHaTQf6hkgtrZLO995vG1L6uqipmaHSzQkvPzMcq9fw_mOd3a_2e3o5g/exec';

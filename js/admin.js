@@ -21,7 +21,13 @@ function applyAdminUI(){
   render();  // re-render cards so Remove buttons show/hide
 }
 
-adminToggle.addEventListener('click', () => {
+async function sha256Hex(text){
+  const bytes = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+adminToggle.addEventListener('click', async () => {
   if(isAdmin){
     isAdmin = false;
     try{ localStorage.removeItem(ADMIN_KEY); }catch(e){}
@@ -30,7 +36,16 @@ adminToggle.addEventListener('click', () => {
   }
   const code = prompt('Enter the admin passcode:');
   if(code === null) return;
-  if(code === ADMIN_PASSCODE){
+  let passcodeHash = '';
+  try{
+    const configDoc = await configCollection.doc('admin').get();
+    passcodeHash = configDoc.exists ? configDoc.data().passcodeHash : '';
+  }catch(e){
+    alert('Could not verify passcode right now — check your connection and try again.');
+    return;
+  }
+  const enteredHash = await sha256Hex(code);
+  if(passcodeHash && enteredHash === passcodeHash){
     isAdmin = true;
     try{ localStorage.setItem(ADMIN_KEY, '1'); }catch(e){}
     let adminName = '';
