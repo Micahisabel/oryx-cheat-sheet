@@ -44,8 +44,12 @@ adminToggle.addEventListener('click', async () => {
     alert('Could not verify passcode right now — check your connection and try again.');
     return;
   }
+  if(!passcodeHash){
+    alert('Admin login isn\'t set up correctly — the passcode is missing from the database. Contact whoever manages Firestore.');
+    return;
+  }
   const enteredHash = await sha256Hex(code);
-  if(passcodeHash && enteredHash === passcodeHash){
+  if(enteredHash === passcodeHash){
     isAdmin = true;
     try{ localStorage.setItem(ADMIN_KEY, '1'); }catch(e){}
     let adminName = '';
