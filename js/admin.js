@@ -30,7 +30,9 @@ adminToggle.addEventListener('click', async () => {
     await firebase.auth().signOut();
     return;
   }
-  const email = prompt('Admin email:');
+  let savedEmail = '';
+  try{ savedEmail = localStorage.getItem(ADMIN_EMAIL_KEY) || ''; }catch(e){}
+  const email = prompt('Admin email:', savedEmail);
   if(email === null) return;
   const password = prompt('Password:');
   if(password === null) return;
@@ -41,6 +43,8 @@ adminToggle.addEventListener('click', async () => {
     alert('Incorrect email or password.');
     return;
   }
+
+  try{ localStorage.setItem(ADMIN_EMAIL_KEY, email.trim()); }catch(e){}
 
   let adminName = '';
   try{ adminName = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
