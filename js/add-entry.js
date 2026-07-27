@@ -128,6 +128,8 @@ function openOverlay(){
   editingEntryId = null;
   overlayHeading.textContent = 'Add an entry';
   saveAdd.textContent = 'Save entry';
+  currentSuggestionId = null;
+  currentSuggestedBy = '';
   let savedAuthor = '';
   try{ savedAuthor = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
   document.getElementById('fAuthor').value = savedAuthor;
