@@ -1,6 +1,5 @@
 // ============= Roles: admin gate, suggestions, review queue =============
 let isAdmin = false;
-try{ isAdmin = localStorage.getItem(ADMIN_KEY) === '1'; }catch(e){}
 let currentSuggestionId = null;   // set when publishing from a suggestion
 let currentSuggestedBy = '';
 let suggestions = [];
@@ -21,50 +20,37 @@ function applyAdminUI(){
   render();  // re-render cards so Remove buttons show/hide
 }
 
-async function sha256Hex(text){
-  const bytes = new TextEncoder().encode(text);
-  const digest = await crypto.subtle.digest('SHA-256', bytes);
-  return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
+firebase.auth().onAuthStateChanged((user) => {
+  isAdmin = !!user;
+  applyAdminUI();
+});
 
 adminToggle.addEventListener('click', async () => {
   if(isAdmin){
-    isAdmin = false;
-    try{ localStorage.removeItem(ADMIN_KEY); }catch(e){}
-    applyAdminUI();
+    await firebase.auth().signOut();
     return;
   }
-  const code = prompt('Enter the admin passcode:');
-  if(code === null) return;
-  let passcodeHash = '';
+  const email = prompt('Admin email:');
+  if(email === null) return;
+  const password = prompt('Password:');
+  if(password === null) return;
+
   try{
-    const configDoc = await configCollection.doc('admin').get();
-    passcodeHash = configDoc.exists ? configDoc.data().passcodeHash : '';
+    await firebase.auth().signInWithEmailAndPassword(email.trim(), password);
   }catch(e){
-    alert('Could not verify passcode right now — check your connection and try again.');
+    alert('Incorrect email or password.');
     return;
   }
-  if(!passcodeHash){
-    alert('Admin login isn\'t set up correctly — the passcode is missing from the database. Contact whoever manages Firestore.');
-    return;
+
+  let adminName = '';
+  try{ adminName = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
+  if(!adminName){
+    const name = prompt('One more thing — what\'s your name? This is stamped on entries you edit, so the team knows who made each change.');
+    if(name && name.trim()){
+      try{ localStorage.setItem(AUTHOR_KEY, name.trim()); }catch(e){}
+    }
   }
-  const enteredHash = await sha256Hex(code);
-  if(enteredHash === passcodeHash){
-    isAdmin = true;
-    try{ localStorage.setItem(ADMIN_KEY, '1'); }catch(e){}
-    let adminName = '';
-    try{ adminName = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
-    if(!adminName){
-      const name = prompt('One more thing — what\'s your name? This is stamped on entries you edit, so the team knows who made each change.');
-      if(name && name.trim()){
-        try{ localStorage.setItem(AUTHOR_KEY, name.trim()); }catch(e){}
-      }
-    }
-    applyAdminUI();
-    if('Notification' in window && Notification.permission === 'default'){
-      Notification.requestPermission();
-    }
-  }else{
-    alert('That passcode is not correct.');
+  if('Notification' in window && Notification.permission === 'default'){
+    Notification.requestPermission();
   }
 });
