@@ -36,9 +36,22 @@ function closeSuggestPanel(){
   document.getElementById('sText').value = '';
   document.getElementById('sType').value = 'Skill';
   document.getElementById('sPlatform').value = 'claude';
+  document.getElementById('sWebsite').value = '';
   ['errDTitle','errDDesc','errDLink','errSTitle','errSText','errSName'].forEach(id => {
     document.getElementById(id).style.display = 'none';
   });
+}
+
+const SUBMIT_COOLDOWN_MS = 60000;
+const LAST_SUBMIT_KEY = 'oryx-cheatsheet-last-submit';
+
+function submitOnCooldown(){
+  let last = 0;
+  try{ last = Number(localStorage.getItem(LAST_SUBMIT_KEY)) || 0; }catch(e){}
+  return Date.now() - last < SUBMIT_COOLDOWN_MS;
+}
+function markSubmitted(){
+  try{ localStorage.setItem(LAST_SUBMIT_KEY, String(Date.now())); }catch(e){}
 }
 openSuggest.addEventListener('click', openSuggestPanel);
 document.getElementById('closeSuggest').addEventListener('click', closeSuggestPanel);
@@ -46,6 +59,9 @@ document.getElementById('cancelSuggest').addEventListener('click', closeSuggestP
 suggestOverlay.addEventListener('click', (ev) => { if(ev.target === suggestOverlay) closeSuggestPanel(); });
 
 async function submitDiscovery(){
+  if(document.getElementById('sWebsite').value.trim()){ closeSuggestPanel(); return; }
+  if(submitOnCooldown()){ alert('Please wait a moment before sending another one.'); return; }
+
   const title = document.getElementById('dTitle').value.trim();
   const desc = document.getElementById('dDesc').value.trim();
   const link = document.getElementById('dLink').value.trim();
@@ -64,6 +80,7 @@ async function submitDiscovery(){
       category: platform === 'other' ? 'other-tools' : 'discoveries', title, body: desc, link,
       platform, author: name || 'Anonymous', createdAt: Date.now()
     });
+    markSubmitted();
     if(name){ try{ localStorage.setItem(AUTHOR_KEY, name); }catch(e){} }
     closeSuggestPanel();
     alert('Published! Your discovery is live in the Discoveries section.');
@@ -86,6 +103,9 @@ function notifySlackOfRequest(s){
 }
 
 async function submitRequest(){
+  if(document.getElementById('sWebsite').value.trim()){ closeSuggestPanel(); return; }
+  if(submitOnCooldown()){ alert('Please wait a moment before sending another one.'); return; }
+
   const title = document.getElementById('sTitle').value.trim();
   const text = document.getElementById('sText').value.trim();
   const type = document.getElementById('sType').value;
@@ -103,6 +123,7 @@ async function submitRequest(){
     await suggestionsCollection.add({
       title, text, type, platform, name, status: 'pending', createdAt: Date.now()
     });
+    markSubmitted();
     notifySlackOfRequest({ title, text, type, platform, name });
     try{ localStorage.setItem(AUTHOR_KEY, name); }catch(e){}
     closeSuggestPanel();
