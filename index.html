@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="css/sidebar.css?v=4">
 <link rel="stylesheet" href="css/dashboard.css?v=3">
 <link rel="stylesheet" href="css/cards.css?v=3">
-<link rel="stylesheet" href="css/modal.css?v=7">
+<link rel="stylesheet" href="css/modal.css?v=8">
 <link rel="stylesheet" href="css/forms.css?v=6">
 <link rel="stylesheet" href="css/responsive.css?v=2">
 </head>
@@ -412,7 +412,11 @@
           <input type="password" id="staffPassword" placeholder="••••••••" autocomplete="current-password">
         </div>
         <div class="field-error" id="errStaffPassword">Incorrect email or password.</div>
-        <button type="button" class="link-btn" id="staffForgotPassword" style="display:none;">Forgot your password?</button>
+
+        <div class="auth-row-between">
+          <label class="auth-remember"><input type="checkbox" id="staffRememberMe" checked> Remember me</label>
+          <button type="button" class="link-btn" id="staffForgotPassword">Forgot your password?</button>
+        </div>
 
         <button class="auth-btn-primary" id="staffSignInBtn">Sign in</button>
         <p class="auth-domain-note">Staff accounts only · <b>@oryxdoors.com</b></p>
@@ -486,7 +490,7 @@
 <script src="js/add-entry.js?v=14"></script>
 <script src="js/shortcuts-form.js?v=14"></script>
 <script src="js/admin.js?v=15"></script>
-<script src="js/suggest.js?v=20"></script>
+<script src="js/suggest.js?v=21"></script>
 <script src="js/review.js?v=14"></script>
 <script src="js/app.js?v=14"></script>
 

@@ -55,7 +55,6 @@ function clearAuthErrors(){
   errStaffPassword.style.display = 'none';
   errSignupEmail.style.display = 'none';
   errSignupPassword.style.display = 'none';
-  staffForgotPassword.style.display = 'none';
 }
 
 function resetSignupModeCopy(){
@@ -112,7 +111,11 @@ document.getElementById('mobileToSignup').addEventListener('click', showSignupMo
 document.getElementById('mobileToLogin').addEventListener('click', () => { clearAuthErrors(); showLoginMode(); });
 
 staffForgotPassword.addEventListener('click', async () => {
-  const email = staffForgotPassword.dataset.email;
+  const email = staffEmailInput.value.trim().toLowerCase();
+  if(!email.endsWith(STAFF_EMAIL_DOMAIN)){
+    errStaffEmail.style.display = 'block';
+    return;
+  }
   try{
     await firebase.auth().sendPasswordResetEmail(email);
     alert('Check your email for a link to reset your password, then come back and try again.');
@@ -137,6 +140,10 @@ staffSignInBtn.addEventListener('click', async () => {
 
   staffSignInBtn.disabled = true; staffSignInBtn.textContent = 'Please wait…';
   try{
+    const persistence = document.getElementById('staffRememberMe').checked
+      ? firebase.auth.Auth.Persistence.LOCAL
+      : firebase.auth.Auth.Persistence.SESSION;
+    await firebase.auth().setPersistence(persistence);
     await firebase.auth().signInWithEmailAndPassword(email, password);
     staffSignInBtn.disabled = false; staffSignInBtn.textContent = 'Sign in';
     if(!firebase.auth().currentUser.displayName){
@@ -149,8 +156,6 @@ staffSignInBtn.addEventListener('click', async () => {
     // This SDK can't reliably tell "no account" apart from "wrong password" here.
     errStaffPassword.textContent = 'Incorrect email or password — or no account yet. Try Create Account below.';
     errStaffPassword.style.display = 'block';
-    staffForgotPassword.style.display = 'inline-block';
-    staffForgotPassword.dataset.email = email;
   }
 });
 
@@ -214,6 +219,7 @@ function openStaffAuthModal(){
     staffSignupEmailInput.value = '';
     staffSignupPasswordInput.value = '';
     staffDisplayNameInput.value = '';
+    document.getElementById('staffRememberMe').checked = true;
     clearAuthErrors();
     resetSignupModeCopy();
     showLoginMode();
