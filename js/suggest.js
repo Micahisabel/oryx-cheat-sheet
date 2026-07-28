@@ -16,14 +16,66 @@ function updateSuggestMode(){
 }
 sMode.addEventListener('change', updateSuggestMode);
 
+function applyVerifiedNameToForm(){
+  const user = firebase.auth().currentUser;
+  const verifiedName = user ? (user.displayName || user.email) : '';
+  ['dName','sName'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = verifiedName;
+    el.readOnly = !!user;
+    el.placeholder = user ? '' : 'e.g. Sara — you\'ll confirm your @oryxdoors.com email when you submit';
+  });
+}
+
+const STAFF_EMAIL_DOMAIN = '@oryxdoors.com';
+
+async function ensureStaffSignedIn(){
+  if(firebase.auth().currentUser) return true;
+
+  const email = prompt('Enter your Oryx email to continue (e.g. sara@oryxdoors.com):');
+  if(email === null) return false;
+  const trimmedEmail = email.trim().toLowerCase();
+  if(!trimmedEmail.endsWith(STAFF_EMAIL_DOMAIN)){
+    alert('Please use your @oryxdoors.com email address.');
+    return false;
+  }
+
+  const password = prompt('Enter your password (first time? this creates your account):');
+  if(password === null) return false;
+
+  try{
+    await firebase.auth().signInWithEmailAndPassword(trimmedEmail, password);
+    return true;
+  }catch(e){
+    if(e.code !== 'auth/user-not-found' && e.code !== 'auth/invalid-credential'){
+      alert('Could not sign in. Check your connection and try again.');
+      return false;
+    }
+  }
+
+  // No account yet with this email — create one.
+  try{
+    const cred = await firebase.auth().createUserWithEmailAndPassword(trimmedEmail, password);
+    const displayName = prompt('What name should we show on things you add? (e.g. Sara)');
+    if(displayName && displayName.trim()){
+      await cred.user.updateProfile({ displayName: displayName.trim() });
+    }
+    return true;
+  }catch(e){
+    alert(e.code === 'auth/weak-password'
+      ? 'Password must be at least 6 characters.'
+      : e.code === 'auth/wrong-password'
+        ? 'Incorrect password for that email.'
+        : 'Could not sign in. Check your connection and try again.');
+    return false;
+  }
+}
+
 function openSuggestPanel(){
   suggestOverlay.classList.add('open');
   sMode.value = 'discovery';
   updateSuggestMode();
-  let savedName = '';
-  try{ savedName = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
-  document.getElementById('sName').value = savedName;
-  document.getElementById('dName').value = savedName;
+  applyVerifiedNameToForm();
 }
 function closeSuggestPanel(){
   suggestOverlay.classList.remove('open');
@@ -66,13 +118,17 @@ async function submitDiscovery(){
   const desc = document.getElementById('dDesc').value.trim();
   const link = document.getElementById('dLink').value.trim();
   const platform = document.getElementById('dPlatform').value;
-  const name = document.getElementById('dName').value.trim();
 
   let ok = true;
   if(!title){ document.getElementById('errDTitle').style.display = 'block'; ok = false; } else document.getElementById('errDTitle').style.display = 'none';
   if(!desc){ document.getElementById('errDDesc').style.display = 'block'; ok = false; } else document.getElementById('errDDesc').style.display = 'none';
   if(!link){ document.getElementById('errDLink').style.display = 'block'; ok = false; } else document.getElementById('errDLink').style.display = 'none';
   if(!ok) return;
+
+  const signedIn = await ensureStaffSignedIn();
+  if(!signedIn) return;
+  applyVerifiedNameToForm();
+  const name = document.getElementById('dName').value.trim();
 
   saveSuggestBtn.disabled = true; saveSuggestBtn.textContent = 'Publishing…';
   try{
@@ -81,7 +137,6 @@ async function submitDiscovery(){
       platform, author: name || 'Anonymous', createdAt: Date.now()
     });
     markSubmitted();
-    if(name){ try{ localStorage.setItem(AUTHOR_KEY, name); }catch(e){} }
     closeSuggestPanel();
     alert('Published! Your discovery is live in the Discoveries section.');
   }catch(e){
@@ -110,13 +165,16 @@ async function submitRequest(){
   const text = document.getElementById('sText').value.trim();
   const type = document.getElementById('sType').value;
   const platform = document.getElementById('sPlatform').value;
-  const name = document.getElementById('sName').value.trim();
 
   let ok = true;
   if(!title){ document.getElementById('errSTitle').style.display = 'block'; ok = false; } else document.getElementById('errSTitle').style.display = 'none';
   if(!text){ document.getElementById('errSText').style.display = 'block'; ok = false; } else document.getElementById('errSText').style.display = 'none';
-  if(!name){ document.getElementById('errSName').style.display = 'block'; ok = false; } else document.getElementById('errSName').style.display = 'none';
   if(!ok) return;
+
+  const signedIn = await ensureStaffSignedIn();
+  if(!signedIn) return;
+  applyVerifiedNameToForm();
+  const name = document.getElementById('sName').value.trim();
 
   saveSuggestBtn.disabled = true; saveSuggestBtn.textContent = 'Sending…';
   try{
@@ -125,7 +183,6 @@ async function submitRequest(){
     });
     markSubmitted();
     notifySlackOfRequest({ title, text, type, platform, name });
-    try{ localStorage.setItem(AUTHOR_KEY, name); }catch(e){}
     closeSuggestPanel();
     alert('Thanks! Your request has been sent to the admin.');
   }catch(e){

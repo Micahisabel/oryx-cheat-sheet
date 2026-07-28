@@ -20,8 +20,10 @@ function applyAdminUI(){
   render();  // re-render cards so Remove buttons show/hide
 }
 
+const ADMIN_EMAIL = 'micah@oryxdoors.com';
+
 firebase.auth().onAuthStateChanged((user) => {
-  isAdmin = !!user;
+  isAdmin = !!user && user.email === ADMIN_EMAIL;
   applyAdminUI();
 });
 
