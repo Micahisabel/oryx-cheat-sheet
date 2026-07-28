@@ -38,6 +38,17 @@ async function ensureDisplayName(){
   }
 }
 
+async function offerPasswordReset(email){
+  const wantsReset = confirm('That password didn\'t work. Click OK to get a password reset link emailed to you, or Cancel to try again.');
+  if(!wantsReset) return;
+  try{
+    await firebase.auth().sendPasswordResetEmail(email);
+    alert('Check your email for a link to reset your password, then come back and try again.');
+  }catch(e){
+    alert('Could not send the reset email. Check the address and try again.');
+  }
+}
+
 async function ensureStaffSignedIn(){
   if(firebase.auth().currentUser){
     await ensureDisplayName();
@@ -72,11 +83,14 @@ async function ensureStaffSignedIn(){
     await ensureDisplayName();
     return true;
   }catch(e){
+    if(e.code === 'auth/email-already-in-use'){
+      // An account exists for this email but the password entered was wrong.
+      await offerPasswordReset(trimmedEmail);
+      return false;
+    }
     alert(e.code === 'auth/weak-password'
       ? 'Password must be at least 6 characters.'
-      : e.code === 'auth/wrong-password'
-        ? 'Incorrect password for that email.'
-        : 'Could not sign in. Check your connection and try again.');
+      : 'Could not sign in. Check your connection and try again.');
     return false;
   }
 }
