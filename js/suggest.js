@@ -38,10 +38,11 @@ const staffAuthContinue = document.getElementById('staffAuthContinue');
 let staffAuthResolve = null;
 let staffAuthStep = 'creds';
 
+const authCard = document.getElementById('authCard');
+
 function showStaffAuthStep(step){
   staffAuthStep = step;
-  staffAuthStepCreds.style.display = step === 'creds' ? '' : 'none';
-  staffAuthStepName.style.display = step === 'name' ? '' : 'none';
+  authCard.classList.toggle('active', step === 'name');
   if(step === 'name'){
     staffDisplayNameInput.value = '';
     staffDisplayNameInput.focus();
@@ -56,7 +57,6 @@ function closeStaffAuth(result){
 }
 
 document.getElementById('closeStaffAuth').addEventListener('click', () => closeStaffAuth(staffAuthStep === 'name'));
-document.getElementById('cancelStaffAuth').addEventListener('click', () => closeStaffAuth(false));
 staffAuthOverlay.addEventListener('click', (ev) => { if(ev.target === staffAuthOverlay) closeStaffAuth(staffAuthStep === 'name'); });
 
 staffForgotPassword.addEventListener('click', async () => {
