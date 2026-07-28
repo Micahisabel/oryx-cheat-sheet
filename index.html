@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="css/sidebar.css?v=4">
 <link rel="stylesheet" href="css/dashboard.css?v=3">
 <link rel="stylesheet" href="css/cards.css?v=3">
-<link rel="stylesheet" href="css/modal.css?v=5">
+<link rel="stylesheet" href="css/modal.css?v=6">
 <link rel="stylesheet" href="css/forms.css?v=6">
 <link rel="stylesheet" href="css/responsive.css?v=2">
 </head>
@@ -395,11 +395,11 @@
     <button class="close-x auth-close-x" id="closeStaffAuth">&times;</button>
 
     <div class="auth-slot auth-slot-creds">
-      <div class="auth-form-inner" id="staffAuthStepCreds">
+      <div class="auth-form-inner">
         <div class="auth-brand-wrap"><div class="auth-brand-mark"></div></div>
         <p class="auth-eyebrow">Welcome back</p>
         <h1 class="auth-h1">Sign in</h1>
-        <p class="auth-dek">Use your Oryx email so we can credit you correctly.</p>
+        <p class="auth-dek">Use your Oryx email to continue.</p>
 
         <div class="auth-field">
           <label for="staffEmail">Oryx email</label>
@@ -409,42 +409,57 @@
 
         <div class="auth-field">
           <label for="staffPassword">Password</label>
-          <input type="password" id="staffPassword" placeholder="First time? This creates your account" autocomplete="current-password">
+          <input type="password" id="staffPassword" placeholder="••••••••" autocomplete="current-password">
         </div>
-        <div class="field-error" id="errStaffPassword">That password didn't work.</div>
+        <div class="field-error" id="errStaffPassword">Incorrect email or password.</div>
         <button type="button" class="link-btn" id="staffForgotPassword" style="display:none;">Forgot your password?</button>
 
-        <button class="auth-btn-primary" id="staffAuthContinue">Continue</button>
+        <button class="auth-btn-primary" id="staffSignInBtn">Sign in</button>
         <p class="auth-domain-note">Staff accounts only · <b>@oryxdoors.com</b></p>
+        <p class="auth-mobile-switch">New around here? <button type="button" class="auth-mobile-link" id="mobileToSignup">Create account</button></p>
       </div>
     </div>
 
-    <div class="auth-slot auth-slot-name">
-      <div class="auth-form-inner" id="staffAuthStepName">
+    <div class="auth-slot auth-slot-name" id="signupSlot">
+      <div class="auth-form-inner">
         <div class="auth-brand-wrap"><div class="auth-brand-mark"></div></div>
-        <p class="auth-eyebrow">Almost done</p>
-        <h1 class="auth-h1">One more thing</h1>
-        <p class="auth-dek">What name should we show on things you add?</p>
+        <p class="auth-eyebrow" id="signupEyebrow">Join the team</p>
+        <h1 class="auth-h1" id="signupHeading">Create account</h1>
+        <p class="auth-dek" id="signupDek">Set up your account to suggest resources and get credited for them.</p>
 
-        <div class="auth-field">
-          <label for="staffDisplayName">Display name</label>
+        <div class="auth-field" id="signupNameField">
+          <label for="staffDisplayName">Your name</label>
           <input type="text" id="staffDisplayName" placeholder="e.g. Sara">
         </div>
+        <div class="auth-field" id="signupEmailField">
+          <label for="staffSignupEmail">Oryx email</label>
+          <input type="email" id="staffSignupEmail" placeholder="you@oryxdoors.com" autocomplete="username">
+        </div>
+        <div class="field-error" id="errSignupEmail">Please use your @oryxdoors.com email address.</div>
+        <div class="auth-field" id="signupPasswordField">
+          <label for="staffSignupPassword">Password</label>
+          <input type="password" id="staffSignupPassword" placeholder="At least 6 characters" autocomplete="new-password">
+        </div>
+        <div class="field-error" id="errSignupPassword">Could not create your account.</div>
 
-        <button class="auth-btn-primary" id="staffAuthSaveName">Save &amp; continue</button>
+        <button class="auth-btn-primary" id="staffAuthSaveName">Create account</button>
+        <p class="auth-domain-note" id="signupDomainNote">Staff accounts only · <b>@oryxdoors.com</b></p>
+        <p class="auth-mobile-switch" id="mobileSignupSwitch">Already on the team? <button type="button" class="auth-mobile-link" id="mobileToLogin">Sign in</button></p>
       </div>
     </div>
 
     <div class="auth-overlay-panel">
       <div class="auth-overlay-content auth-overlay-content--creds">
         <img class="auth-overlay-logo" src="assets/logos/oryx-logo-white.png" alt="Oryx Doors &amp; Windows">
-        <h2>Oryx AI Knowledge Hub</h2>
-        <p>Sign in to suggest resources, track what you've shared, and pick up right where you left off.</p>
+        <h2>New around here?</h2>
+        <p>Create an account to suggest resources and see everything you've shared under My Components.</p>
+        <button type="button" class="auth-btn-outline" id="showSignup">Create account</button>
       </div>
       <div class="auth-overlay-content auth-overlay-content--name">
         <img class="auth-overlay-logo" src="assets/logos/oryx-logo-white.png" alt="Oryx Doors &amp; Windows">
-        <h2>Welcome to the team</h2>
-        <p>Just your name, then you're set — it's stamped on everything you add so the team knows it's you.</p>
+        <h2>Already on the team?</h2>
+        <p>Sign in to pick up right where you left off.</p>
+        <button type="button" class="auth-btn-outline" id="showLogin">Sign in</button>
       </div>
     </div>
 
@@ -471,7 +486,7 @@
 <script src="js/add-entry.js?v=14"></script>
 <script src="js/shortcuts-form.js?v=14"></script>
 <script src="js/admin.js?v=15"></script>
-<script src="js/suggest.js?v=19"></script>
+<script src="js/suggest.js?v=20"></script>
 <script src="js/review.js?v=14"></script>
 <script src="js/app.js?v=14"></script>
 

@@ -23,30 +23,77 @@ function getVerifiedName(){
 
 const STAFF_EMAIL_DOMAIN = '@oryxdoors.com';
 
-// ---- Staff sign-in modal (replaces browser prompt() dialogs) ----
+// ---- Staff sign-in modal (explicit Sign In / Create Account, sliding two-panel card) ----
 const staffAuthOverlay = document.getElementById('staffAuthOverlay');
-const staffAuthStepCreds = document.getElementById('staffAuthStepCreds');
-const staffAuthStepName = document.getElementById('staffAuthStepName');
+const authCard = document.getElementById('authCard');
 const staffEmailInput = document.getElementById('staffEmail');
 const staffPasswordInput = document.getElementById('staffPassword');
-const staffDisplayNameInput = document.getElementById('staffDisplayName');
 const errStaffEmail = document.getElementById('errStaffEmail');
 const errStaffPassword = document.getElementById('errStaffPassword');
 const staffForgotPassword = document.getElementById('staffForgotPassword');
-const staffAuthContinue = document.getElementById('staffAuthContinue');
+const staffSignInBtn = document.getElementById('staffSignInBtn');
+
+const staffDisplayNameInput = document.getElementById('staffDisplayName');
+const staffSignupEmailInput = document.getElementById('staffSignupEmail');
+const staffSignupPasswordInput = document.getElementById('staffSignupPassword');
+const errSignupEmail = document.getElementById('errSignupEmail');
+const errSignupPassword = document.getElementById('errSignupPassword');
+const staffAuthSaveName = document.getElementById('staffAuthSaveName');
+const signupNameField = document.getElementById('signupNameField');
+const signupEmailField = document.getElementById('signupEmailField');
+const signupPasswordField = document.getElementById('signupPasswordField');
+const signupEyebrow = document.getElementById('signupEyebrow');
+const signupHeading = document.getElementById('signupHeading');
+const signupDek = document.getElementById('signupDek');
+const signupDomainNote = document.getElementById('signupDomainNote');
+const mobileSignupSwitch = document.getElementById('mobileSignupSwitch');
 
 let staffAuthResolve = null;
-let staffAuthStep = 'creds';
 
-const authCard = document.getElementById('authCard');
+function clearAuthErrors(){
+  errStaffEmail.style.display = 'none';
+  errStaffPassword.style.display = 'none';
+  errSignupEmail.style.display = 'none';
+  errSignupPassword.style.display = 'none';
+  staffForgotPassword.style.display = 'none';
+}
 
-function showStaffAuthStep(step){
-  staffAuthStep = step;
-  authCard.classList.toggle('active', step === 'name');
-  if(step === 'name'){
-    staffDisplayNameInput.value = '';
-    staffDisplayNameInput.focus();
-  }
+function resetSignupModeCopy(){
+  signupEyebrow.textContent = 'Join the team';
+  signupHeading.textContent = 'Create account';
+  signupDek.textContent = 'Set up your account to suggest resources and get credited for them.';
+  signupNameField.style.display = '';
+  signupEmailField.style.display = '';
+  signupPasswordField.style.display = '';
+  signupDomainNote.style.display = '';
+  mobileSignupSwitch.style.display = '';
+  staffAuthSaveName.textContent = 'Create account';
+}
+
+function showLoginMode(){
+  authCard.classList.remove('active');
+  authCard.classList.remove('name-only');
+}
+function showSignupMode(){
+  clearAuthErrors();
+  resetSignupModeCopy();
+  authCard.classList.add('active');
+  authCard.classList.remove('name-only');
+}
+function showNameOnlyMode(){
+  authCard.classList.add('active');
+  authCard.classList.add('name-only');
+  signupEyebrow.textContent = 'Almost done';
+  signupHeading.textContent = 'One more thing';
+  signupDek.textContent = 'What name should we show on things you add?';
+  signupNameField.style.display = '';
+  signupEmailField.style.display = 'none';
+  signupPasswordField.style.display = 'none';
+  signupDomainNote.style.display = 'none';
+  mobileSignupSwitch.style.display = 'none';
+  staffAuthSaveName.textContent = 'Save & continue';
+  staffDisplayNameInput.value = '';
+  staffDisplayNameInput.focus();
 }
 
 function closeStaffAuth(result){
@@ -56,8 +103,13 @@ function closeStaffAuth(result){
   if(resolve) resolve(result);
 }
 
-document.getElementById('closeStaffAuth').addEventListener('click', () => closeStaffAuth(staffAuthStep === 'name'));
-staffAuthOverlay.addEventListener('click', (ev) => { if(ev.target === staffAuthOverlay) closeStaffAuth(staffAuthStep === 'name'); });
+document.getElementById('closeStaffAuth').addEventListener('click', () => closeStaffAuth(false));
+staffAuthOverlay.addEventListener('click', (ev) => { if(ev.target === staffAuthOverlay) closeStaffAuth(false); });
+
+document.getElementById('showSignup').addEventListener('click', showSignupMode);
+document.getElementById('showLogin').addEventListener('click', () => { clearAuthErrors(); showLoginMode(); });
+document.getElementById('mobileToSignup').addEventListener('click', showSignupMode);
+document.getElementById('mobileToLogin').addEventListener('click', () => { clearAuthErrors(); showLoginMode(); });
 
 staffForgotPassword.addEventListener('click', async () => {
   const email = staffForgotPassword.dataset.email;
@@ -69,11 +121,8 @@ staffForgotPassword.addEventListener('click', async () => {
   }
 });
 
-staffAuthContinue.addEventListener('click', async () => {
-  errStaffEmail.style.display = 'none';
-  errStaffPassword.style.display = 'none';
-  staffForgotPassword.style.display = 'none';
-
+staffSignInBtn.addEventListener('click', async () => {
+  clearAuthErrors();
   const email = staffEmailInput.value.trim().toLowerCase();
   const password = staffPasswordInput.value;
   if(!email.endsWith(STAFF_EMAIL_DOMAIN)){
@@ -86,57 +135,75 @@ staffAuthContinue.addEventListener('click', async () => {
     return;
   }
 
-  staffAuthContinue.disabled = true; staffAuthContinue.textContent = 'Please wait…';
-
+  staffSignInBtn.disabled = true; staffSignInBtn.textContent = 'Please wait…';
   try{
     await firebase.auth().signInWithEmailAndPassword(email, password);
-    staffAuthContinue.disabled = false; staffAuthContinue.textContent = 'Continue';
+    staffSignInBtn.disabled = false; staffSignInBtn.textContent = 'Sign in';
     if(!firebase.auth().currentUser.displayName){
-      showStaffAuthStep('name');
+      showNameOnlyMode();
     }else{
       closeStaffAuth(true);
     }
-    return;
   }catch(e){
-    if(e.code !== 'auth/user-not-found' && e.code !== 'auth/invalid-credential'){
-      errStaffPassword.textContent = 'Could not sign in. Check your connection and try again.';
-      errStaffPassword.style.display = 'block';
-      staffAuthContinue.disabled = false; staffAuthContinue.textContent = 'Continue';
-      return;
-    }
-  }
-
-  // No account yet with this email — create one.
-  try{
-    await firebase.auth().createUserWithEmailAndPassword(email, password);
-    staffAuthContinue.disabled = false; staffAuthContinue.textContent = 'Continue';
-    showStaffAuthStep('name');
-  }catch(e){
-    staffAuthContinue.disabled = false; staffAuthContinue.textContent = 'Continue';
-    if(e.code === 'auth/email-already-in-use'){
-      // An account exists for this email but the password entered was wrong.
-      errStaffPassword.textContent = 'That password didn\'t work.';
-      errStaffPassword.style.display = 'block';
-      staffForgotPassword.style.display = 'inline-block';
-      staffForgotPassword.dataset.email = email;
-    }else if(e.code === 'auth/weak-password'){
-      errStaffPassword.textContent = 'Password must be at least 6 characters.';
-      errStaffPassword.style.display = 'block';
-    }else{
-      errStaffPassword.textContent = 'Could not sign in. Check your connection and try again.';
-      errStaffPassword.style.display = 'block';
-    }
+    staffSignInBtn.disabled = false; staffSignInBtn.textContent = 'Sign in';
+    // This SDK can't reliably tell "no account" apart from "wrong password" here.
+    errStaffPassword.textContent = 'Incorrect email or password — or no account yet. Try Create Account below.';
+    errStaffPassword.style.display = 'block';
+    staffForgotPassword.style.display = 'inline-block';
+    staffForgotPassword.dataset.email = email;
   }
 });
 
-document.getElementById('staffAuthSaveName').addEventListener('click', async () => {
-  const name = staffDisplayNameInput.value.trim();
-  const user = firebase.auth().currentUser;
-  if(name && user){
-    try{ await user.updateProfile({ displayName: name }); }catch(e){}
+staffAuthSaveName.addEventListener('click', async () => {
+  // Name-only catch-up: user is already signed in, just missing a display name.
+  if(authCard.classList.contains('name-only')){
+    const name = staffDisplayNameInput.value.trim();
+    const user = firebase.auth().currentUser;
+    if(name && user){
+      try{ await user.updateProfile({ displayName: name }); }catch(e){}
+    }
+    refreshSignInPill();
+    closeStaffAuth(true);
+    return;
   }
-  refreshSignInPill();
-  closeStaffAuth(true);
+
+  // Full account creation.
+  clearAuthErrors();
+  const name = staffDisplayNameInput.value.trim();
+  const email = staffSignupEmailInput.value.trim().toLowerCase();
+  const password = staffSignupPasswordInput.value;
+  if(!email.endsWith(STAFF_EMAIL_DOMAIN)){
+    errSignupEmail.style.display = 'block';
+    return;
+  }
+  if(!password){
+    errSignupPassword.textContent = 'Enter a password.';
+    errSignupPassword.style.display = 'block';
+    return;
+  }
+
+  staffAuthSaveName.disabled = true; staffAuthSaveName.textContent = 'Please wait…';
+  try{
+    await firebase.auth().createUserWithEmailAndPassword(email, password);
+    if(name){
+      try{ await firebase.auth().currentUser.updateProfile({ displayName: name }); }catch(e){}
+    }
+    staffAuthSaveName.disabled = false; staffAuthSaveName.textContent = 'Create account';
+    refreshSignInPill();
+    closeStaffAuth(true);
+  }catch(e){
+    staffAuthSaveName.disabled = false; staffAuthSaveName.textContent = 'Create account';
+    if(e.code === 'auth/email-already-in-use'){
+      errSignupPassword.textContent = 'An account already exists for that email — try signing in instead.';
+      errSignupPassword.style.display = 'block';
+    }else if(e.code === 'auth/weak-password'){
+      errSignupPassword.textContent = 'Password must be at least 6 characters.';
+      errSignupPassword.style.display = 'block';
+    }else{
+      errSignupPassword.textContent = 'Could not create your account. Check your connection and try again.';
+      errSignupPassword.style.display = 'block';
+    }
+  }
 });
 
 function openStaffAuthModal(){
@@ -144,7 +211,12 @@ function openStaffAuthModal(){
     staffAuthResolve = resolve;
     staffEmailInput.value = '';
     staffPasswordInput.value = '';
-    showStaffAuthStep('creds');
+    staffSignupEmailInput.value = '';
+    staffSignupPasswordInput.value = '';
+    staffDisplayNameInput.value = '';
+    clearAuthErrors();
+    resetSignupModeCopy();
+    showLoginMode();
     staffAuthOverlay.classList.add('open');
     staffEmailInput.focus();
   });
@@ -157,7 +229,7 @@ function ensureStaffSignedIn(){
     // Signed in but missing a display name (e.g. skipped it earlier) — catch it up.
     return new Promise((resolve) => {
       staffAuthResolve = resolve;
-      showStaffAuthStep('name');
+      showNameOnlyMode();
       staffAuthOverlay.classList.add('open');
     });
   }
