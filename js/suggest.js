@@ -182,13 +182,68 @@ function refreshSignInPill(){
 
 firebase.auth().onAuthStateChanged(refreshSignInPill);
 
+// ---- Account dropdown (My Components / Sign Out) ----
+const accountMenu = document.getElementById('accountMenu');
+const accountMenuName = document.getElementById('accountMenuName');
+const accountMenuEmail = document.getElementById('accountMenuEmail');
+
+function closeAccountMenu(){ accountMenu.classList.remove('open'); }
+
 staffSignInToggle.addEventListener('click', async () => {
-  if(firebase.auth().currentUser){
-    await firebase.auth().signOut();
+  const user = firebase.auth().currentUser;
+  if(user){
+    accountMenuName.textContent = user.displayName || 'Signed in';
+    accountMenuEmail.textContent = user.email;
+    accountMenu.classList.toggle('open');
   }else{
     await ensureStaffSignedIn();
   }
 });
+
+document.addEventListener('click', (ev) => {
+  if(!document.getElementById('accountWrap').contains(ev.target)) closeAccountMenu();
+});
+
+document.getElementById('accountSignOut').addEventListener('click', async () => {
+  closeAccountMenu();
+  await firebase.auth().signOut();
+});
+
+// ---- My Components (entries the signed-in user has published) ----
+const myComponentsOverlay = document.getElementById('myComponentsOverlay');
+const myComponentsList = document.getElementById('myComponentsList');
+
+async function openMyComponentsPanel(){
+  closeAccountMenu();
+  const user = firebase.auth().currentUser;
+  if(!user) return;
+  myComponentsOverlay.classList.add('open');
+  myComponentsList.innerHTML = '<div class="s-empty">Loading…</div>';
+  try{
+    const snap = await entriesCollection.where('authorEmail', '==', user.email).get();
+    const rows = [];
+    snap.forEach(doc => rows.push(doc.data()));
+    rows.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    if(!rows.length){
+      myComponentsList.innerHTML = '<div class="s-empty">You haven\'t suggested any resources yet.</div>';
+      return;
+    }
+    myComponentsList.innerHTML = rows.map(r => `
+      <div class="my-component-row">
+        <div class="my-component-title">${escapeHtml(r.title || 'Untitled')}</div>
+        <div class="my-component-meta">
+          <span>${escapeHtml(r.platform || '')}</span>
+          <span>${r.createdAt ? new Date(r.createdAt).toLocaleDateString() : ''}</span>
+        </div>
+      </div>
+    `).join('');
+  }catch(e){
+    myComponentsList.innerHTML = '<div class="s-empty">Could not load your components. Check your connection and try again.</div>';
+  }
+}
+document.getElementById('openMyComponents').addEventListener('click', openMyComponentsPanel);
+document.getElementById('closeMyComponents').addEventListener('click', () => myComponentsOverlay.classList.remove('open'));
+myComponentsOverlay.addEventListener('click', (ev) => { if(ev.target === myComponentsOverlay) myComponentsOverlay.classList.remove('open'); });
 
 function openSuggestPanel(){
   suggestOverlay.classList.add('open');
@@ -250,7 +305,7 @@ async function submitDiscovery(){
   try{
     await entriesCollection.add({
       category: platform === 'other' ? 'other-tools' : 'discoveries', title, body: desc, link,
-      platform, author: name || 'Anonymous', createdAt: Date.now()
+      platform, author: name || 'Anonymous', authorEmail: firebase.auth().currentUser.email, createdAt: Date.now()
     });
     markSubmitted();
     closeSuggestPanel();
