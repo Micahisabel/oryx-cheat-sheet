@@ -171,7 +171,8 @@ const staffSignInLabel = document.getElementById('staffSignInLabel');
 function refreshSignInPill(){
   const user = firebase.auth().currentUser;
   if(user){
-    staffSignInLabel.textContent = user.displayName || user.email;
+    const name = user.displayName || user.email;
+    staffSignInLabel.textContent = isAdmin ? `${name} · Admin` : name;
     staffSignInToggle.classList.add('signed-in');
   }else{
     staffSignInLabel.textContent = 'Sign In';
