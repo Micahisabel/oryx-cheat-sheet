@@ -108,8 +108,10 @@
   .account-menu-divider{height:1px;background:var(--line-soft);margin:4px 6px;}
 
   .my-component-row{
-    display:flex;flex-direction:column;gap:4px;padding:14px 0;border-bottom:1px solid var(--line-soft);
+    display:flex;flex-direction:column;gap:4px;padding:14px 10px;margin:0 -10px;border-bottom:1px solid var(--line-soft);
+    cursor:pointer;border-radius:9px;transition:background 0.15s ease;
   }
+  .my-component-row:hover{background:var(--panel);}
   .my-component-row:last-child{border-bottom:none;}
   .my-component-title{font-family:var(--font-display);font-weight:600;font-size:14px;color:var(--black);}
   .my-component-meta{display:flex;gap:10px;align-items:center;font-size:11.5px;color:var(--silver);font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;}

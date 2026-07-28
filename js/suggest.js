@@ -222,14 +222,14 @@ async function openMyComponentsPanel(){
   try{
     const snap = await entriesCollection.where('authorEmail', '==', user.email).get();
     const rows = [];
-    snap.forEach(doc => rows.push(doc.data()));
+    snap.forEach(doc => rows.push({ id: doc.id, ...doc.data() }));
     rows.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     if(!rows.length){
       myComponentsList.innerHTML = '<div class="s-empty">You haven\'t suggested any resources yet.</div>';
       return;
     }
     myComponentsList.innerHTML = rows.map(r => `
-      <div class="my-component-row">
+      <div class="my-component-row" data-id="${r.id}">
         <div class="my-component-title">${escapeHtml(r.title || 'Untitled')}</div>
         <div class="my-component-meta">
           <span>${escapeHtml(r.platform || '')}</span>
@@ -237,6 +237,15 @@ async function openMyComponentsPanel(){
         </div>
       </div>
     `).join('');
+    myComponentsList.querySelectorAll('.my-component-row').forEach(row => {
+      row.addEventListener('click', () => {
+        const entry = rows.find(r => r.id === row.dataset.id);
+        if(entry){
+          myComponentsOverlay.classList.remove('open');
+          openNoteDetail(entry);
+        }
+      });
+    });
   }catch(e){
     myComponentsList.innerHTML = '<div class="s-empty">Could not load your components. Check your connection and try again.</div>';
   }
