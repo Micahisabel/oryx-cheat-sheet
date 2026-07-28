@@ -110,6 +110,12 @@ platformNav.addEventListener('click', (ev) => {
   } else {
     sideNav.style.display = '';
   }
+  if(btn.dataset.platform === 'claude' || btn.dataset.platform === 'chatgpt'){
+    const submenu = document.getElementById(btn.dataset.platform + 'Submenu');
+    const expandBtn = platformNav.querySelector(`.platform-expand-btn[data-expand="${btn.dataset.platform}"]`);
+    if(submenu) submenu.style.display = 'flex';
+    if(expandBtn) expandBtn.classList.add('open');
+  }
   currentPage = 1;
   render();
 });
