@@ -1,3 +1,26 @@
+function repositionTabIndicator(container, indicatorSelector, activeSelector){
+  const indicator = container.querySelector(indicatorSelector);
+  const active = container.querySelector(activeSelector);
+  if(!indicator) return;
+  if(!active || container.offsetParent === null){
+    indicator.style.opacity = '0';
+    return;
+  }
+  indicator.style.top = active.offsetTop + 'px';
+  indicator.style.left = active.offsetLeft + 'px';
+  indicator.style.width = active.offsetWidth + 'px';
+  indicator.style.height = active.offsetHeight + 'px';
+  indicator.style.opacity = '1';
+}
+function repositionAllTabIndicators(){
+  repositionTabIndicator(platformNav, '.platform-active-indicator', '.platform-item.active');
+  [sideNav, shortcutNav, chatgptShortcutNav].forEach(nav => {
+    repositionTabIndicator(nav, '.cat-tab-indicator', '.cat-tab.active');
+  });
+}
+window.addEventListener('resize', repositionAllTabIndicators);
+window.addEventListener('load', repositionAllTabIndicators);
+
 function enterShortcutsMode(group){
   viewMode = 'shortcuts';
   shortcutGroup = group;
@@ -16,6 +39,7 @@ function enterShortcutsMode(group){
   const activeSubmenuBtn = document.getElementById(group === 'chatgpt' ? 'chatgptShortcutsBtn' : 'claudeShortcutsBtn');
   if(activeSubmenuBtn) activeSubmenuBtn.classList.add('active');
   updateAddShortcutVisibility();
+  repositionAllTabIndicators();
   render();
 }
 
@@ -29,6 +53,7 @@ function exitShortcutsMode(){
   sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
   document.querySelectorAll('.platform-submenu-item').forEach(b => b.classList.remove('active'));
   updateAddShortcutVisibility();
+  repositionAllTabIndicators();
   render();
 }
 
@@ -81,6 +106,7 @@ function handleShortcutTabClick(nav, ev){
   btn.classList.add('active');
   activeCat = btn.dataset.cat;
   currentPage = 1;
+  repositionTabIndicator(nav, '.cat-tab-indicator', '.cat-tab.active');
   render();
 }
 shortcutNav.addEventListener('click', (ev) => handleShortcutTabClick(shortcutNav, ev));
@@ -117,6 +143,7 @@ platformNav.addEventListener('click', (ev) => {
     if(expandBtn) expandBtn.classList.add('open');
   }
   currentPage = 1;
+  repositionAllTabIndicators();
   render();
 });
 
@@ -127,5 +154,8 @@ sideNav.addEventListener('click', (ev) => {
   btn.classList.add('active');
   activeCat = btn.dataset.cat;
   currentPage = 1;
+  repositionTabIndicator(sideNav, '.cat-tab-indicator', '.cat-tab.active');
   render();
 });
+
+repositionAllTabIndicators();
