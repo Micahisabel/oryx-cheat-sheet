@@ -1,9 +1,9 @@
   /* ---------- Header ---------- */
   header{
     position:relative;
-    padding:14px 28px;
+    padding:16px 28px;
     background:var(--oryx-blue);
-    border-bottom:1px solid rgba(255,255,255,0.12);
+    box-shadow:0 4px 20px rgba(2,42,58,0.18);
   }
   .header-inner{
     display:flex;
