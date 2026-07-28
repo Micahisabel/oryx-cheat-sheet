@@ -29,70 +29,144 @@ function applyVerifiedNameToForm(){
 
 const STAFF_EMAIL_DOMAIN = '@oryxdoors.com';
 
-async function ensureDisplayName(){
-  const user = firebase.auth().currentUser;
-  if(!user || user.displayName) return;
-  const displayName = prompt('What name should we show on things you add? (e.g. Sara)');
-  if(displayName && displayName.trim()){
-    await user.updateProfile({ displayName: displayName.trim() });
+// ---- Staff sign-in modal (replaces browser prompt() dialogs) ----
+const staffAuthOverlay = document.getElementById('staffAuthOverlay');
+const staffAuthStepCreds = document.getElementById('staffAuthStepCreds');
+const staffAuthStepName = document.getElementById('staffAuthStepName');
+const staffEmailInput = document.getElementById('staffEmail');
+const staffPasswordInput = document.getElementById('staffPassword');
+const staffDisplayNameInput = document.getElementById('staffDisplayName');
+const errStaffEmail = document.getElementById('errStaffEmail');
+const errStaffPassword = document.getElementById('errStaffPassword');
+const staffForgotPassword = document.getElementById('staffForgotPassword');
+const staffAuthContinue = document.getElementById('staffAuthContinue');
+
+let staffAuthResolve = null;
+let staffAuthStep = 'creds';
+
+function showStaffAuthStep(step){
+  staffAuthStep = step;
+  staffAuthStepCreds.style.display = step === 'creds' ? '' : 'none';
+  staffAuthStepName.style.display = step === 'name' ? '' : 'none';
+  if(step === 'name'){
+    staffDisplayNameInput.value = '';
+    staffDisplayNameInput.focus();
   }
 }
 
-async function offerPasswordReset(email){
-  const wantsReset = confirm('That password didn\'t work. Click OK to get a password reset link emailed to you, or Cancel to try again.');
-  if(!wantsReset) return;
+function closeStaffAuth(result){
+  staffAuthOverlay.classList.remove('open');
+  const resolve = staffAuthResolve;
+  staffAuthResolve = null;
+  if(resolve) resolve(result);
+}
+
+document.getElementById('closeStaffAuth').addEventListener('click', () => closeStaffAuth(staffAuthStep === 'name'));
+document.getElementById('cancelStaffAuth').addEventListener('click', () => closeStaffAuth(false));
+staffAuthOverlay.addEventListener('click', (ev) => { if(ev.target === staffAuthOverlay) closeStaffAuth(staffAuthStep === 'name'); });
+
+staffForgotPassword.addEventListener('click', async () => {
+  const email = staffForgotPassword.dataset.email;
   try{
     await firebase.auth().sendPasswordResetEmail(email);
     alert('Check your email for a link to reset your password, then come back and try again.');
   }catch(e){
     alert('Could not send the reset email. Check the address and try again.');
   }
-}
+});
 
-async function ensureStaffSignedIn(){
-  if(firebase.auth().currentUser){
-    await ensureDisplayName();
-    return true;
+staffAuthContinue.addEventListener('click', async () => {
+  errStaffEmail.style.display = 'none';
+  errStaffPassword.style.display = 'none';
+  staffForgotPassword.style.display = 'none';
+
+  const email = staffEmailInput.value.trim().toLowerCase();
+  const password = staffPasswordInput.value;
+  if(!email.endsWith(STAFF_EMAIL_DOMAIN)){
+    errStaffEmail.style.display = 'block';
+    return;
+  }
+  if(!password){
+    errStaffPassword.textContent = 'Enter a password.';
+    errStaffPassword.style.display = 'block';
+    return;
   }
 
-  const email = prompt('Enter your Oryx email to continue (e.g. sara@oryxdoors.com):');
-  if(email === null) return false;
-  const trimmedEmail = email.trim().toLowerCase();
-  if(!trimmedEmail.endsWith(STAFF_EMAIL_DOMAIN)){
-    alert('Please use your @oryxdoors.com email address.');
-    return false;
-  }
-
-  const password = prompt('Enter your password (first time? this creates your account):');
-  if(password === null) return false;
+  staffAuthContinue.disabled = true; staffAuthContinue.textContent = 'Please wait…';
 
   try{
-    await firebase.auth().signInWithEmailAndPassword(trimmedEmail, password);
-    await ensureDisplayName();
-    return true;
+    await firebase.auth().signInWithEmailAndPassword(email, password);
+    staffAuthContinue.disabled = false; staffAuthContinue.textContent = 'Continue';
+    if(!firebase.auth().currentUser.displayName){
+      showStaffAuthStep('name');
+    }else{
+      closeStaffAuth(true);
+    }
+    return;
   }catch(e){
     if(e.code !== 'auth/user-not-found' && e.code !== 'auth/invalid-credential'){
-      alert('Could not sign in. Check your connection and try again.');
-      return false;
+      errStaffPassword.textContent = 'Could not sign in. Check your connection and try again.';
+      errStaffPassword.style.display = 'block';
+      staffAuthContinue.disabled = false; staffAuthContinue.textContent = 'Continue';
+      return;
     }
   }
 
   // No account yet with this email — create one.
   try{
-    await firebase.auth().createUserWithEmailAndPassword(trimmedEmail, password);
-    await ensureDisplayName();
-    return true;
+    await firebase.auth().createUserWithEmailAndPassword(email, password);
+    staffAuthContinue.disabled = false; staffAuthContinue.textContent = 'Continue';
+    showStaffAuthStep('name');
   }catch(e){
+    staffAuthContinue.disabled = false; staffAuthContinue.textContent = 'Continue';
     if(e.code === 'auth/email-already-in-use'){
       // An account exists for this email but the password entered was wrong.
-      await offerPasswordReset(trimmedEmail);
-      return false;
+      errStaffPassword.textContent = 'That password didn\'t work.';
+      errStaffPassword.style.display = 'block';
+      staffForgotPassword.style.display = 'inline-block';
+      staffForgotPassword.dataset.email = email;
+    }else if(e.code === 'auth/weak-password'){
+      errStaffPassword.textContent = 'Password must be at least 6 characters.';
+      errStaffPassword.style.display = 'block';
+    }else{
+      errStaffPassword.textContent = 'Could not sign in. Check your connection and try again.';
+      errStaffPassword.style.display = 'block';
     }
-    alert(e.code === 'auth/weak-password'
-      ? 'Password must be at least 6 characters.'
-      : 'Could not sign in. Check your connection and try again.');
-    return false;
   }
+});
+
+document.getElementById('staffAuthSaveName').addEventListener('click', async () => {
+  const name = staffDisplayNameInput.value.trim();
+  const user = firebase.auth().currentUser;
+  if(name && user){
+    try{ await user.updateProfile({ displayName: name }); }catch(e){}
+  }
+  closeStaffAuth(true);
+});
+
+function openStaffAuthModal(){
+  return new Promise((resolve) => {
+    staffAuthResolve = resolve;
+    staffEmailInput.value = '';
+    staffPasswordInput.value = '';
+    showStaffAuthStep('creds');
+    staffAuthOverlay.classList.add('open');
+    staffEmailInput.focus();
+  });
+}
+
+function ensureStaffSignedIn(){
+  const user = firebase.auth().currentUser;
+  if(user && user.displayName) return Promise.resolve(true);
+  if(user){
+    // Signed in but missing a display name (e.g. skipped it earlier) — catch it up.
+    return new Promise((resolve) => {
+      staffAuthResolve = resolve;
+      showStaffAuthStep('name');
+      staffAuthOverlay.classList.add('open');
+    });
+  }
+  return openStaffAuthModal();
 }
 
 function openSuggestPanel(){
