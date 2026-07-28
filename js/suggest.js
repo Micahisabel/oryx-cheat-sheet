@@ -141,6 +141,7 @@ document.getElementById('staffAuthSaveName').addEventListener('click', async () 
   if(name && user){
     try{ await user.updateProfile({ displayName: name }); }catch(e){}
   }
+  refreshSignInPill();
   closeStaffAuth(true);
 });
 
@@ -168,6 +169,32 @@ function ensureStaffSignedIn(){
   }
   return openStaffAuthModal();
 }
+
+// ---- Header "Sign In" pill (reflects the same Firebase Auth session as staff sign-in) ----
+const staffSignInToggle = document.getElementById('staffSignInToggle');
+const staffSignInLabel = document.getElementById('staffSignInLabel');
+
+function refreshSignInPill(){
+  const user = firebase.auth().currentUser;
+  if(user){
+    staffSignInLabel.textContent = user.displayName || user.email;
+    staffSignInToggle.classList.add('signed-in');
+  }else{
+    staffSignInLabel.textContent = 'Sign In';
+    staffSignInToggle.classList.remove('signed-in');
+  }
+}
+
+firebase.auth().onAuthStateChanged(refreshSignInPill);
+
+staffSignInToggle.addEventListener('click', async () => {
+  if(firebase.auth().currentUser){
+    await firebase.auth().signOut();
+  }else{
+    const signedIn = await ensureStaffSignedIn();
+    if(signedIn) applyVerifiedNameToForm();
+  }
+});
 
 function openSuggestPanel(){
   suggestOverlay.classList.add('open');

@@ -72,6 +72,16 @@
     font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--silver);padding:0;
   }
   .admin-link:hover{color:var(--white);}
+
+  .signin-pill{
+    display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.16);border-radius:20px;cursor:pointer;
+    padding:9px 16px 9px 12px;font-family:var(--font-body);font-weight:500;font-size:13px;
+    color:var(--white);transition:background 0.15s ease,border-color 0.15s ease;
+  }
+  .signin-pill:hover{background:rgba(255,255,255,0.14);border-color:rgba(255,255,255,0.3);}
+  .signin-pill svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;flex-shrink:0;}
+  .signin-pill.signed-in{background:rgba(255,255,255,0.14);border-color:rgba(255,255,255,0.3);}
   .btn-outline{
     font-family:var(--font-display);font-weight:600;font-size:13px;letter-spacing:0.06em;
     text-transform:uppercase;background:none;color:var(--white);border:1px solid rgba(255,255,255,0.3);
