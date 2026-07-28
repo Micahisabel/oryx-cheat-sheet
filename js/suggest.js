@@ -29,8 +29,20 @@ function applyVerifiedNameToForm(){
 
 const STAFF_EMAIL_DOMAIN = '@oryxdoors.com';
 
+async function ensureDisplayName(){
+  const user = firebase.auth().currentUser;
+  if(!user || user.displayName) return;
+  const displayName = prompt('What name should we show on things you add? (e.g. Sara)');
+  if(displayName && displayName.trim()){
+    await user.updateProfile({ displayName: displayName.trim() });
+  }
+}
+
 async function ensureStaffSignedIn(){
-  if(firebase.auth().currentUser) return true;
+  if(firebase.auth().currentUser){
+    await ensureDisplayName();
+    return true;
+  }
 
   const email = prompt('Enter your Oryx email to continue (e.g. sara@oryxdoors.com):');
   if(email === null) return false;
@@ -45,6 +57,7 @@ async function ensureStaffSignedIn(){
 
   try{
     await firebase.auth().signInWithEmailAndPassword(trimmedEmail, password);
+    await ensureDisplayName();
     return true;
   }catch(e){
     if(e.code !== 'auth/user-not-found' && e.code !== 'auth/invalid-credential'){
@@ -55,11 +68,8 @@ async function ensureStaffSignedIn(){
 
   // No account yet with this email — create one.
   try{
-    const cred = await firebase.auth().createUserWithEmailAndPassword(trimmedEmail, password);
-    const displayName = prompt('What name should we show on things you add? (e.g. Sara)');
-    if(displayName && displayName.trim()){
-      await cred.user.updateProfile({ displayName: displayName.trim() });
-    }
+    await firebase.auth().createUserWithEmailAndPassword(trimmedEmail, password);
+    await ensureDisplayName();
     return true;
   }catch(e){
     alert(e.code === 'auth/weak-password'
