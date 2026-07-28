@@ -16,15 +16,9 @@ function updateSuggestMode(){
 }
 sMode.addEventListener('change', updateSuggestMode);
 
-function applyVerifiedNameToForm(){
+function getVerifiedName(){
   const user = firebase.auth().currentUser;
-  const verifiedName = user ? (user.displayName || user.email) : '';
-  ['dName','sName'].forEach(id => {
-    const el = document.getElementById(id);
-    el.value = verifiedName;
-    el.readOnly = !!user;
-    el.placeholder = user ? '' : 'e.g. Sara — you\'ll confirm your @oryxdoors.com email when you submit';
-  });
+  return user ? (user.displayName || user.email) : '';
 }
 
 const STAFF_EMAIL_DOMAIN = '@oryxdoors.com';
@@ -191,8 +185,7 @@ staffSignInToggle.addEventListener('click', async () => {
   if(firebase.auth().currentUser){
     await firebase.auth().signOut();
   }else{
-    const signedIn = await ensureStaffSignedIn();
-    if(signedIn) applyVerifiedNameToForm();
+    await ensureStaffSignedIn();
   }
 });
 
@@ -200,7 +193,6 @@ function openSuggestPanel(){
   suggestOverlay.classList.add('open');
   sMode.value = 'discovery';
   updateSuggestMode();
-  applyVerifiedNameToForm();
 }
 function closeSuggestPanel(){
   suggestOverlay.classList.remove('open');
@@ -208,13 +200,12 @@ function closeSuggestPanel(){
   document.getElementById('dDesc').value = '';
   document.getElementById('dLink').value = '';
   document.getElementById('dPlatform').value = 'claude';
-  document.getElementById('dName').value = '';
   document.getElementById('sTitle').value = '';
   document.getElementById('sText').value = '';
   document.getElementById('sType').value = 'Skill';
   document.getElementById('sPlatform').value = 'claude';
   document.getElementById('sWebsite').value = '';
-  ['errDTitle','errDDesc','errDLink','errSTitle','errSText','errSName'].forEach(id => {
+  ['errDTitle','errDDesc','errDLink','errSTitle','errSText'].forEach(id => {
     document.getElementById(id).style.display = 'none';
   });
 }
@@ -252,8 +243,7 @@ async function submitDiscovery(){
 
   const signedIn = await ensureStaffSignedIn();
   if(!signedIn) return;
-  applyVerifiedNameToForm();
-  const name = document.getElementById('dName').value.trim();
+  const name = getVerifiedName();
 
   saveSuggestBtn.disabled = true; saveSuggestBtn.textContent = 'Publishing…';
   try{
@@ -298,8 +288,7 @@ async function submitRequest(){
 
   const signedIn = await ensureStaffSignedIn();
   if(!signedIn) return;
-  applyVerifiedNameToForm();
-  const name = document.getElementById('sName').value.trim();
+  const name = getVerifiedName();
 
   saveSuggestBtn.disabled = true; saveSuggestBtn.textContent = 'Sending…';
   try{
