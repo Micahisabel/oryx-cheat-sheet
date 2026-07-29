@@ -16,6 +16,12 @@ function updateSuggestMode(){
 }
 sMode.addEventListener('change', updateSuggestMode);
 
+const dPlatform = document.getElementById('dPlatform');
+const dOtherCategoryField = document.getElementById('dOtherCategoryField');
+dPlatform.addEventListener('change', () => {
+  dOtherCategoryField.style.display = dPlatform.value === 'other' ? '' : 'none';
+});
+
 function getVerifiedName(){
   const user = firebase.auth().currentUser;
   return user ? (user.displayName || user.email) : '';
@@ -343,6 +349,7 @@ function closeSuggestPanel(){
   document.getElementById('dDesc').value = '';
   document.getElementById('dLink').value = '';
   document.getElementById('dPlatform').value = 'claude';
+  dOtherCategoryField.style.display = 'none';
   document.getElementById('sTitle').value = '';
   document.getElementById('sText').value = '';
   document.getElementById('sType').value = 'Skill';
@@ -377,6 +384,7 @@ async function submitDiscovery(){
   const desc = document.getElementById('dDesc').value.trim();
   const link = document.getElementById('dLink').value.trim();
   const platform = document.getElementById('dPlatform').value;
+  const otherCategory = document.getElementById('dOtherCategory').value;
 
   let ok = true;
   if(!title){ document.getElementById('errDTitle').style.display = 'block'; ok = false; } else document.getElementById('errDTitle').style.display = 'none';
@@ -391,7 +399,7 @@ async function submitDiscovery(){
   saveSuggestBtn.disabled = true; saveSuggestBtn.textContent = 'Publishing…';
   try{
     await entriesCollection.add({
-      category: platform === 'other' ? 'other-tools' : 'discoveries', title, body: desc, link,
+      category: platform === 'other' ? otherCategory : 'discoveries', title, body: desc, link,
       platform, author: name || 'Anonymous', authorEmail: firebase.auth().currentUser.email, createdAt: Date.now()
     });
     markSubmitted();

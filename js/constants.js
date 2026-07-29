@@ -7,6 +7,13 @@ const CATEGORY_LABELS = {
   plugins: 'Plugin',
   discoveries: 'Discovery',
   'other-tools': 'Other AI Tool',
+  'other-writing': 'Writing',
+  'other-video': 'Video',
+  'other-images': 'Images',
+  'other-research': 'Research',
+  'other-design': 'Design',
+  'other-audio': 'Audio',
+  'other-automation': 'Automation',
   'shortcut-desktop': 'Claude Desktop',
   'shortcut-code': 'Claude Code',
   'shortcut-slash': 'Slash Command',
@@ -26,6 +33,13 @@ const CATEGORY_PLURAL_LABELS = {
   plugins: 'Plugins',
   discoveries: 'Discoveries',
   'other-tools': 'Other AI Tools',
+  'other-writing': 'Writing',
+  'other-video': 'Video',
+  'other-images': 'Images',
+  'other-research': 'Research',
+  'other-design': 'Design',
+  'other-audio': 'Audio',
+  'other-automation': 'Automation',
   'shortcut-desktop': 'Claude Shortcuts',
   'shortcut-code': 'Claude Shortcuts',
   'shortcut-slash': 'Claude Shortcuts',
@@ -41,7 +55,14 @@ const CATEGORY_ICON_PATHS = {
   mcps: '<path d="M9 2v6M15 2v6M6 8h12v3a6 6 0 0 1-12 0zM12 17v5"/>',
   plugins: '<path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4a2 2 0 0 0-2 2v3.8h1.5a2.7 2.7 0 0 1 0 5.4H2V20a2 2 0 0 0 2 2h3.8v-1.5a2.7 2.7 0 0 1 5.4 0V22H17a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"/>',
   discoveries: '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
-  'other-tools': '<path d="M12 3l2.1 4.9L19 10l-4.9 2.1L12 17l-2.1-4.9L5 10l4.9-2.1z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/>'
+  'other-tools': '<path d="M12 3l2.1 4.9L19 10l-4.9 2.1L12 17l-2.1-4.9L5 10l4.9-2.1z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/>',
+  'other-writing': '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  'other-video': '<rect x="2" y="5" width="15" height="14" rx="2"/><path d="M17 10l5-3v10l-5-3z"/>',
+  'other-images': '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+  'other-research': '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  'other-design': '<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.3c1.8 0 3.2-1.4 3.2-3.2C20.5 6.6 16.7 3 12 3z"/><circle cx="7.5" cy="10.5" r="1"/><circle cx="10.5" cy="7" r="1"/>',
+  'other-audio': '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  'other-automation': '<path d="M12 2l1.5 3.6L17 7l-3.5 1.4L12 12l-1.5-3.6L7 7l3.5-1.4z"/><path d="M5 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>'
 };
 function cardPlaceholderHtml(category){
   const path = CATEGORY_ICON_PATHS[category];
@@ -52,6 +73,9 @@ function cardPlaceholderHtml(category){
 // Categories that use the full detail template (Purpose, Best For, Sample Prompts, etc.)
 const RICH_CATEGORIES = ['skills', 'commands', 'agents', 'mcps', 'plugins'];
 function isRichCategory(cat){ return RICH_CATEGORIES.includes(cat); }
+
+const OTHER_TOOLS_CATS = ['other-writing', 'other-video', 'other-images', 'other-research', 'other-design', 'other-audio', 'other-automation'];
+function isOtherToolsCategory(cat){ return cat === 'other-tools' || OTHER_TOOLS_CATS.includes(cat); }
 
 const CLAUDE_SHORTCUT_CATS = ['shortcut-desktop', 'shortcut-code', 'shortcut-slash'];
 const CHATGPT_SHORTCUT_CATS = ['chatgpt-shortcut-desktop', 'chatgpt-shortcut-code', 'chatgpt-shortcut-slash'];

@@ -11,6 +11,7 @@ const grid = document.getElementById('grid');
 const pagination = document.getElementById('pagination');
 const countRow = document.getElementById('countRow');
 const sideNav = document.getElementById('sideNav');
+const otherToolsNav = document.getElementById('otherToolsNav');
 const shortcutNav = document.getElementById('shortcutNav');
 const chatgptShortcutNav = document.getElementById('chatgptShortcutNav');
 const shortcutsBanner = document.getElementById('shortcutsBanner');

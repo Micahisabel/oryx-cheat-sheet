@@ -202,10 +202,10 @@ function render(){
 
     const platformFilteredEntries = activePlatform === 'all' ? libraryEntries : libraryEntries.filter(e => (e.platform || 'claude') === activePlatform);
     const counts = { all: platformFilteredEntries.length, skills: 0, commands: 0, agents: 0, mcps: 0, plugins: 0, discoveries: 0, 'other-tools': 0 };
+    OTHER_TOOLS_CATS.forEach(c => { counts[c] = 0; });
     platformFilteredEntries.forEach(e => { if(counts[e.category] !== undefined) counts[e.category]++; });
     Object.keys(counts).forEach(cat => {
-      const el = sideNav.querySelector(`[data-count-for="${cat}"]`);
-      if(el) el.textContent = counts[cat];
+      document.querySelectorAll(`[data-count-for="${cat}"]`).forEach(el => { el.textContent = counts[cat]; });
     });
   }
 
@@ -238,7 +238,7 @@ function render(){
 
   grid.innerHTML = pageItems.map(e => {
     let thumbInner = e.link ? linkThumbHtml(e.link) : '';
-    if(!thumbInner && e.category === 'other-tools' && e.link) thumbInner = faviconBadgeHtml(e.link, e.category);
+    if(!thumbInner && isOtherToolsCategory(e.category) && e.link) thumbInner = faviconBadgeHtml(e.link, e.category);
     if(!thumbInner) thumbInner = isShortcutCategory(e.category) ? shortcutBadgeHtml(e.shortcutKey) : cardPlaceholderHtml(e.category);
     const thumbHtml = e.link ? `<a class="card-thumb-link" href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${thumbInner}</a>` : thumbInner;
     const linkHtml = e.link ? `<div class="card-link"><a href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${escapeHtml(e.link)}</a></div>` : '';

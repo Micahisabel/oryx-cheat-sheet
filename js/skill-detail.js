@@ -8,7 +8,7 @@ function openNoteDetail(entry){
   const catLabel = CATEGORY_LABELS[entry.category] || entry.category;
   const thumbInner = entry.link ? linkThumbHtml(entry.link) : '';
   const thumbHtml = entry.link ? `<a class="card-thumb-link" href="${escapeHtml(entry.link)}" target="_blank" rel="noopener">${thumbInner}</a>` : '';
-  const titleFaviconUrl = entry.category === 'other-tools' && entry.link ? faviconUrlForLink(entry.link) : null;
+  const titleFaviconUrl = isOtherToolsCategory(entry.category) && entry.link ? faviconUrlForLink(entry.link) : null;
   const titleLogoHtml = titleFaviconUrl
     ? `<img class="skill-title-logo" src="${titleFaviconUrl}" alt="" onerror="this.style.display='none';">`
     : '';
@@ -35,7 +35,7 @@ function openNoteDetail(entry){
     html += `<div class="skill-thumb">${thumbHtml}</div>`;
   }
 
-  const isLinkResource = entry.category === 'discoveries' || entry.category === 'other-tools';
+  const isLinkResource = entry.category === 'discoveries' || isOtherToolsCategory(entry.category);
 
   if(isRichCategory(entry.category)){
     html += optionalBlock('Purpose', entry.purpose || entry.body)

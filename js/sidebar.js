@@ -14,7 +14,7 @@ function repositionTabIndicator(container, indicatorSelector, activeSelector){
 }
 function repositionAllTabIndicators(){
   repositionTabIndicator(platformNav, '.platform-active-indicator', '.platform-item.active');
-  [sideNav, shortcutNav, chatgptShortcutNav].forEach(nav => {
+  [sideNav, shortcutNav, chatgptShortcutNav, otherToolsNav].forEach(nav => {
     repositionTabIndicator(nav, '.cat-tab-indicator', '.cat-tab.active');
   });
 }
@@ -129,12 +129,16 @@ platformNav.addEventListener('click', (ev) => {
   if(activePlatform === 'all'){
     activeCat = 'all';
     sideNav.style.display = '';
+    otherToolsNav.style.display = 'none';
     sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
   } else if(activePlatform === 'other'){
-    activeCat = 'other-tools';
+    activeCat = OTHER_TOOLS_CATS[0];
     sideNav.style.display = 'none';
+    otherToolsNav.style.display = 'flex';
+    otherToolsNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
   } else {
     sideNav.style.display = '';
+    otherToolsNav.style.display = 'none';
   }
   if(btn.dataset.platform === 'claude' || btn.dataset.platform === 'chatgpt'){
     const submenu = document.getElementById(btn.dataset.platform + 'Submenu');
@@ -155,6 +159,17 @@ sideNav.addEventListener('click', (ev) => {
   activeCat = btn.dataset.cat;
   currentPage = 1;
   repositionTabIndicator(sideNav, '.cat-tab-indicator', '.cat-tab.active');
+  render();
+});
+
+otherToolsNav.addEventListener('click', (ev) => {
+  const btn = ev.target.closest('.cat-tab');
+  if(!btn) return;
+  otherToolsNav.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  activeCat = btn.dataset.cat;
+  currentPage = 1;
+  repositionTabIndicator(otherToolsNav, '.cat-tab-indicator', '.cat-tab.active');
   render();
 });
 
