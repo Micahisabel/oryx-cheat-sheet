@@ -398,6 +398,9 @@ async function submitDiscovery(){
 
   saveSuggestBtn.disabled = true; saveSuggestBtn.textContent = 'Publishing…';
   try{
+    // The Firestore rule for entries/create (isValidDiscovery) requires category to be
+    // 'discoveries' or match '^other-.*' — keep #dOtherCategory option values prefixed
+    // with 'other-', or staff writes for that category will fail with permission-denied.
     await entriesCollection.add({
       category: platform === 'other' ? otherCategory : 'discoveries', title, body: desc, link,
       platform, author: name || 'Anonymous', authorEmail: firebase.auth().currentUser.email, createdAt: Date.now()
