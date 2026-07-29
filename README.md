@@ -4,6 +4,9 @@ Oryx Doors & Windows internal knowledge base — Skills, Commands, AI Agents, MC
 Discoveries, Other AI Tools, and Claude/ChatGPT Shortcuts. Static HTML/CSS/JS app backed by
 Firebase Firestore, no build step required.
 
+See [ARCHITECTURE.md](ARCHITECTURE.md) for roles, the Firestore/rules coupling, and how
+deploys work — read it before planning a change to auth, data, or the sign-up flow.
+
 ## Running locally
 
 Any static file server works, since this is plain HTML/CSS/JS with no bundler:
