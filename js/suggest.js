@@ -47,6 +47,18 @@ const errSignupPassword = document.getElementById('errSignupPassword');
 const staffAuthSaveName = document.getElementById('staffAuthSaveName');
 const signupNameField = document.getElementById('signupNameField');
 const signupEmailField = document.getElementById('signupEmailField');
+
+function wirePasswordToggle(toggleId, inputEl){
+  const toggle = document.getElementById(toggleId);
+  toggle.addEventListener('click', () => {
+    const shown = inputEl.type === 'text';
+    inputEl.type = shown ? 'password' : 'text';
+    toggle.textContent = shown ? '👁' : '🙈';
+    toggle.setAttribute('aria-label', shown ? 'Show password' : 'Hide password');
+  });
+}
+wirePasswordToggle('staffPasswordToggle', staffPasswordInput);
+wirePasswordToggle('staffSignupPasswordToggle', staffSignupPasswordInput);
 const signupPasswordField = document.getElementById('signupPasswordField');
 const signupEyebrow = document.getElementById('signupEyebrow');
 const signupHeading = document.getElementById('signupHeading');

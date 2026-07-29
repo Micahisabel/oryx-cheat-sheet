@@ -124,6 +124,16 @@
     transition:border-color 0.15s ease, box-shadow 0.15s ease;
   }
   .auth-field input:focus{outline:none;border-color:var(--oryx-blue);box-shadow:0 0 0 3px rgba(2,42,58,0.08);}
+  .auth-password-wrap{position:relative;}
+  .auth-password-wrap input{padding-right:40px;}
+  .auth-password-toggle{
+    position:absolute;top:50%;right:6px;transform:translateY(-50%);
+    width:28px;height:28px;border:none;background:none;cursor:pointer;
+    font-size:15px;line-height:1;color:#5b6b72;opacity:0.6;
+    display:flex;align-items:center;justify-content:center;border-radius:6px;
+    transition:opacity 0.15s ease;
+  }
+  .auth-password-toggle:hover{opacity:1;}
   .auth-form-inner .field-error{font-size:12.5px;margin:-7px 0 10px;}
   .auth-row-between{display:flex;align-items:center;justify-content:space-between;margin:2px 0 4px;gap:12px;}
   .auth-remember{

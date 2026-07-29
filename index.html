@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="css/sidebar.css?v=4">
 <link rel="stylesheet" href="css/dashboard.css?v=3">
 <link rel="stylesheet" href="css/cards.css?v=3">
-<link rel="stylesheet" href="css/modal.css?v=8">
+<link rel="stylesheet" href="css/modal.css?v=9">
 <link rel="stylesheet" href="css/forms.css?v=6">
 <link rel="stylesheet" href="css/responsive.css?v=2">
 </head>
@@ -432,7 +432,10 @@
 
         <div class="auth-field">
           <label for="staffPassword">Password</label>
-          <input type="password" id="staffPassword" placeholder="••••••••" autocomplete="current-password">
+          <div class="auth-password-wrap">
+            <input type="password" id="staffPassword" placeholder="••••••••" autocomplete="current-password">
+            <button type="button" class="auth-password-toggle" id="staffPasswordToggle" aria-label="Show password">👁</button>
+          </div>
         </div>
         <div class="field-error" id="errStaffPassword">Incorrect email or password.</div>
 
@@ -465,7 +468,10 @@
         <div class="field-error" id="errSignupEmail">Please use your @oryxdoors.com email address.</div>
         <div class="auth-field" id="signupPasswordField">
           <label for="staffSignupPassword">Password</label>
-          <input type="password" id="staffSignupPassword" placeholder="At least 6 characters" autocomplete="new-password">
+          <div class="auth-password-wrap">
+            <input type="password" id="staffSignupPassword" placeholder="At least 6 characters" autocomplete="new-password">
+            <button type="button" class="auth-password-toggle" id="staffSignupPasswordToggle" aria-label="Show password">👁</button>
+          </div>
         </div>
         <div class="field-error" id="errSignupPassword">Could not create your account.</div>
 
