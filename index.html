@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="css/layout.css?v=3">
 <link rel="stylesheet" href="css/sidebar.css?v=4">
 <link rel="stylesheet" href="css/dashboard.css?v=3">
-<link rel="stylesheet" href="css/cards.css?v=3">
+<link rel="stylesheet" href="css/cards.css?v=4">
 <link rel="stylesheet" href="css/modal.css?v=9">
 <link rel="stylesheet" href="css/forms.css?v=6">
 <link rel="stylesheet" href="css/responsive.css?v=2">
@@ -51,6 +51,10 @@
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
             My Components
           </button>
+          <button class="account-menu-item" id="openMyFavorites">
+            <svg viewBox="0 0 24 24"><path d="M12 17.3l-6.2 3.7 1.6-7L2 9.3l7.1-.6L12 2l2.9 6.7 7.1.6-5.4 4.7 1.6 7z"/></svg>
+            My Favorites
+          </button>
           <div class="account-menu-divider"></div>
           <button class="account-menu-item danger" id="accountSignOut">
             <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
@@ -69,6 +73,16 @@
     <h2>My Components</h2>
     <p class="sub">Resources you've suggested and published</p>
     <div id="myComponentsList"></div>
+  </div>
+</div>
+
+<!-- My Favorites (entries the signed-in user has starred) -->
+<div class="overlay" id="myFavoritesOverlay">
+  <div class="panel">
+    <button class="close-x" id="closeMyFavorites">&times;</button>
+    <h2>My Favorites</h2>
+    <p class="sub">Entries you've starred for quick access</p>
+    <div id="myFavoritesList"></div>
   </div>
 </div>
 
@@ -509,17 +523,18 @@
   </div>
 </div>
 
-<script src="js/firebase.js?v=15"></script>
+<script src="js/firebase.js?v=16"></script>
 <script src="js/utils.js?v=14"></script>
 <script src="js/constants.js?v=15"></script>
 <script src="js/state.js?v=15"></script>
 <script src="js/sidebar.js?v=17"></script>
-<script src="js/entries.js?v=15"></script>
-<script src="js/skill-detail.js?v=15"></script>
+<script src="js/entries.js?v=16"></script>
+<script src="js/skill-detail.js?v=16"></script>
 <script src="js/add-entry.js?v=14"></script>
 <script src="js/shortcuts-form.js?v=14"></script>
 <script src="js/admin.js?v=15"></script>
 <script src="js/suggest.js?v=22"></script>
+<script src="js/favorites.js?v=1"></script>
 <script src="js/review.js?v=14"></script>
 <script src="js/app.js?v=14"></script>
 

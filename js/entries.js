@@ -6,6 +6,8 @@ searchInput.addEventListener('input', () => {
 
 let knownEntryIds = null;
 
+const FAV_STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 17.3l-6.2 3.7 1.6-7L2 9.3l7.1-.6L12 2l2.9 6.7 7.1.6-5.4 4.7 1.6 7z"/></svg>';
+
 function notifyNewDiscovery(e){
   if(!isAdmin || !('Notification' in window) || Notification.permission !== 'granted') return;
   const logoEl = document.querySelector('.logo-img');
@@ -247,8 +249,10 @@ function render(){
     const tagChipHtml = e.tag ? `<span class="card-tag-chip">${escapeHtml(e.tag)}</span>` : '';
     const platformTagLabel = e.platform === 'other' ? 'Other AI Tools' : platformMeta(e.platform).label;
     const cardTagLabel = isRichCategory(e.category) && e.department ? e.department : (e.category === 'discoveries' ? platformTagLabel : (CATEGORY_LABELS[e.category] || e.category));
+    const isFav = favoriteIds.has(e.id);
     return `
       <div class="card" data-id="${e.id}">
+        <button class="card-fav-btn${isFav ? ' active' : ''}" data-id="${e.id}" aria-label="${isFav ? 'Remove from favorites' : 'Add to favorites'}">${FAV_STAR_SVG}</button>
         ${thumbHtml}
         <span class="card-tag">${escapeHtml(cardTagLabel)}</span>
         <p class="card-title">${escapeHtml(e.title)}</p>
@@ -274,6 +278,13 @@ function render(){
 
   grid.querySelectorAll('.card-thumb-link').forEach(link => {
     link.addEventListener('click', (ev) => ev.stopPropagation());
+  });
+
+  grid.querySelectorAll('.card-fav-btn').forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      toggleFavorite(btn.dataset.id);
+    });
   });
 
   grid.querySelectorAll('.card-edit').forEach(btn => {

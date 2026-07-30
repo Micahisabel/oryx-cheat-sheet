@@ -25,7 +25,10 @@ function openNoteDetail(entry){
           <span class="tag">${escapeHtml(catLabel)}</span>
           <span class="tag platform"><span class="platform-dot" style="background:${pm.color}"></span>${escapeHtml(pm.label)}</span>
         </div>
-        <div class="skill-title-row">${titleLogoHtml}<h1>${escapeHtml(entry.title)}</h1></div>
+        <div class="skill-title-row">
+          ${titleLogoHtml}<h1>${escapeHtml(entry.title)}</h1>
+          <button class="card-fav-btn skill-fav-btn${favoriteIds.has(entry.id) ? ' active' : ''}" id="skillFavBtn" data-id="${entry.id}" aria-label="${favoriteIds.has(entry.id) ? 'Remove from favorites' : 'Add to favorites'}">${FAV_STAR_SVG}</button>
+        </div>
       </div>
     </div>
     <div class="skill-wrap">
@@ -86,4 +89,10 @@ function openNoteDetail(entry){
   document.getElementById('skillBack').addEventListener('click', closeDetail);
   const downloadBtn = document.getElementById('downloadSkill');
   if(downloadBtn) downloadBtn.addEventListener('click', () => downloadSkillMd(entry));
+  const favBtn = document.getElementById('skillFavBtn');
+  if(favBtn) favBtn.addEventListener('click', () => {
+    toggleFavorite(entry.id);
+    favBtn.classList.toggle('active', !favoriteIds.has(entry.id));
+    favBtn.setAttribute('aria-label', favoriteIds.has(entry.id) ? 'Remove from favorites' : 'Add to favorites');
+  });
 }
