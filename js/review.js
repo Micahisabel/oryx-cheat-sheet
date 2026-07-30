@@ -1,5 +1,6 @@
 // ---- Review queue (admin) ----
 let knownSuggestionIds = null;
+let suggestionsUnsub = null;
 
 function notifyNewSuggestion(s){
   if(!isAdmin || !('Notification' in window) || Notification.permission !== 'granted') return;
@@ -12,7 +13,8 @@ function notifyNewSuggestion(s){
 }
 
 function listenForSuggestions(){
-  suggestionsCollection.orderBy('createdAt', 'desc').onSnapshot(
+  if(suggestionsUnsub) return; // already listening
+  suggestionsUnsub = suggestionsCollection.orderBy('createdAt', 'desc').onSnapshot(
     (snap) => {
       suggestions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       reviewCount.textContent = suggestions.length;
@@ -28,6 +30,14 @@ function listenForSuggestions(){
     },
     (err) => { console.error('Suggestions sync error:', err); }
   );
+}
+
+function stopListeningForSuggestions(){
+  if(suggestionsUnsub){ suggestionsUnsub(); suggestionsUnsub = null; }
+  knownSuggestionIds = null;
+  suggestions = [];
+  reviewCount.textContent = '0';
+  renderReviewList();
 }
 
 function renderReviewList(){

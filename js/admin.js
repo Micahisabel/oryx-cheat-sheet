@@ -23,7 +23,12 @@ const ADMIN_EMAIL = 'micah@oryxdoors.com';
 firebase.auth().onAuthStateChanged((user) => {
   isAdmin = !!user && user.email === ADMIN_EMAIL;
   applyAdminUI();
-  if(isAdmin && 'Notification' in window && Notification.permission === 'default'){
-    Notification.requestPermission();
+  if(isAdmin){
+    listenForSuggestions();
+    if('Notification' in window && Notification.permission === 'default'){
+      Notification.requestPermission();
+    }
+  }else{
+    stopListeningForSuggestions();
   }
 });
