@@ -2,6 +2,7 @@ const BACK_ARROW_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="no
 const DOWNLOAD_ICON_SVG = '<svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM12 4v8.17l3.59-3.58L17 10l-6 6-6-6 1.41-1.41L10 12.17V4h2z"/></svg>';
 
 function openNoteDetail(entry){
+  incrementViewCount(entry.id);
   const inner = document.getElementById('skillPageInner');
   const dateStr = new Date(entry.createdAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
   const pm = platformMeta(entry.platform);

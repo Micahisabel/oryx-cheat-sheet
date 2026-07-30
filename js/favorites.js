@@ -31,6 +31,9 @@ async function toggleFavorite(id){
         ? firebase.firestore.FieldValue.arrayRemove(id)
         : firebase.firestore.FieldValue.arrayUnion(id)
     }, { merge: true });
+    entriesCollection.doc(id).update({
+      favCount: firebase.firestore.FieldValue.increment(isFav ? -1 : 1)
+    }).catch(() => {});
   }catch(e){
     alert('Could not update favorites. Check your connection and try again.');
   }
