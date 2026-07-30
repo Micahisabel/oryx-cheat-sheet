@@ -22,6 +22,7 @@ window.addEventListener('resize', repositionAllTabIndicators);
 window.addEventListener('load', repositionAllTabIndicators);
 
 function enterShortcutsMode(group){
+  exitAnalyticsMode();
   viewMode = 'shortcuts';
   shortcutGroup = group;
   const cats = group === 'chatgpt' ? CHATGPT_SHORTCUT_CATS : CLAUDE_SHORTCUT_CATS;
@@ -123,6 +124,7 @@ chatgptShortcutNav.addEventListener('click', (ev) => handleShortcutTabClick(chat
 platformNav.addEventListener('click', (ev) => {
   const btn = ev.target.closest('.platform-item');
   if(!btn || btn.disabled) return;
+  exitAnalyticsMode();
   platformNav.querySelectorAll('.platform-item').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   activePlatform = btn.dataset.platform;

@@ -44,3 +44,5 @@
   /* ---------- Hub layout ---------- */
   .hub-body{display:flex;align-items:flex-start;}
   .hub-main{flex:1;min-width:0;padding:24px 32px 64px;}
+  .hub-main.analytics-mode > *:not(#analyticsView){display:none !important;}
+  .hub-main.analytics-mode #analyticsView{display:block !important;}

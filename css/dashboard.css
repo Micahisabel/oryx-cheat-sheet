@@ -1,3 +1,8 @@
+  /* ---------- Usage analytics (in-page, admin only) ---------- */
+  .analytics-page-head{margin-bottom:24px;}
+  .analytics-page-head h2{font-family:var(--font-display);font-size:22px;color:var(--oryx-blue);margin:0 0 4px;}
+  .analytics-page-sub{font-size:13px;color:var(--silver);margin:0;}
+
   /* ---------- Filter toolbar (search + department + advanced) ---------- */
   .filter-toolbar{
     display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;
