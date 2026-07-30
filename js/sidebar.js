@@ -30,6 +30,7 @@ function enterShortcutsMode(group){
   activeCat = cats[0];
   currentPage = 1;
   sideNav.style.display = 'none';
+  otherToolsNav.style.display = 'none';
   nav.style.display = 'flex';
   otherNav.style.display = 'none';
   shortcutsBanner.style.display = 'flex';
@@ -45,12 +46,20 @@ function enterShortcutsMode(group){
 
 function exitShortcutsMode(){
   viewMode = 'library';
-  activeCat = 'skills';
-  sideNav.style.display = '';
   shortcutNav.style.display = 'none';
   chatgptShortcutNav.style.display = 'none';
   shortcutsBanner.style.display = 'none';
-  sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
+  if(activePlatform === 'other'){
+    activeCat = OTHER_TOOLS_CATS[0];
+    sideNav.style.display = 'none';
+    otherToolsNav.style.display = 'flex';
+    otherToolsNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
+  }else{
+    activeCat = 'skills';
+    sideNav.style.display = '';
+    otherToolsNav.style.display = 'none';
+    sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
+  }
   document.querySelectorAll('.platform-submenu-item').forEach(b => b.classList.remove('active'));
   updateAddShortcutVisibility();
   repositionAllTabIndicators();
