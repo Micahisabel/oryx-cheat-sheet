@@ -85,9 +85,6 @@ function renderNotifPrefsList(){
 }
 
 function openNotifPrefsPanel(){
-  closeAccountMenu();
-  const user = firebase.auth().currentUser;
-  if(!user) return;
   notifPrefsOverlay.classList.add('open');
   renderNotifPrefsList();
 }
