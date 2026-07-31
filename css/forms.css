@@ -132,6 +132,9 @@
     padding:1px 7px;min-width:18px;text-align:center;font-family:var(--font-body);
   }
   .suggestion-item{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px;}
+  .activity-row{cursor:pointer;transition:background 0.15s ease;}
+  .activity-row:hover{background:var(--panel);}
+  .activity-row--new{border-color:var(--oryx-blue);box-shadow:0 0 0 1px var(--oryx-blue) inset;}
   .suggestion-item .s-meta{
     font-size:11px;color:var(--silver);text-transform:uppercase;letter-spacing:0.06em;
     font-family:var(--font-display);font-weight:600;margin-bottom:8px;display:flex;gap:10px;flex-wrap:wrap;

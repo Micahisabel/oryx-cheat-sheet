@@ -14,6 +14,7 @@ const reviewCount = document.getElementById('reviewCount');
 function applyAdminUI(){
   openAdd.style.display = isAdmin ? '' : 'none';
   openReview.style.display = isAdmin ? '' : 'none';
+  document.getElementById('openActivity').style.display = isAdmin ? '' : 'none';
   document.getElementById('openAnalyticsNav').style.display = isAdmin ? '' : 'none';
   updateAddShortcutVisibility();
   render();  // re-render cards so Remove buttons show/hide

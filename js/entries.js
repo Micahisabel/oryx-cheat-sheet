@@ -154,6 +154,7 @@ function renderRecentStrip(libraryEntries){
 }
 
 function render(){
+  updateActivityBadge();
   const libraryEntries = entries.filter(e => !isShortcutCategory(e.category));
   const shortcutEntries = entries.filter(e => isShortcutCategory(e.category));
 
