@@ -183,20 +183,25 @@ function render(){
 
   let filtered;
   if(viewMode === 'shortcuts'){
+    // While searching, look across all sub-tabs of the current shortcut group (Desktop/Code/Slash)
+    // instead of just the selected one — a shortcut key shouldn't be findable only from its own tab.
+    const groupCats = shortcutGroup === 'chatgpt' ? CHATGPT_SHORTCUT_CATS : CLAUDE_SHORTCUT_CATS;
     filtered = shortcutEntries.filter(e => {
-      if(e.category !== activeCat) return false;
-      if(!searchTerm) return true;
+      if(!groupCats.includes(e.category)) return false;
+      if(!searchTerm) return e.category === activeCat;
       const haystack = [e.title, e.shortcutKey, e.purpose, e.howToUse, e.example, e.notes]
         .filter(Boolean).join(' ').toLowerCase();
       return haystack.includes(searchTerm);
     }).sort((a,b) => b.createdAt - a.createdAt);
   } else {
     filtered = libraryEntries.filter(e => {
-      const catMatch = activeCat === 'all' || e.category === activeCat;
-      if(!catMatch) return false;
       const platformMatch = activePlatform === 'all' || (e.platform || 'claude') === activePlatform;
       if(!platformMatch) return false;
-      if(!searchTerm) return true;
+      if(!searchTerm){
+        return activeCat === 'all' || e.category === activeCat;
+      }
+      // While searching, look across all category tabs in the current platform view instead of
+      // just the selected one, so a shortcut key or command isn't only findable from its own tab.
       const haystack = [e.title, e.body, e.purpose, e.bestFor, e.notes, e.department]
         .filter(Boolean).join(' ').toLowerCase();
       return haystack.includes(searchTerm);
