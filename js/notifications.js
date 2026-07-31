@@ -42,6 +42,9 @@ async function setNotifyAll(enabled){
 // Called from listenForEntries() for every entry that's brand-new this sync — fires a browser
 // notification if the current signed-in user has notifications turned on.
 function notifyIfSubscribed(entry){
+  // Admin already gets a dedicated notification for new discoveries via notifyNewDiscovery()
+  // (entries.js) regardless of this opt-in — skip here so a subscribed admin doesn't get two.
+  if(isAdmin && entry.category === 'discoveries') return;
   if(!subscribedCats.has(entry.category)) return;
   if(!('Notification' in window) || Notification.permission !== 'granted') return;
   const logoEl = document.querySelector('.logo-img');
