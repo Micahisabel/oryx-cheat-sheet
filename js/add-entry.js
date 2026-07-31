@@ -63,28 +63,6 @@ if(aiOpenChat){
   });
 }
 
-async function copyToClipboard(text){
-  try{
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      await navigator.clipboard.writeText(text);
-      return true;
-    }
-  }catch(e){ /* fall through to legacy method */ }
-  // Legacy fallback — works in many contexts where the async API is blocked.
-  try{
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    const ok = document.execCommand('copy');
-    document.body.removeChild(ta);
-    return ok;
-  }catch(e){ return false; }
-}
-
 document.getElementById('aiGenerate').addEventListener('click', async () => {
   const desc = aiInput.value.trim();
   if(!desc){ setAiStatus('Type a short description first.'); return; }

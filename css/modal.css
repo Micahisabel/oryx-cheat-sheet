@@ -246,3 +246,16 @@
   .detail-value{font-size:14.5px;line-height:1.7;color:var(--black);white-space:pre-wrap;}
   .detail-value.mono{font-family:monospace;background:var(--panel);padding:10px 12px;font-size:13px;}
   .detail-tip{background:var(--panel);border-left:3px solid var(--oryx-blue);padding:14px 16px;font-size:13.5px;line-height:1.65;}
+
+  .detail-value-row{display:flex;align-items:flex-start;gap:8px;}
+  .detail-value-row .detail-value{flex:1;min-width:0;}
+  .copy-btn{
+    flex-shrink:0;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);
+    background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:background 0.15s ease, border-color 0.15s ease;
+  }
+  .copy-btn svg{width:15px;height:15px;fill:none;stroke:var(--silver);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .copy-btn:hover{background:var(--panel);border-color:var(--oryx-blue);}
+  .copy-btn:hover svg{stroke:var(--oryx-blue);}
+  .copy-btn.copied{background:var(--oryx-blue);border-color:var(--oryx-blue);}
+  .copy-btn.copied svg{stroke:var(--white);}

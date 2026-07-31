@@ -44,7 +44,7 @@ function openNoteDetail(entry){
   if(isRichCategory(entry.category)){
     html += optionalBlock('Purpose', entry.purpose || entry.body)
       + optionalBlock('Best For', entry.bestFor)
-      + optionalBlock('Sample Prompts', entry.samplePrompt, 'detail-value mono')
+      + copyableBlock('Sample Prompts', entry.samplePrompt, 'detail-value mono', 'samplePrompt')
       + optionalBlock('Example Output', entry.exampleOutput)
       + optionalBlock('Notes', entry.notes)
       + optionalBlock('Department', entry.department)
@@ -52,10 +52,10 @@ function openNoteDetail(entry){
       + detailBlock('How to Install and Use It in Claude', entry.howToAccess && entry.howToAccess.trim() ? entry.howToAccess : INSTALL_HELP_TEXT)
       + optionalBlock('How This Helps Oryx Doors & Windows', entry.oryxTip, 'detail-tip');
   } else if(isShortcutCategory(entry.category)){
-    html += optionalBlock('Shortcut / Command', entry.shortcutKey, 'detail-value mono')
+    html += copyableBlock('Shortcut / Command', entry.shortcutKey, 'detail-value mono', 'shortcutKey')
       + optionalBlock('Purpose', entry.purpose)
       + optionalBlock('How to Use It', entry.howToUse)
-      + optionalBlock('Example', entry.example, 'detail-value mono')
+      + copyableBlock('Example', entry.example, 'detail-value mono', 'example')
       + optionalBlock('Notes', entry.notes);
   } else {
     html += optionalBlock('Details', entry.body)
@@ -84,6 +84,7 @@ function openNoteDetail(entry){
 
   inner.innerHTML = html;
   hydrateTikTokThumbs(inner);
+  wireCopyButtons(inner, entry);
   const page = document.getElementById('skillPage');
   page.classList.add('open');
   page.scrollTop = 0;

@@ -29,6 +29,64 @@ function optionalBlock(label, value, valueClass){
   return detailBlock(label, value, valueClass);
 }
 
+const COPY_ICON_SVG = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>';
+const CHECK_ICON_SVG = '<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>';
+
+// Same content as optionalBlock/detailBlock, plus a copy button. `fieldName` must be a fixed,
+// non-user-controlled string (e.g. 'shortcutKey') — the click handler reads entry[fieldName]
+// directly rather than embedding the (possibly quote-containing) value in a data attribute.
+function copyableBlock(label, value, valueClass, fieldName){
+  if(value === undefined || value === null || !String(value).trim()) return '';
+  return `<div class="detail-block">
+    <div class="detail-label">${escapeHtml(label)}</div>
+    <div class="detail-value-row">
+      <div class="${valueClass || 'detail-value'}">${escapeHtml(value)}</div>
+      <button class="copy-btn" data-field="${fieldName}" aria-label="Copy ${escapeHtml(label)}" title="Copy">${COPY_ICON_SVG}</button>
+    </div>
+  </div>`;
+}
+
+async function copyToClipboard(text){
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  }catch(e){ /* fall through to legacy method */ }
+  // Legacy fallback — works in many contexts where the async API is blocked.
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  }catch(e){ return false; }
+}
+
+function wireCopyButtons(root, entry){
+  root.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = entry[btn.dataset.field] || '';
+      const ok = await copyToClipboard(text);
+      if(!ok) return;
+      const original = btn.innerHTML;
+      btn.innerHTML = CHECK_ICON_SVG;
+      btn.classList.add('copied');
+      btn.setAttribute('aria-label', 'Copied!');
+      setTimeout(() => {
+        btn.innerHTML = original;
+        btn.classList.remove('copied');
+        btn.setAttribute('aria-label', 'Copy');
+      }, 1500);
+    });
+  });
+}
+
 function faviconUrlForLink(link){
   try{ return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(new URL(link).hostname)}&sz=64`; }
   catch(e){ return null; }
