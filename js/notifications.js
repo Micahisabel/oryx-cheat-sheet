@@ -75,6 +75,10 @@ function renderNotifPrefsList(){
 function openNotifPrefsPanel(){
   notifPrefsOverlay.classList.add('open');
   renderNotifPrefsList();
+  if(isAdmin){
+    renderActivityList();
+    markActivitySeen();
+  }
 }
 
 document.getElementById('openNotifPrefs').addEventListener('click', openNotifPrefsPanel);
