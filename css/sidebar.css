@@ -1,7 +1,8 @@
   /* ---------- Platform sidebar (Oryx blue, icon + pill + badge) ---------- */
   .platform-sidebar{
-    width:250px;flex-shrink:0;padding:24px 16px;position:sticky;top:0;
-    height:100vh;overflow-y:auto;background:var(--oryx-blue);
+    width:250px;flex-shrink:0;padding:24px 16px;position:sticky;
+    top:var(--header-h, 0px);height:calc(100vh - var(--header-h, 0px));
+    overflow-y:auto;background:var(--oryx-blue);
     display:flex;flex-direction:column;
   }
   .sidebar-footer{margin-top:auto;padding-top:16px;}

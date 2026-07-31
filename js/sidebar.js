@@ -184,4 +184,13 @@ otherToolsNav.addEventListener('click', (ev) => {
   render();
 });
 
+// Keep --header-h in sync with the real (sticky) header height, so the sidebar below it
+// always fills exactly the remaining viewport — header height varies as its content wraps.
+const siteHeaderEl = document.querySelector('header');
+function syncHeaderHeightVar(){
+  document.documentElement.style.setProperty('--header-h', siteHeaderEl.offsetHeight + 'px');
+}
+syncHeaderHeightVar();
+new ResizeObserver(syncHeaderHeightVar).observe(siteHeaderEl);
+
 repositionAllTabIndicators();
