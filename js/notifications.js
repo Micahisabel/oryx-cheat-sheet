@@ -1,12 +1,10 @@
-// ============= Notify on new entry (per-category browser notifications, opt-in per staff member) =============
+// ============= Notification (browser notification on every new entry, opt-in per staff member) =============
 let subscribedCats = new Set();
 let notifSubsUnsub = null;
 
-const NOTIFICATION_CATEGORY_GROUPS = [
-  { label: 'Knowledge Base', cats: ['skills', 'commands', 'agents', 'mcps', 'plugins', 'discoveries'] },
-  { label: 'Other AI Tools', cats: OTHER_TOOLS_CATS },
-  { label: 'Claude Shortcuts', cats: CLAUDE_SHORTCUT_CATS },
-  { label: 'ChatGPT Shortcuts', cats: CHATGPT_SHORTCUT_CATS }
+const ALL_NOTIFICATION_CATEGORIES = [
+  'skills', 'commands', 'agents', 'mcps', 'plugins', 'discoveries',
+  ...OTHER_TOOLS_CATS, ...CLAUDE_SHORTCUT_CATS, ...CHATGPT_SHORTCUT_CATS
 ];
 
 firebase.auth().onAuthStateChanged((user) => {
@@ -25,18 +23,15 @@ firebase.auth().onAuthStateChanged((user) => {
   );
 });
 
-async function toggleNotifSubscription(category){
+async function setNotifyAll(enabled){
   const signedIn = await ensureStaffSignedIn();
   if(!signedIn) return;
   const uid = firebase.auth().currentUser.uid;
-  const isSubscribed = subscribedCats.has(category);
   try{
     await notificationSubsCollection.doc(uid).set({
-      categories: isSubscribed
-        ? firebase.firestore.FieldValue.arrayRemove(category)
-        : firebase.firestore.FieldValue.arrayUnion(category)
+      categories: enabled ? ALL_NOTIFICATION_CATEGORIES : []
     }, { merge: true });
-    if(!isSubscribed && 'Notification' in window && Notification.permission === 'default'){
+    if(enabled && 'Notification' in window && Notification.permission === 'default'){
       Notification.requestPermission();
     }
   }catch(e){
@@ -45,7 +40,7 @@ async function toggleNotifSubscription(category){
 }
 
 // Called from listenForEntries() for every entry that's brand-new this sync — fires a browser
-// notification if the current signed-in user has opted into that entry's category.
+// notification if the current signed-in user has notifications turned on.
 function notifyIfSubscribed(entry){
   if(!subscribedCats.has(entry.category)) return;
   if(!('Notification' in window) || Notification.permission !== 'granted') return;
@@ -67,21 +62,14 @@ const notifPrefsOverlay = document.getElementById('notifPrefsOverlay');
 const notifPrefsList = document.getElementById('notifPrefsList');
 
 function renderNotifPrefsList(){
-  notifPrefsList.innerHTML = NOTIFICATION_CATEGORY_GROUPS.map(group => `
-    <div class="notif-group">
-      <div class="notif-group-label">${escapeHtml(group.label)}</div>
-      ${group.cats.map(cat => `
-        <label class="notif-cat-row">
-          <input type="checkbox" data-cat="${cat}" ${subscribedCats.has(cat) ? 'checked' : ''}>
-          <span>${escapeHtml(CATEGORY_LABELS[cat] || cat)}</span>
-        </label>
-      `).join('')}
-    </div>
-  `).join('');
-
-  notifPrefsList.querySelectorAll('input[type="checkbox"]').forEach(box => {
-    box.addEventListener('change', () => toggleNotifSubscription(box.dataset.cat));
-  });
+  const isOn = ALL_NOTIFICATION_CATEGORIES.every(cat => subscribedCats.has(cat));
+  notifPrefsList.innerHTML = `
+    <label class="notif-cat-row">
+      <input type="checkbox" id="notifAllToggle" ${isOn ? 'checked' : ''}>
+      <span>Notify me about every new entry</span>
+    </label>
+  `;
+  document.getElementById('notifAllToggle').addEventListener('change', (ev) => setNotifyAll(ev.target.checked));
 }
 
 function openNotifPrefsPanel(){
