@@ -74,14 +74,15 @@ function wireCopyButtons(root, entry){
       const text = entry[btn.dataset.field] || '';
       const ok = await copyToClipboard(text);
       if(!ok) return;
-      const original = btn.innerHTML;
+      const originalHtml = btn.innerHTML;
+      const originalLabel = btn.getAttribute('aria-label');
       btn.innerHTML = CHECK_ICON_SVG;
       btn.classList.add('copied');
       btn.setAttribute('aria-label', 'Copied!');
       setTimeout(() => {
-        btn.innerHTML = original;
+        btn.innerHTML = originalHtml;
         btn.classList.remove('copied');
-        btn.setAttribute('aria-label', 'Copy');
+        btn.setAttribute('aria-label', originalLabel);
       }, 1500);
     });
   });
