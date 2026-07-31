@@ -12,6 +12,7 @@ const db = firebase.firestore();
 const entriesCollection = db.collection('entries');
 const suggestionsCollection = db.collection('suggestions');
 const favoritesCollection = db.collection('favorites');
+const notificationSubsCollection = db.collection('notificationSubs');
 const AUTHOR_KEY = 'oryx-cheatsheet-author-name';
 // Google Apps Script Web App that forwards new requests to Slack — the real Slack webhook
 // lives only inside that script, never in this public client-side file.

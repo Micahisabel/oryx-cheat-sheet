@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="css/dashboard.css?v=4">
 <link rel="stylesheet" href="css/cards.css?v=4">
 <link rel="stylesheet" href="css/modal.css?v=11">
-<link rel="stylesheet" href="css/forms.css?v=6">
+<link rel="stylesheet" href="css/forms.css?v=7">
 <link rel="stylesheet" href="css/responsive.css?v=2">
 </head>
 <body>
@@ -55,6 +55,10 @@
             <svg viewBox="0 0 24 24"><path d="M12 17.3l-6.2 3.7 1.6-7L2 9.3l7.1-.6L12 2l2.9 6.7 7.1.6-5.4 4.7 1.6 7z"/></svg>
             My Favorites
           </button>
+          <button class="account-menu-item" id="openNotifPrefs">
+            <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Notify Me
+          </button>
           <div class="account-menu-divider"></div>
           <button class="account-menu-item danger" id="accountSignOut">
             <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
@@ -83,6 +87,16 @@
     <h2>My Favorites</h2>
     <p class="sub">Entries you've starred for quick access</p>
     <div id="myFavoritesList"></div>
+  </div>
+</div>
+
+<!-- Notify Me (per-category browser notifications on new entries) -->
+<div class="overlay" id="notifPrefsOverlay">
+  <div class="panel">
+    <button class="close-x" id="closeNotifPrefs">&times;</button>
+    <h2>Notify Me</h2>
+    <p class="sub">Get a browser notification when a category you pick gets a new entry</p>
+    <div id="notifPrefsList"></div>
   </div>
 </div>
 
@@ -527,18 +541,19 @@
   </div>
 </div>
 
-<script src="js/firebase.js?v=16"></script>
+<script src="js/firebase.js?v=17"></script>
 <script src="js/utils.js?v=14"></script>
 <script src="js/constants.js?v=15"></script>
 <script src="js/state.js?v=15"></script>
 <script src="js/sidebar.js?v=18"></script>
-<script src="js/entries.js?v=17"></script>
+<script src="js/entries.js?v=18"></script>
 <script src="js/skill-detail.js?v=17"></script>
 <script src="js/add-entry.js?v=14"></script>
 <script src="js/shortcuts-form.js?v=14"></script>
 <script src="js/admin.js?v=18"></script>
 <script src="js/suggest.js?v=22"></script>
 <script src="js/favorites.js?v=2"></script>
+<script src="js/notifications.js?v=1"></script>
 <script src="js/review.js?v=15"></script>
 <script src="js/analytics.js?v=3"></script>
 <script src="js/app.js?v=15"></script>

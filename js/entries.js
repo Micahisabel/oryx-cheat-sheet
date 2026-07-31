@@ -28,9 +28,9 @@ function listenForEntries(){
 
       const currentEntryIds = new Set(entries.map(e => e.id));
       if(knownEntryIds !== null){
-        entries
-          .filter(e => e.category === 'discoveries' && !knownEntryIds.has(e.id))
-          .forEach(notifyNewDiscovery);
+        const newEntries = entries.filter(e => !knownEntryIds.has(e.id));
+        newEntries.filter(e => e.category === 'discoveries').forEach(notifyNewDiscovery);
+        newEntries.forEach(notifyIfSubscribed);
       }
       knownEntryIds = currentEntryIds;
     },
