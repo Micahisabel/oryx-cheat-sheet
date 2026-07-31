@@ -28,7 +28,14 @@ firebase.auth().onAuthStateChanged((user) => {
   }
   activityLastSeenUnsub = adminStateCollection.doc('activityFeed').onSnapshot(
     (doc) => {
-      activityLastSeenAt = (doc.data() && doc.data().lastSeenAt) || 0;
+      if(!doc.exists){
+        // First time this feature has ever run — don't retroactively flag years of
+        // pre-existing team submissions as "new". Baseline starts from right now.
+        activityLastSeenAt = Date.now();
+        adminStateCollection.doc('activityFeed').set({ lastSeenAt: activityLastSeenAt }).catch(() => {});
+      }else{
+        activityLastSeenAt = (doc.data().lastSeenAt) || 0;
+      }
       updateActivityBadge();
       if(notifPrefsOverlay.classList.contains('open')) renderActivityList();
     },
