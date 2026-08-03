@@ -302,6 +302,7 @@ document.addEventListener('click', (ev) => {
 
 document.getElementById('accountSignOut').addEventListener('click', async () => {
   closeAccountMenu();
+  if(!confirm('Sign out of your Oryx account?')) return;
   await firebase.auth().signOut();
 });
 
