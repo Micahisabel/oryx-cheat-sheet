@@ -66,7 +66,7 @@ const signupDek = document.getElementById('signupDek');
 const signupDomainNote = document.getElementById('signupDomainNote');
 const mobileSignupSwitch = document.getElementById('mobileSignupSwitch');
 
-let staffAuthResolve = null;
+let staffAuthResolvers = [];
 
 function clearAuthErrors(){
   errStaffEmail.style.display = 'none';
@@ -115,9 +115,9 @@ function showNameOnlyMode(){
 
 function closeStaffAuth(result){
   staffAuthOverlay.classList.remove('open');
-  const resolve = staffAuthResolve;
-  staffAuthResolve = null;
-  if(resolve) resolve(result);
+  const resolvers = staffAuthResolvers;
+  staffAuthResolvers = [];
+  resolvers.forEach(resolve => resolve(result));
 }
 
 document.getElementById('closeStaffAuth').addEventListener('click', () => closeStaffAuth(false));
@@ -231,7 +231,13 @@ staffAuthSaveName.addEventListener('click', async () => {
 
 function openStaffAuthModal(){
   return new Promise((resolve) => {
-    staffAuthResolve = resolve;
+    // If the modal is already open (another action is mid-sign-in), just queue
+    // behind it instead of resetting fields the user may already be filling in.
+    if(staffAuthOverlay.classList.contains('open')){
+      staffAuthResolvers.push(resolve);
+      return;
+    }
+    staffAuthResolvers.push(resolve);
     staffEmailInput.value = '';
     staffPasswordInput.value = '';
     staffSignupEmailInput.value = '';
@@ -252,9 +258,11 @@ function ensureStaffSignedIn(){
   if(user){
     // Signed in but missing a display name (e.g. skipped it earlier) — catch it up.
     return new Promise((resolve) => {
-      staffAuthResolve = resolve;
-      showNameOnlyMode();
-      staffAuthOverlay.classList.add('open');
+      staffAuthResolvers.push(resolve);
+      if(!staffAuthOverlay.classList.contains('open')){
+        showNameOnlyMode();
+        staffAuthOverlay.classList.add('open');
+      }
     });
   }
   return openStaffAuthModal();
