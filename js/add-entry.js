@@ -35,7 +35,7 @@ Return ONLY a JSON object — no explanation, no markdown code fences — with t
 - "platform": "claude" or "chatgpt"
 - "title": a short, clear name
 - "department": the Oryx department it best fits (e.g. Sales and Marketing, Customer Service, Operations, HR, Finance, IT)
-- "purpose": what it does and why it's useful, in very simple language — write it so a 5-year-old could follow it. Short sentences, no jargon, no technical terms.
+- "purpose": 2-3 sentences on what it does and why it's useful, in very simple language — write it so a 5-year-old could follow it. Short sentences, no jargon, no technical terms. Cover: (1) what it does, (2) what you give it / how you use it, (3) why that's better than doing it yourself.
 - "bestFor": when someone should use it
 - "samplePrompt": 2-3 reusable example prompts someone could paste straight into Claude, each covering a different common task. Put ONE prompt per line (no numbering, no blank lines between them).
 - "exampleOutput": a short example of the result
