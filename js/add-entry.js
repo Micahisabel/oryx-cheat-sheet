@@ -35,7 +35,7 @@ Return ONLY a JSON object — no explanation, no markdown code fences — with t
 - "platform": "claude" or "chatgpt"
 - "title": a short, clear name
 - "department": the Oryx department it best fits (e.g. Sales and Marketing, Customer Service, Operations, HR, Finance, IT)
-- "purpose": 2-3 sentences on what it does and why it's useful, in very simple language — write it so a 5-year-old could follow it. Short sentences, no jargon, no technical terms. Cover: (1) what it does, (2) what you give it / how you use it, (3) why that's better than doing it yourself.
+- "purpose": written formally, in the third person, in the style real Claude Skill descriptions use. Structure it as: (1) one or two sentences starting "This skill..." that state what it does and what it produces, (2) a sentence starting "The user provides..." that states what input is needed, (3) a sentence starting "They may include..." for optional extra context the user might add. Do not write in first or second person ("you"/"I") and do not simplify it for a general audience — this is a technical description of the skill's function and inputs.
 - "bestFor": when someone should use it
 - "samplePrompt": 2-3 reusable example prompts someone could paste straight into Claude, each covering a different common task. Put ONE prompt per line (no numbering, no blank lines between them).
 - "exampleOutput": a short example of the result
