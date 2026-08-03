@@ -67,9 +67,10 @@ const notifPrefsList = document.getElementById('notifPrefsList');
 function renderNotifPrefsList(){
   const isOn = ALL_NOTIFICATION_CATEGORIES.every(cat => subscribedCats.has(cat));
   notifPrefsList.innerHTML = `
-    <label class="notif-cat-row">
+    <label class="notif-toggle-row">
       <input type="checkbox" id="notifAllToggle" ${isOn ? 'checked' : ''}>
-      <span>Notify me about every new entry</span>
+      <span class="notif-toggle-track"></span>
+      <span class="notif-toggle-label">Notify me about every new entry</span>
     </label>
   `;
   document.getElementById('notifAllToggle').addEventListener('change', (ev) => setNotifyAll(ev.target.checked));
