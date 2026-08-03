@@ -111,7 +111,11 @@
     background:var(--white);border-radius:22px;overflow:hidden;
     box-shadow:0 40px 90px -30px rgba(2,42,58,0.55), 0 0 0 1px rgba(255,255,255,0.06);
   }
-  .auth-close-x{position:absolute;top:20px;right:22px;z-index:3;}
+  .auth-close-x{
+    position:absolute;top:16px;right:18px;z-index:3;background:var(--white);color:var(--silver);
+    box-shadow:0 1px 4px rgba(2,42,58,0.18);
+  }
+  .auth-close-x:hover{background:var(--white);color:var(--oryx-blue);}
 
   .auth-slot{
     position:absolute;top:0;width:50%;height:100%;padding:36px;
