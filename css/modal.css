@@ -70,26 +70,31 @@
   }
 
   /* ---------- Usage analytics (admin) ---------- */
-  .analytics-kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:26px;}
+  .analytics-kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:26px;}
   .analytics-kpis--wide{grid-template-columns:repeat(4, 1fr);}
-  .analytics-kpi{background:var(--panel);border:1px solid var(--line-soft);border-radius:10px;padding:14px 16px;}
-  .analytics-kpi-label{display:block;font-family:var(--font-display);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--silver);margin-bottom:6px;}
-  .analytics-kpi-value{display:block;font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--oryx-blue);}
-  .analytics-kpi-value--text{font-size:15px;}
+  .analytics-kpi{background:var(--white);border-left:3px solid var(--oryx-blue);border-radius:12px;padding:16px 18px;box-shadow:0 2px 10px rgba(2,42,58,0.08);}
+  .analytics-kpi:nth-child(2){border-left-color:#F5C451;}
+  .analytics-kpi:nth-child(3){border-left-color:#c15656;}
+  .analytics-kpi:nth-child(4){border-left-color:var(--oryx-blue-tint);}
+  .analytics-kpi-label{display:block;font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0.02em;color:#8a97a0;margin-bottom:8px;}
+  .analytics-kpi-value{display:block;font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--oryx-blue);}
+  .analytics-kpi-value--text{font-size:17px;}
   .analytics-section-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px;}
   .analytics-section-head h3{font-family:var(--font-display);font-size:14px;color:var(--oryx-blue);margin:0;}
-  .analytics-seg{display:flex;gap:2px;background:var(--panel);border:1px solid var(--line-soft);border-radius:7px;padding:2px;}
-  .analytics-seg-btn{appearance:none;border:none;background:none;font-family:var(--font-display);font-size:11px;font-weight:600;color:var(--silver);padding:5px 10px;border-radius:5px;cursor:pointer;}
+  .analytics-seg{display:flex;gap:2px;background:var(--panel);border:1px solid var(--line-soft);border-radius:999px;padding:2px;}
+  .analytics-seg-btn{appearance:none;border:none;background:none;font-family:var(--font-display);font-size:11px;font-weight:600;color:var(--silver);padding:6px 12px;border-radius:999px;cursor:pointer;}
   .analytics-seg-btn.active{background:var(--oryx-blue);color:var(--white);}
   .analytics-row{display:flex;align-items:center;gap:12px;cursor:pointer;}
-  .analytics-rank{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:var(--panel);color:var(--silver);font-size:10.5px;font-weight:700;font-family:var(--font-display);display:inline-flex;align-items:center;justify-content:center;}
+  .analytics-row.my-component-row{background:var(--white);border-radius:12px;box-shadow:0 1px 4px rgba(2,42,58,0.06);padding:12px 14px;margin:0 0 8px;border-bottom:none;transition:box-shadow 0.15s ease, transform 0.15s ease;}
+  .analytics-row.my-component-row:hover{background:var(--white);box-shadow:0 6px 16px rgba(2,42,58,0.12);transform:translateY(-1px);}
+  .analytics-rank{flex-shrink:0;width:26px;height:26px;border-radius:8px;background:var(--oryx-blue);color:var(--white);font-size:12px;font-weight:700;font-family:var(--font-display);display:inline-flex;align-items:center;justify-content:center;}
   .analytics-row-main{flex:1;min-width:0;}
-  .analytics-count{flex-shrink:0;font-family:var(--font-display);font-weight:700;color:var(--oryx-blue);font-size:14px;}
-  .analytics-cats{display:flex;flex-direction:column;gap:12px;}
-  .analytics-cat-row{display:flex;flex-direction:column;gap:5px;}
+  .analytics-count{flex-shrink:0;font-family:var(--font-display);font-weight:700;color:var(--oryx-blue);font-size:15px;}
+  .analytics-cats{display:flex;flex-direction:column;gap:14px;}
+  .analytics-cat-row{display:flex;flex-direction:column;gap:6px;}
   .analytics-cat-top{display:flex;justify-content:space-between;font-size:12.5px;color:var(--black);font-family:var(--font-display);}
-  .analytics-bar-track{height:6px;background:var(--panel);border-radius:4px;overflow:hidden;}
-  .analytics-bar-fill{height:100%;background:var(--oryx-blue);border-radius:4px;}
+  .analytics-bar-track{height:8px;background:var(--panel);border-radius:999px;overflow:hidden;}
+  .analytics-bar-fill{height:100%;background:linear-gradient(90deg, var(--oryx-blue), var(--oryx-blue-tint));border-radius:999px;}
   .analytics-footnote{margin-top:24px;font-size:11px;color:var(--silver);text-align:center;}
 
   /* ---------- Staff account / sign-in modal (sliding two-panel card) ---------- */
