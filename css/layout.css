@@ -35,7 +35,7 @@
     display:flex;align-items:center;gap:6px;
   }
   .sync-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--silver);}
-  .sync-status.live::before{background:#4caf7d;}
+  .sync-status.live{display:none;}
   .sync-status.error::before{background:#c15656;}
 
   .view{display:none;}
