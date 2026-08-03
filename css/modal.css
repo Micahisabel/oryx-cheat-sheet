@@ -47,8 +47,8 @@
   .skill-download-bar p{font-size:13.5px;color:#555;margin:0 0 22px;line-height:1.55;}
   .download-btn{
     display:inline-flex;align-items:center;gap:10px;background:var(--oryx-blue);color:var(--white);
-    border:none;cursor:pointer;font-family:var(--font-display);font-weight:700;font-size:14px;
-    letter-spacing:0.04em;text-transform:uppercase;padding:16px 34px;border-radius:10px;
+    border:none;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:14.5px;
+    letter-spacing:0.01em;padding:13px 28px;border-radius:999px;
     transition:background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
   }
   .download-btn:hover{background:var(--oryx-blue-tint);box-shadow:0 8px 20px rgba(2,42,58,0.25);transform:translateY(-1px);}

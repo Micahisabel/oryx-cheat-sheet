@@ -58,13 +58,16 @@
     font-family:var(--font-display);font-weight:600;font-size:10px;letter-spacing:0.05em;
     text-transform:uppercase;background:var(--panel);color:var(--oryx-blue);padding:4px 8px;
   }
-  .card-admin-actions{display:flex;align-items:center;gap:12px;}
+  .card-admin-actions{display:flex;align-items:center;gap:8px;}
   .card-edit, .card-del{
-    background:none;border:none;color:var(--silver);cursor:pointer;font-size:11px;letter-spacing:0.05em;
-    text-transform:uppercase;font-family:var(--font-display);padding:0;
+    border:none;cursor:pointer;font-size:12px;letter-spacing:0.01em;font-weight:600;
+    font-family:var(--font-display);padding:4px 10px;border-radius:999px;
+    transition:background 0.15s ease, color 0.15s ease;
   }
-  .card-edit:hover{color:var(--oryx-blue);}
-  .card-del:hover{color:#8a2b2b;}
+  .card-edit{background:var(--panel);color:#5b6b72;}
+  .card-edit:hover{background:var(--line-soft);color:var(--oryx-blue);}
+  .card-del{background:#fbeceb;color:#8a2b2b;}
+  .card-del:hover{background:#f5d9d7;}
   .card-fav-btn{
     position:absolute;top:14px;right:14px;z-index:2;
     width:30px;height:30px;border-radius:50%;border:none;background:rgba(255,255,255,0.92);
