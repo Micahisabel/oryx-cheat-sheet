@@ -78,7 +78,7 @@
   .card-fav-btn svg{width:16px;height:16px;fill:none;stroke:var(--oryx-blue);stroke-width:2;stroke-linejoin:round;}
   .card-fav-btn.active svg{fill:var(--oryx-blue);}
   .skill-fav-btn{position:static;margin-left:auto;flex-shrink:0;}
-  .empty{padding:60px 20px;text-align:center;color:var(--silver);font-size:14px;grid-column:1/-1;border:1px dashed var(--line);}
+  .empty{padding:60px 20px;text-align:center;color:var(--silver);font-size:14px;grid-column:1/-1;background:var(--panel);border-radius:16px;}
 
   .add-btn{
     font-family:var(--font-display);font-weight:600;font-size:13.5px;letter-spacing:0.01em;
