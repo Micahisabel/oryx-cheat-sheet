@@ -13,7 +13,7 @@ function repositionTabIndicator(container, indicatorSelector, activeSelector){
   indicator.style.opacity = '1';
 }
 function repositionAllTabIndicators(){
-  repositionTabIndicator(platformNav, '.platform-active-indicator', '.platform-item.active');
+  repositionTabIndicator(platformNav, '.platform-active-indicator', '.platform-item.active, .sidebar-analytics-item.active');
   [sideNav, shortcutNav, chatgptShortcutNav, otherToolsNav].forEach(nav => {
     repositionTabIndicator(nav, '.cat-tab-indicator', '.cat-tab.active');
   });
