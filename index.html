@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="css/sidebar.css?v=8">
 <link rel="stylesheet" href="css/dashboard.css?v=4">
 <link rel="stylesheet" href="css/cards.css?v=9">
-<link rel="stylesheet" href="css/modal.css?v=17">
+<link rel="stylesheet" href="css/modal.css?v=18">
 <link rel="stylesheet" href="css/forms.css?v=15">
 <link rel="stylesheet" href="css/responsive.css?v=2">
 </head>
@@ -275,29 +275,31 @@
     </div>
 
     <div id="skillFields" style="display:none;">
-      <label for="fPurpose">Purpose</label>
-      <textarea id="fPurpose" placeholder="What does this skill do?"></textarea>
+      <label for="fPurpose">Purpose <span class="optional-tag">(write it simply — as if explaining to a 5-year-old)</span></label>
+      <textarea id="fPurpose" placeholder="e.g. This helps you write emails faster by giving you a good first draft to work from."></textarea>
       <div class="field-error" id="errPurpose">Add a purpose.</div>
 
-      <div class="form-divider">optional details</div>
+      <label for="fSamplePrompt">Sample prompts <span class="optional-tag">(add 2-3, one per line, for different situations)</span></label>
+      <textarea id="fSamplePrompt" placeholder="e.g.&#10;Write a follow-up email to a customer who visited our showroom last week.&#10;Draft a reminder email for an unpaid invoice, keep it polite.&#10;Summarise this email thread in 3 bullet points."></textarea>
+      <div class="field-error" id="errSamplePrompt">Add at least one sample prompt someone can paste in and try.</div>
 
-      <label for="fDepartment">Department <span class="optional-tag">(optional)</span></label>
-      <input type="text" id="fDepartment" placeholder="e.g. Sales and Marketing">
+      <label for="fHowToAccess">How to install and use it in Claude</label>
+      <textarea id="fHowToAccess" placeholder="Steps to find, install, and run this skill"></textarea>
+      <div class="field-error" id="errHowToAccess">Add steps for installing and using this.</div>
+
+      <div class="form-divider">optional details</div>
 
       <label for="fBestFor">Best for <span class="optional-tag">(optional)</span></label>
       <textarea id="fBestFor" placeholder="When should someone reach for this?"></textarea>
 
-      <label for="fSamplePrompt">Sample prompt <span class="optional-tag">(optional)</span></label>
-      <textarea id="fSamplePrompt" placeholder="An example prompt someone could paste in"></textarea>
-
       <label for="fExampleOutput">Example output <span class="optional-tag">(optional)</span></label>
       <textarea id="fExampleOutput" placeholder="Before/after or sample result"></textarea>
 
+      <label for="fDepartment">Department <span class="optional-tag">(optional)</span></label>
+      <input type="text" id="fDepartment" placeholder="e.g. Sales and Marketing">
+
       <label for="fNotes">Notes <span class="optional-tag">(optional)</span></label>
       <textarea id="fNotes" placeholder="Gotchas, limitations, tips"></textarea>
-
-      <label for="fHowToAccess">How to install and use it in Claude <span class="optional-tag">(optional)</span></label>
-      <textarea id="fHowToAccess" placeholder="Steps to find and run this skill"></textarea>
 
       <label for="fOryxTip">How it helps Oryx Doors and Windows <span class="optional-tag">(optional)</span></label>
       <textarea id="fOryxTip" placeholder="A concrete Oryx use case"></textarea>
@@ -553,13 +555,13 @@
 </div>
 
 <script src="js/firebase.js?v=18"></script>
-<script src="js/utils.js?v=16"></script>
+<script src="js/utils.js?v=18"></script>
 <script src="js/constants.js?v=15"></script>
 <script src="js/state.js?v=15"></script>
 <script src="js/sidebar.js?v=20"></script>
 <script src="js/entries.js?v=20"></script>
-<script src="js/skill-detail.js?v=18"></script>
-<script src="js/add-entry.js?v=15"></script>
+<script src="js/skill-detail.js?v=20"></script>
+<script src="js/add-entry.js?v=17"></script>
 <script src="js/shortcuts-form.js?v=15"></script>
 <script src="js/admin.js?v=20"></script>
 <script src="js/suggest.js?v=24"></script>

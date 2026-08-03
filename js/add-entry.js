@@ -35,9 +35,9 @@ Return ONLY a JSON object — no explanation, no markdown code fences — with t
 - "platform": "claude" or "chatgpt"
 - "title": a short, clear name
 - "department": the Oryx department it best fits (e.g. Sales and Marketing, Customer Service, Operations, HR, Finance, IT)
-- "purpose": what it does, in 1-2 sentences
+- "purpose": what it does and why it's useful, in very simple language — write it so a 5-year-old could follow it. Short sentences, no jargon, no technical terms.
 - "bestFor": when someone should use it
-- "samplePrompt": a reusable example prompt someone could paste in
+- "samplePrompt": 2-3 reusable example prompts someone could paste straight into Claude, each covering a different common task. Put ONE prompt per line (no numbering, no blank lines between them).
 - "exampleOutput": a short example of the result
 - "notes": tips, gotchas, or limitations
 - "howToAccess": brief steps to install and use it in Claude
@@ -46,6 +46,7 @@ Return ONLY a JSON object — no explanation, no markdown code fences — with t
 Rules:
 - Do not include a link field — this is handled separately in the system, not generated here.
 - "Added by" and "date added" are also handled separately, not generated here.
+- "purpose", "samplePrompt", and "howToAccess" are required — never leave them empty. Every prompt in "samplePrompt" must be something someone can paste into Claude and run immediately, no placeholders like "[describe task]". "howToAccess" must be concrete steps, not a placeholder.
 - Use UK English spelling. Be accurate — do not invent figures, prices, or claims.
 
 INPUT:
@@ -128,6 +129,8 @@ function closeOverlay(){
   document.getElementById('errTitle').style.display = 'none';
   document.getElementById('errBody').style.display = 'none';
   document.getElementById('errPurpose').style.display = 'none';
+  document.getElementById('errSamplePrompt').style.display = 'none';
+  document.getElementById('errHowToAccess').style.display = 'none';
   SKILL_FIELD_IDS.forEach(id => { document.getElementById(id).value = ''; });
   aiInput.value = '';
   aiResult.value = '';
@@ -162,6 +165,8 @@ function openEditEntry(entry){
   document.getElementById('errTitle').style.display = 'none';
   document.getElementById('errBody').style.display = 'none';
   document.getElementById('errPurpose').style.display = 'none';
+  document.getElementById('errSamplePrompt').style.display = 'none';
+  document.getElementById('errHowToAccess').style.display = 'none';
 }
 
 openAdd.addEventListener('click', openOverlay);
@@ -188,6 +193,10 @@ saveAdd.addEventListener('click', async () => {
   if(isSkill){
     if(!skillValues.fPurpose){ document.getElementById('errPurpose').style.display = 'block'; valid = false; }
     else { document.getElementById('errPurpose').style.display = 'none'; }
+    if(!skillValues.fSamplePrompt){ document.getElementById('errSamplePrompt').style.display = 'block'; valid = false; }
+    else { document.getElementById('errSamplePrompt').style.display = 'none'; }
+    if(!skillValues.fHowToAccess){ document.getElementById('errHowToAccess').style.display = 'block'; valid = false; }
+    else { document.getElementById('errHowToAccess').style.display = 'none'; }
   } else {
     if(!body){ document.getElementById('errBody').style.display = 'block'; valid = false; }
     else { document.getElementById('errBody').style.display = 'none'; }

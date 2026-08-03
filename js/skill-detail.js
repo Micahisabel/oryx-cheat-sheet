@@ -42,15 +42,19 @@ function openNoteDetail(entry){
   const isLinkResource = entry.category === 'discoveries' || isOtherToolsCategory(entry.category);
 
   if(isRichCategory(entry.category)){
-    html += optionalBlock('Purpose', entry.purpose || entry.body)
-      + optionalBlock('Best For', entry.bestFor)
-      + copyableBlock('Sample Prompts', entry.samplePrompt, 'detail-value mono', 'samplePrompt')
-      + optionalBlock('Example Output', entry.exampleOutput)
-      + optionalBlock('Notes', entry.notes)
-      + optionalBlock('Department', entry.department)
-      + detailBlock('How to Download', DOWNLOAD_HELP_TEXT)
-      + detailBlock('How to Install and Use It in Claude', entry.howToAccess && entry.howToAccess.trim() ? entry.howToAccess : INSTALL_HELP_TEXT)
-      + optionalBlock('How This Helps Oryx Doors & Windows', entry.oryxTip, 'detail-tip');
+    html += detailSection('Overview',
+        optionalBlock('Purpose', entry.purpose || entry.body)
+        + optionalBlock('Best For', entry.bestFor)
+        + optionalBlock('Department', entry.department))
+      + detailSection('Try It',
+        samplePromptsBlock(entry)
+        + optionalBlock('Example Output', entry.exampleOutput))
+      + detailSection('Setup',
+        optionalBlock('How to Install and Use It in Claude', entry.howToAccess)
+        + detailBlock('How to Get It Running', INSTALL_HELP_TEXT))
+      + detailSection('Tips',
+        optionalBlock('Notes', entry.notes)
+        + optionalBlock('How This Helps Oryx Doors & Windows', entry.oryxTip, 'detail-tip'));
   } else if(isShortcutCategory(entry.category)){
     html += copyableBlock('Shortcut / Command', entry.shortcutKey, 'detail-value mono', 'shortcutKey')
       + optionalBlock('Purpose', entry.purpose)
@@ -73,11 +77,14 @@ function openNoteDetail(entry){
     + optionalBlock('Last edited by', lastEditedStr);
 
   if(!isLinkResource){
+    const isSkillFile = isRichCategory(entry.category);
     html += `
       <div class="skill-download-bar">
-        <h3>Download this entry</h3>
-        <p>Save this entry as a Markdown (.md) file to keep, share, or upload into Claude.</p>
-        <button class="download-btn" id="downloadSkill">${DOWNLOAD_ICON_SVG} Download ${escapeHtml(CATEGORY_LABELS[entry.category] || 'Entry')} (.md)</button>
+        <h3>${isSkillFile ? 'Download this Claude Skill' : 'Download this entry'}</h3>
+        <p>${isSkillFile
+          ? 'Get a ready-to-use SKILL.md file — drop it into a folder named after the skill and Claude can run it directly, no copy-pasting needed.'
+          : 'Save this entry as a Markdown (.md) file to keep, share, or upload into Claude.'}</p>
+        <button class="download-btn" id="downloadSkill">${DOWNLOAD_ICON_SVG} ${isSkillFile ? 'Download SKILL.md' : `Download ${escapeHtml(CATEGORY_LABELS[entry.category] || 'Entry')} (.md)`}</button>
       </div>`;
   }
   html += `</div>`;
@@ -85,6 +92,7 @@ function openNoteDetail(entry){
   inner.innerHTML = html;
   hydrateTikTokThumbs(inner);
   wireCopyButtons(inner, entry);
+  wireSamplePromptCopyButtons(inner, entry);
   const page = document.getElementById('skillPage');
   page.classList.add('open');
   page.scrollTop = 0;

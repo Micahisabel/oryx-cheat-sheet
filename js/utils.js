@@ -19,6 +19,10 @@ function detailBlock(label, value, valueClass){
 function detailBlockHtml(label, valueHtml, valueClass){
   return `<div class="detail-block"><div class="detail-label">${escapeHtml(label)}</div><div class="${valueClass || 'detail-value'}">${valueHtml}</div></div>`;
 }
+function detailSection(heading, innerHtml){
+  if(!innerHtml) return '';
+  return `<div class="detail-section"><h3 class="detail-section-heading">${escapeHtml(heading)}</h3>${innerHtml}</div>`;
+}
 
 function closeDetail(){
   document.getElementById('skillPage').classList.remove('open');
@@ -68,8 +72,49 @@ async function copyToClipboard(text){
   }catch(e){ return false; }
 }
 
+// A skill's samplePrompt field holds one or more example prompts, one per line.
+function splitSamplePrompts(text){
+  return String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
+}
+
+// Renders each sample prompt as its own copyable block. Copy buttons reference the
+// prompt by index (a plain number, safe in a data attribute) and re-split entry.samplePrompt
+// at click time, rather than embedding the (possibly quote-containing) prompt text directly.
+function samplePromptsBlock(entry){
+  const prompts = splitSamplePrompts(entry.samplePrompt);
+  if(!prompts.length) return '';
+  const label = prompts.length > 1 ? 'Sample Prompts' : 'Sample Prompt';
+  const items = prompts.map((p, i) => `
+    <div class="detail-value-row" style="margin-bottom:${i < prompts.length - 1 ? '10px' : '0'};">
+      <div class="detail-value mono">${escapeHtml(p)}</div>
+      <button class="copy-btn" data-sample-prompt-index="${i}" aria-label="Copy sample prompt" title="Copy">${COPY_ICON_SVG}</button>
+    </div>`).join('');
+  return `<div class="detail-block"><div class="detail-label">${escapeHtml(label)}</div>${items}</div>`;
+}
+
+function wireSamplePromptCopyButtons(root, entry){
+  const prompts = splitSamplePrompts(entry.samplePrompt);
+  root.querySelectorAll('[data-sample-prompt-index]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = prompts[Number(btn.dataset.samplePromptIndex)] || '';
+      const ok = await copyToClipboard(text);
+      if(!ok) return;
+      const originalHtml = btn.innerHTML;
+      const originalLabel = btn.getAttribute('aria-label');
+      btn.innerHTML = CHECK_ICON_SVG;
+      btn.classList.add('copied');
+      btn.setAttribute('aria-label', 'Copied!');
+      setTimeout(() => {
+        btn.innerHTML = originalHtml;
+        btn.classList.remove('copied');
+        btn.setAttribute('aria-label', originalLabel);
+      }, 1500);
+    });
+  });
+}
+
 function wireCopyButtons(root, entry){
-  root.querySelectorAll('.copy-btn').forEach(btn => {
+  root.querySelectorAll('.copy-btn:not([data-sample-prompt-index])').forEach(btn => {
     btn.addEventListener('click', async () => {
       const text = entry[btn.dataset.field] || '';
       const ok = await copyToClipboard(text);
@@ -104,13 +149,52 @@ function platformMeta(platform){
 
 const DOWNLOAD_HELP_TEXT = 'Click the "Download Skill (.md)" button at the bottom of this page. The file saves to your device as a Markdown (.md) file you can open, edit, or share with the team.';
 const USE_LINK_HELP_TEXT = 'Open the link above to visit this tool.';
-const INSTALL_HELP_TEXT = 'Open Claude (claude.ai or the desktop app) and start a new chat, or open your team Project. Paste the sample prompt above to run it. To reuse it as a saved skill, upload the downloaded .md file into your Claude Project knowledge, or paste its contents into the conversation.';
+const INSTALL_HELP_TEXT = 'Click "Download SKILL.md" below, then put the file in its own folder named after the skill (e.g. showroom-follow-up/SKILL.md) inside your Claude Skills folder, or upload that folder into a Claude Project. Claude will read it and offer the skill automatically — no copy-pasting needed. To try it right away without installing, just paste the sample prompt above into a new Claude chat.';
 
 function slugify(str){
   return (str || 'skill').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'skill';
 }
 
-function buildSkillMarkdown(entry){
+// Builds a real Claude Skill file: YAML frontmatter (name + description) followed by
+// the instructions body, so it can be dropped straight into a Skills folder and used —
+// not just read as a reference doc. See: https://docs.claude.com/en/docs/agents-and-tools/agent-skills
+function buildClaudeSkillMd(entry){
+  const name = slugify(entry.title);
+  const oneLine = (str) => String(str || '').replace(/\s+/g, ' ').trim();
+  const purpose = oneLine(entry.purpose || entry.body);
+  const bestFor = oneLine(entry.bestFor);
+  const description = [purpose, bestFor ? `Use when: ${bestFor}` : '']
+    .filter(Boolean).join(' ') || `Skill for ${entry.title || 'Untitled'}`;
+
+  const lines = [];
+  lines.push('---');
+  lines.push(`name: ${name}`);
+  lines.push(`description: ${JSON.stringify(description)}`);
+  lines.push('---', '', `# ${entry.title || 'Untitled'}`, '');
+
+  const section = (title, val) => {
+    if(val && String(val).trim()){ lines.push(`## ${title}`, '', String(val).trim(), ''); }
+  };
+
+  section('Instructions', entry.howToAccess);
+  const prompts = splitSamplePrompts(entry.samplePrompt);
+  if(prompts.length){
+    lines.push(prompts.length > 1 ? '## Sample Prompts' : '## Sample Prompt', '');
+    prompts.forEach(p => lines.push(`- ${p}`));
+    lines.push('');
+  }
+  section('Example Output', entry.exampleOutput);
+  section('Notes', entry.notes);
+  if(entry.department) section('Department', entry.department);
+  section('How This Helps Oryx Doors & Windows', entry.oryxTip);
+  if(entry.link) section('Link', entry.link);
+
+  const dateStr = new Date(entry.createdAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
+  lines.push(`<!-- Added by ${entry.author || 'Anonymous'} on ${dateStr} via the Oryx AI Knowledge Hub -->`);
+  return lines.join('\n');
+}
+
+function buildGenericMarkdown(entry){
   const pm = platformMeta(entry.platform);
   const catLabel = CATEGORY_LABELS[entry.category] || entry.category;
   const dateStr = new Date(entry.createdAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
@@ -126,15 +210,7 @@ function buildSkillMarkdown(entry){
     if(val && String(val).trim()){ lines.push(`## ${title}`, '', String(val).trim(), ''); }
   };
 
-  if(isRichCategory(entry.category)){
-    section('Purpose', entry.purpose || entry.body);
-    section('Best For', entry.bestFor);
-    section('Sample Prompts', entry.samplePrompt);
-    section('Example Output', entry.exampleOutput);
-    section('Notes', entry.notes);
-    section('How to Install and Use It in Claude', entry.howToAccess);
-    section('How This Helps Oryx Doors & Windows', entry.oryxTip);
-  } else if(isShortcutCategory(entry.category)){
+  if(isShortcutCategory(entry.category)){
     section('Shortcut / Command', entry.shortcutKey);
     section('Purpose', entry.purpose);
     section('How to Use It', entry.howToUse);
@@ -148,12 +224,13 @@ function buildSkillMarkdown(entry){
 }
 
 function downloadSkillMd(entry){
-  const md = buildSkillMarkdown(entry);
+  const isSkillFile = isRichCategory(entry.category);
+  const md = isSkillFile ? buildClaudeSkillMd(entry) : buildGenericMarkdown(entry);
   const blob = new Blob([md], {type:'text/markdown;charset=utf-8'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = slugify(entry.title) + '.md';
+  a.download = isSkillFile ? `${slugify(entry.title)}.SKILL.md` : slugify(entry.title) + '.md';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
