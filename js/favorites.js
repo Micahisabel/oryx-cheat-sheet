@@ -20,9 +20,13 @@ firebase.auth().onAuthStateChanged((user) => {
   );
 });
 
+const favoritesInFlight = new Set();
+
 async function toggleFavorite(id){
+  if(favoritesInFlight.has(id)) return;
   const signedIn = await ensureStaffSignedIn();
   if(!signedIn) return;
+  favoritesInFlight.add(id);
   const uid = firebase.auth().currentUser.uid;
   const isFav = favoriteIds.has(id);
   try{
@@ -36,6 +40,8 @@ async function toggleFavorite(id){
     }).catch(() => {});
   }catch(e){
     alert('Could not update favorites. Check your connection and try again.');
+  }finally{
+    favoritesInFlight.delete(id);
   }
 }
 

@@ -297,7 +297,9 @@ function render(){
     btn.addEventListener('click', (ev) => {
       ev.stopPropagation();
       const entry = entries.find(e => e.id === btn.dataset.id);
-      if(entry) openEditEntry(entry);
+      if(!entry) return;
+      if(isShortcutCategory(entry.category)) openEditShortcut(entry);
+      else openEditEntry(entry);
     });
   });
 

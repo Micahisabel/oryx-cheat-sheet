@@ -4,20 +4,44 @@ const openAddShortcutBtn = document.getElementById('openAddShortcut');
 const closeShortcutPanel = document.getElementById('closeShortcutPanel');
 const cancelAddShortcut = document.getElementById('cancelAddShortcut');
 const saveAddShortcut = document.getElementById('saveAddShortcut');
+let editingShortcutId = null;
 
 function openShortcutOverlay(){
   shortcutOverlay.classList.add('open');
+  editingShortcutId = null;
   const cats = shortcutGroup === 'chatgpt' ? CHATGPT_SHORTCUT_CATS : CLAUDE_SHORTCUT_CATS;
   const scCategory = document.getElementById('scCategory');
   scCategory.innerHTML = cats.map(c => `<option value="${c}">${CATEGORY_LABELS[c]}</option>`).join('');
   scCategory.value = activeCat;
   document.getElementById('shortcutPanelTitle').textContent = shortcutGroup === 'chatgpt' ? 'Add a ChatGPT shortcut' : 'Add a Claude shortcut';
+  saveAddShortcut.textContent = 'Save shortcut';
   let savedAuthor = '';
   try{ savedAuthor = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
   document.getElementById('scAuthor').value = savedAuthor;
 }
+
+function openEditShortcut(entry){
+  shortcutOverlay.classList.add('open');
+  editingShortcutId = entry.id;
+  const isChatgpt = CHATGPT_SHORTCUT_CATS.includes(entry.category);
+  const cats = isChatgpt ? CHATGPT_SHORTCUT_CATS : CLAUDE_SHORTCUT_CATS;
+  const scCategory = document.getElementById('scCategory');
+  scCategory.innerHTML = cats.map(c => `<option value="${c}">${CATEGORY_LABELS[c]}</option>`).join('');
+  scCategory.value = entry.category;
+  document.getElementById('shortcutPanelTitle').textContent = 'Edit shortcut';
+  saveAddShortcut.textContent = 'Save changes';
+  document.getElementById('scTitle').value = entry.title || '';
+  document.getElementById('scKey').value = entry.shortcutKey || '';
+  document.getElementById('scPurpose').value = entry.purpose || '';
+  document.getElementById('scHowToUse').value = entry.howToUse || '';
+  document.getElementById('scExample').value = entry.example || '';
+  document.getElementById('scNotes').value = entry.notes || '';
+  document.getElementById('scAuthor').value = entry.author || '';
+}
+
 function closeShortcutOverlay(){
   shortcutOverlay.classList.remove('open');
+  editingShortcutId = null;
   document.getElementById('scTitle').value = '';
   document.getElementById('scKey').value = '';
   document.getElementById('scPurpose').value = '';
@@ -49,6 +73,9 @@ saveAddShortcut.addEventListener('click', async () => {
   else { document.getElementById('errScPurpose').style.display = 'none'; }
   if(!valid) return;
 
+  const isEditing = !!editingShortcutId;
+  const existing = isEditing ? entries.find(e => e.id === editingShortcutId) : null;
+
   saveAddShortcut.disabled = true;
   saveAddShortcut.textContent = 'Saving…';
 
@@ -61,12 +88,23 @@ saveAddShortcut.addEventListener('click', async () => {
     link: '', tag: '', body: '', department: '',
     platform: shortcutGroup === 'chatgpt' ? 'chatgpt' : 'claude',
     author: author || 'Anonymous',
-    suggestedBy: '',
-    createdAt: Date.now()
+    suggestedBy: existing ? (existing.suggestedBy || '') : ''
   };
+  if(isEditing){
+    let editorName = '';
+    try{ editorName = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
+    entryData.lastEditedBy = editorName || author || 'Anonymous';
+    entryData.lastEditedAt = Date.now();
+  }else{
+    entryData.createdAt = Date.now();
+  }
 
   try{
-    await entriesCollection.add(entryData);
+    if(isEditing){
+      await entriesCollection.doc(editingShortcutId).update(entryData);
+    }else{
+      await entriesCollection.add(entryData);
+    }
     if(author){
       try{ localStorage.setItem(AUTHOR_KEY, author); }catch(e){}
     }
@@ -75,6 +113,6 @@ saveAddShortcut.addEventListener('click', async () => {
     alert('Could not save that shortcut. Check your connection and try again.');
   }finally{
     saveAddShortcut.disabled = false;
-    saveAddShortcut.textContent = 'Save shortcut';
+    saveAddShortcut.textContent = isEditing ? 'Save changes' : 'Save shortcut';
   }
 });
