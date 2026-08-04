@@ -173,16 +173,21 @@ function slugify(str){
   return (str || 'skill').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'skill';
 }
 
-// Builds a real Claude Skill file: YAML frontmatter (name + description) followed by
-// the instructions body, so it can be dropped straight into a Skills folder and used —
-// not just read as a reference doc. See: https://docs.claude.com/en/docs/agents-and-tools/agent-skills
+// Builds a real Claude Skill file per Anthropic's Agent Skills spec: YAML frontmatter
+// with only "name" (lowercase-hyphenated, matches the folder) and "description" (a
+// single-line, third-person statement of what it does and when to use it — this is the
+// text Claude actually matches against to decide whether to trigger the skill), followed
+// by a Markdown body of task instructions. Folder metadata (install steps, department,
+// links, attribution) is deliberately left out of the file — it's Oryx app context, not
+// something Claude needs to run the skill. See: https://docs.claude.com/en/docs/agents-and-tools/agent-skills
 function buildClaudeSkillMd(entry){
   const name = slugify(entry.title);
   const oneLine = (str) => String(str || '').replace(/\s+/g, ' ').trim();
   const purpose = oneLine(entry.purpose || entry.body);
   const bestFor = oneLine(entry.bestFor);
-  const description = [purpose, bestFor ? `Use when: ${bestFor}` : '']
+  let description = [purpose, bestFor ? `Use when: ${bestFor}` : '']
     .filter(Boolean).join(' ') || `Skill for ${entry.title || 'Untitled'}`;
+  if(description.length > 1024) description = description.slice(0, 1021).trim() + '...';
 
   const lines = [];
   lines.push('---');
@@ -190,26 +195,27 @@ function buildClaudeSkillMd(entry){
   lines.push(`description: ${JSON.stringify(description)}`);
   lines.push('---', '', `# ${entry.title || 'Untitled'}`, '');
 
+  if(purpose) lines.push(purpose, '');
+
   const section = (title, val) => {
     if(val && String(val).trim()){ lines.push(`## ${title}`, '', String(val).trim(), ''); }
   };
 
-  section('Instructions', entry.howToAccess);
+  const instructionParts = [entry.notes, entry.oryxTip].map(v => String(v || '').trim()).filter(Boolean);
+  if(instructionParts.length){
+    lines.push('## Instructions', '', instructionParts.join('\n\n'), '');
+  }
+
+  section('Example', entry.exampleOutput);
+
   const prompts = splitSamplePrompts(entry.samplePrompt);
   if(prompts.length){
-    lines.push(prompts.length > 1 ? '## Sample Prompts' : '## Sample Prompt', '');
+    lines.push(prompts.length > 1 ? '## Reference Prompts' : '## Reference Prompt', '');
     prompts.forEach(p => lines.push(`- ${p}`));
     lines.push('');
   }
-  section('Example Output', entry.exampleOutput);
-  section('Notes', entry.notes);
-  if(entry.department) section('Department', entry.department);
-  section('How This Helps Oryx Doors & Windows', entry.oryxTip);
-  if(entry.link) section('Link', entry.link);
 
-  const dateStr = new Date(entry.createdAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
-  lines.push(`<!-- Added by ${entry.author || 'Anonymous'} on ${dateStr} via the Oryx AI Knowledge Hub -->`);
-  return lines.join('\n');
+  return lines.join('\n').replace(/\n+$/, '\n');
 }
 
 function buildGenericMarkdown(entry){
