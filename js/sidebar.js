@@ -80,6 +80,9 @@ document.querySelectorAll('.platform-expand-btn').forEach(btn => {
     const isOpen = target.style.display !== 'none';
     target.style.display = isOpen ? 'none' : 'flex';
     btn.classList.toggle('open', !isOpen);
+    // Expanding/collapsing the submenu shifts every item below it — the active
+    // highlight must be recalculated or it's left floating at its old position.
+    repositionAllTabIndicators();
   });
 });
 
