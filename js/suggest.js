@@ -395,7 +395,6 @@ function markSubmitted(){
 openSuggest.addEventListener('click', openSuggestPanel);
 document.getElementById('closeSuggest').addEventListener('click', closeSuggestPanel);
 document.getElementById('cancelSuggest').addEventListener('click', closeSuggestPanel);
-suggestOverlay.addEventListener('click', (ev) => { if(ev.target === suggestOverlay) closeSuggestPanel(); });
 
 async function submitDiscovery(){
   if(document.getElementById('sWebsite').value.trim()){ closeSuggestPanel(); return; }
