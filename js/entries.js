@@ -203,7 +203,7 @@ function render(){
       }
       // While searching, look across all category tabs in the current platform view instead of
       // just the selected one, so a shortcut key or command isn't only findable from its own tab.
-      const haystack = [e.title, e.body, e.purpose, e.bestFor, e.notes, e.department]
+      const haystack = [e.title, e.body, e.purpose, e.bestFor, e.notes, e.department, e.samplePrompt, e.exampleOutput, e.oryxTip, e.howToAccess]
         .filter(Boolean).join(' ').toLowerCase();
       return haystack.includes(searchTerm);
     }).sort((a,b) => b.createdAt - a.createdAt);
