@@ -123,6 +123,22 @@ function closeStaffAuth(result){
 document.getElementById('closeStaffAuth').addEventListener('click', () => closeStaffAuth(false));
 staffAuthOverlay.addEventListener('click', (ev) => { if(ev.target === staffAuthOverlay) closeStaffAuth(false); });
 
+// Enter submits whichever action is showing, Escape cancels — mirrors normal browser form behavior.
+staffAuthOverlay.addEventListener('keydown', (ev) => {
+  if(ev.key === 'Escape' || ev.keyCode === 27){
+    closeStaffAuth(false);
+    return;
+  }
+  if((ev.key === 'Enter' || ev.keyCode === 13) && ev.target.tagName !== 'TEXTAREA'){
+    ev.preventDefault();
+    if(authCard.classList.contains('active')){
+      staffAuthSaveName.click();
+    }else{
+      staffSignInBtn.click();
+    }
+  }
+});
+
 document.getElementById('showSignup').addEventListener('click', showSignupMode);
 document.getElementById('showLogin').addEventListener('click', () => { clearAuthErrors(); showLoginMode(); });
 document.getElementById('mobileToSignup').addEventListener('click', showSignupMode);
