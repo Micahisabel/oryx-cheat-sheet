@@ -102,9 +102,13 @@ function openNoteDetail(entry){
   const downloadBtn = document.getElementById('downloadSkill');
   if(downloadBtn) downloadBtn.addEventListener('click', () => downloadSkillMd(entry));
   const favBtn = document.getElementById('skillFavBtn');
-  if(favBtn) favBtn.addEventListener('click', () => {
-    toggleFavorite(entry.id);
-    favBtn.classList.toggle('active', !favoriteIds.has(entry.id));
+  if(favBtn) favBtn.addEventListener('click', async () => {
+    // Wait for the toggle to actually resolve (it may no-op if sign-in is cancelled or the
+    // write fails) before reading favoriteIds, instead of optimistically assuming success —
+    // this page's button isn't re-rendered by the favorites onSnapshot listener, so a wrong
+    // optimistic flip here would otherwise never get corrected.
+    await toggleFavorite(entry.id);
+    favBtn.classList.toggle('active', favoriteIds.has(entry.id));
     favBtn.setAttribute('aria-label', favoriteIds.has(entry.id) ? 'Remove from favorites' : 'Add to favorites');
   });
 }

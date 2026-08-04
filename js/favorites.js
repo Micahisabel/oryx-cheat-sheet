@@ -28,16 +28,24 @@ async function toggleFavorite(id){
   if(!signedIn) return;
   favoritesInFlight.add(id);
   const uid = firebase.auth().currentUser.uid;
-  const isFav = favoriteIds.has(id);
   try{
-    await favoritesCollection.doc(uid).set({
-      entryIds: isFav
-        ? firebase.firestore.FieldValue.arrayRemove(id)
-        : firebase.firestore.FieldValue.arrayUnion(id)
-    }, { merge: true });
-    entriesCollection.doc(id).update({
-      favCount: firebase.firestore.FieldValue.increment(isFav ? -1 : 1)
-    }).catch(() => {});
+    // Runs the read (current entryIds) and both writes (favorites doc + favCount) as one
+    // atomic transaction, so two tabs/devices toggling the same entry in quick succession
+    // can't both read a stale "not favorited" state and double-increment favCount.
+    await db.runTransaction(async (tx) => {
+      const favRef = favoritesCollection.doc(uid);
+      const favDoc = await tx.get(favRef);
+      const currentIds = (favDoc.exists && favDoc.data().entryIds) || [];
+      const isFav = currentIds.includes(id);
+      tx.set(favRef, {
+        entryIds: isFav
+          ? firebase.firestore.FieldValue.arrayRemove(id)
+          : firebase.firestore.FieldValue.arrayUnion(id)
+      }, { merge: true });
+      tx.update(entriesCollection.doc(id), {
+        favCount: firebase.firestore.FieldValue.increment(isFav ? -1 : 1)
+      });
+    });
   }catch(e){
     alert('Could not update favorites. Check your connection and try again.');
   }finally{

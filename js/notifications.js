@@ -45,6 +45,11 @@ function notifyIfSubscribed(entry){
   // Admin already gets a dedicated notification for new discoveries via notifyNewDiscovery()
   // (entries.js) regardless of this opt-in — skip here so a subscribed admin doesn't get two.
   if(isAdmin && entry.category === 'discoveries') return;
+  // Don't notify someone about their own submission (only discoveries/other-tools entries
+  // carry authorEmail today — entries from the +Add Entry form don't, so this only guards
+  // the quick-share path where self-notification is most likely to actually happen).
+  const currentUser = firebase.auth().currentUser;
+  if(currentUser && entry.authorEmail && entry.authorEmail === currentUser.email) return;
   if(!subscribedCats.has(entry.category)) return;
   if(!('Notification' in window) || Notification.permission !== 'granted') return;
   const logoEl = document.querySelector('.logo-img');
