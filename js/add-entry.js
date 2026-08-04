@@ -209,6 +209,21 @@ saveAdd.addEventListener('click', async () => {
   if(!valid) return;
 
   const isEditing = !!editingEntryId;
+
+  if(!isEditing){
+    const normalizedTitle = title.toLowerCase();
+    const existingMatch = entries.find(e =>
+      e.category === category && (e.title || '').trim().toLowerCase() === normalizedTitle
+    );
+    if(existingMatch){
+      const addedBy = existingMatch.author || 'someone';
+      const proceed = confirm(
+        `An entry titled "${title}" already exists in this category (added by ${addedBy}). Save this as a duplicate anyway?`
+      );
+      if(!proceed) return;
+    }
+  }
+
   saveAdd.disabled = true;
   saveAdd.textContent = 'Saving…';
 

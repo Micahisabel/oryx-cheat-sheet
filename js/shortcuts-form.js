@@ -75,6 +75,21 @@ saveAddShortcut.addEventListener('click', async () => {
 
   const isEditing = !!editingShortcutId;
   const existing = isEditing ? entries.find(e => e.id === editingShortcutId) : null;
+  const scCategoryValue = document.getElementById('scCategory').value;
+
+  if(!isEditing){
+    const normalizedTitle = title.toLowerCase();
+    const existingMatch = entries.find(e =>
+      e.category === scCategoryValue && (e.title || '').trim().toLowerCase() === normalizedTitle
+    );
+    if(existingMatch){
+      const addedBy = existingMatch.author || 'someone';
+      const proceed = confirm(
+        `A shortcut titled "${title}" already exists in this category (added by ${addedBy}). Save this as a duplicate anyway?`
+      );
+      if(!proceed) return;
+    }
+  }
 
   saveAddShortcut.disabled = true;
   saveAddShortcut.textContent = 'Saving…';
