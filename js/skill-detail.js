@@ -42,19 +42,20 @@ function openNoteDetail(entry){
   const isLinkResource = entry.category === 'discoveries' || isOtherToolsCategory(entry.category);
 
   if(isRichCategory(entry.category)){
-    html += detailSection('Overview',
-        optionalBlock('Purpose', entry.purpose || entry.body)
-        + optionalBlock('Best For', entry.bestFor)
-        + optionalBlock('Department', entry.department))
+    html += detailSection('Overview', detailList([
+        {label: 'Purpose', value: entry.purpose || entry.body},
+        {label: 'Best For', value: entry.bestFor},
+        {label: 'Department', value: entry.department}
+      ]))
       + detailSection('Try It',
         samplePromptsBlock(entry)
-        + optionalBlock('Example Output', entry.exampleOutput))
+        + detailList([{label: 'Example Output', value: entry.exampleOutput}]))
       + detailSection('Setup',
-        optionalBlock('How to Install and Use It in Claude', entry.howToAccess)
-        + detailBlock('How to Get It Running', INSTALL_HELP_TEXT))
+        detailList([{label: 'How to Install and Use It in Claude', value: entry.howToAccess}])
+        + detailParagraph(INSTALL_HELP_TEXT))
       + detailSection('Tips',
-        optionalBlock('Notes', entry.notes)
-        + optionalBlock('How This Helps Oryx Doors & Windows', entry.oryxTip, 'detail-tip'));
+        detailList([{label: 'Notes', value: entry.notes}])
+        + detailTipParagraph('How This Helps Oryx Doors & Windows', entry.oryxTip));
   } else if(isShortcutCategory(entry.category)){
     html += copyableBlock('Shortcut / Command', entry.shortcutKey, 'detail-value mono', 'shortcutKey')
       + optionalBlock('Purpose', entry.purpose)

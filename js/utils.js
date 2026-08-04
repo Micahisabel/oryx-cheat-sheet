@@ -24,6 +24,24 @@ function detailSection(heading, innerHtml){
   return `<div class="detail-section"><h3 class="detail-section-heading">${escapeHtml(heading)}</h3>${innerHtml}</div>`;
 }
 
+// Flowing, document-style presentation for a group of fields — a bold inline
+// label followed by its value, as bullet points, instead of separate boxed rows.
+function detailList(items){
+  const lis = items
+    .filter(item => item.value !== undefined && item.value !== null && String(item.value).trim())
+    .map(item => `<li><strong>${escapeHtml(item.label)}:</strong> ${escapeHtml(item.value)}</li>`)
+    .join('');
+  return lis ? `<ul class="detail-list">${lis}</ul>` : '';
+}
+function detailParagraph(text){
+  if(!text || !String(text).trim()) return '';
+  return `<p class="detail-text">${escapeHtml(text)}</p>`;
+}
+function detailTipParagraph(label, text){
+  if(!text || !String(text).trim()) return '';
+  return `<p class="detail-tip-text"><strong>${escapeHtml(label)}:</strong> ${escapeHtml(text)}</p>`;
+}
+
 function closeDetail(){
   document.getElementById('skillPage').classList.remove('open');
 }
@@ -89,7 +107,7 @@ function samplePromptsBlock(entry){
       <div class="detail-value mono">${escapeHtml(p)}</div>
       <button class="copy-btn" data-sample-prompt-index="${i}" aria-label="Copy sample prompt" title="Copy">${COPY_ICON_SVG}</button>
     </div>`).join('');
-  return `<div class="detail-block"><div class="detail-label">${escapeHtml(label)}</div>${items}</div>`;
+  return `<div class="detail-block detail-block-flow"><div class="detail-subheading">${escapeHtml(label)}</div>${items}</div>`;
 }
 
 function wireSamplePromptCopyButtons(root, entry){
