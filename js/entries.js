@@ -245,11 +245,12 @@ function render(){
   }
 
   grid.innerHTML = pageItems.map(e => {
+    const safeLink = e.link && isValidLink(e.link) ? e.link : '';
     let thumbInner = e.link ? linkThumbHtml(e.link) : '';
     if(!thumbInner && isOtherToolsCategory(e.category) && e.link) thumbInner = faviconBadgeHtml(e.link, e.category);
     if(!thumbInner) thumbInner = isShortcutCategory(e.category) ? shortcutBadgeHtml(e.shortcutKey) : cardPlaceholderHtml(e.category);
-    const thumbHtml = e.link ? `<a class="card-thumb-link" href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${thumbInner}</a>` : thumbInner;
-    const linkHtml = e.link ? `<div class="card-link"><a href="${escapeHtml(e.link)}" target="_blank" rel="noopener">${escapeHtml(e.link)}</a></div>` : '';
+    const thumbHtml = safeLink ? `<a class="card-thumb-link" href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${thumbInner}</a>` : thumbInner;
+    const linkHtml = safeLink ? `<div class="card-link"><a href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${escapeHtml(safeLink)}</a></div>` : '';
     const dateStr = new Date(e.createdAt).toLocaleDateString(undefined, {month:'short', day:'numeric'});
     const preview = (isRichCategory(e.category) || isShortcutCategory(e.category)) ? (e.purpose || e.body) : e.body;
     const tagChipHtml = e.tag ? `<span class="card-tag-chip">${escapeHtml(e.tag)}</span>` : '';

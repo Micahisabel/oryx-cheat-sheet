@@ -7,14 +7,15 @@ function openNoteDetail(entry){
   const dateStr = new Date(entry.createdAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
   const pm = platformMeta(entry.platform);
   const catLabel = CATEGORY_LABELS[entry.category] || entry.category;
+  const safeLink = entry.link && isValidLink(entry.link) ? entry.link : '';
   const thumbInner = entry.link ? linkThumbHtml(entry.link) : '';
-  const thumbHtml = entry.link ? `<a class="card-thumb-link" href="${escapeHtml(entry.link)}" target="_blank" rel="noopener">${thumbInner}</a>` : '';
+  const thumbHtml = safeLink ? `<a class="card-thumb-link" href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${thumbInner}</a>` : '';
   const titleFaviconUrl = isOtherToolsCategory(entry.category) && entry.link ? faviconUrlForLink(entry.link) : null;
   const titleLogoHtml = titleFaviconUrl
     ? `<img class="skill-title-logo" src="${titleFaviconUrl}" alt="" onerror="this.style.display='none';">`
     : '';
-  const linkHtml = entry.link
-    ? `<a href="${escapeHtml(entry.link)}" target="_blank" rel="noopener">${escapeHtml(entry.link)}</a>`
+  const linkHtml = safeLink
+    ? `<a href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${escapeHtml(safeLink)}</a>`
     : 'Not provided';
 
   let html = `
