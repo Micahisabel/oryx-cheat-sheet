@@ -411,6 +411,10 @@ async function submitDiscovery(){
   if(!title){ document.getElementById('errDTitle').style.display = 'block'; ok = false; } else document.getElementById('errDTitle').style.display = 'none';
   if(!desc){ document.getElementById('errDDesc').style.display = 'block'; ok = false; } else document.getElementById('errDDesc').style.display = 'none';
   if(!link){ document.getElementById('errDLink').style.display = 'block'; ok = false; } else document.getElementById('errDLink').style.display = 'none';
+  if(link && !isValidLink(link)){
+    alert('That link doesn\'t look valid. Make sure it starts with https://');
+    ok = false;
+  }
   if(!ok) return;
 
   const signedIn = await ensureStaffSignedIn();
