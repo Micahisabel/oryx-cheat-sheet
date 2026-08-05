@@ -112,6 +112,24 @@ function openOverlay(){
   let savedAuthor = '';
   try{ savedAuthor = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
   document.getElementById('fAuthor').value = savedAuthor;
+  // Always start from a clean form — this can be called directly (e.g. from the
+  // Review queue's "Create entry") without closeOverlay() running first, so a
+  // draft left over from a prior, uncancelled Add Entry session must not leak in.
+  document.getElementById('fPlatform').value = 'claude';
+  document.getElementById('fCategory').value = 'skills';
+  document.getElementById('fTitle').value = '';
+  document.getElementById('fBody').value = '';
+  document.getElementById('fLink').value = '';
+  document.getElementById('fTag').value = '';
+  document.getElementById('errTitle').style.display = 'none';
+  document.getElementById('errBody').style.display = 'none';
+  document.getElementById('errPurpose').style.display = 'none';
+  document.getElementById('errSamplePrompt').style.display = 'none';
+  document.getElementById('errHowToAccess').style.display = 'none';
+  SKILL_FIELD_IDS.forEach(id => { document.getElementById(id).value = ''; });
+  aiInput.value = '';
+  aiResult.value = '';
+  setAiStatus('');
   toggleEntryFields();
 }
 function closeOverlay(){

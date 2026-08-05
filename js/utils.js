@@ -1,7 +1,14 @@
 function escapeHtml(str){
-  const d = document.createElement('div');
-  d.textContent = str == null ? '' : String(str);
-  return d.innerHTML;
+  // Must also escape quotes, not just &/</> — several call sites interpolate this
+  // straight into an href/data-* attribute value, where a bare " or ' lets a
+  // crafted link (e.g. https://x.com" onmouseover="...) break out and inject
+  // a live event-handler attribute.
+  return (str == null ? '' : String(str))
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 function isValidLink(url){
   try{ const u = new URL(url); return u.protocol === 'http:' || u.protocol === 'https:'; }catch(e){ return false; }

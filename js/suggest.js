@@ -129,7 +129,7 @@ staffAuthOverlay.addEventListener('keydown', (ev) => {
     closeStaffAuth(false);
     return;
   }
-  if((ev.key === 'Enter' || ev.keyCode === 13) && ev.target.tagName !== 'TEXTAREA'){
+  if((ev.key === 'Enter' || ev.keyCode === 13) && ev.target.tagName === 'INPUT' && ev.target.type !== 'checkbox'){
     ev.preventDefault();
     if(authCard.classList.contains('active')){
       staffAuthSaveName.click();

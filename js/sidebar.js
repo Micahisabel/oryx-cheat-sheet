@@ -2,7 +2,10 @@ function repositionTabIndicator(container, indicatorSelector, activeSelector){
   const indicator = container.querySelector(indicatorSelector);
   const active = container.querySelector(activeSelector);
   if(!indicator) return;
-  if(!active || container.offsetParent === null){
+  // offsetParent === null also catches an "active" match that's currently display:none
+  // (e.g. a nav item hidden pending an admin-only visibility toggle) — without this,
+  // its 0x0 offsets still get drawn at opacity 1, showing up as a stray dot in the corner.
+  if(!active || container.offsetParent === null || active.offsetParent === null){
     indicator.style.opacity = '0';
     return;
   }
