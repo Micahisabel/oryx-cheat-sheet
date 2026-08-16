@@ -217,6 +217,15 @@ function render(){
     });
   }
 
+  // Category explainer — show only in library view, for a category that has one, and not while searching.
+  const explainer = (viewMode !== 'shortcuts' && !searchTerm) ? CATEGORY_EXPLAINERS[activeCat] : null;
+  if(explainer){
+    catExplainer.textContent = explainer;
+    catExplainer.style.display = '';
+  }else{
+    catExplainer.style.display = 'none';
+  }
+
   countRow.textContent = filtered.length + (filtered.length === 1 ? ' entry' : ' entries');
 
   if(filtered.length === 0){

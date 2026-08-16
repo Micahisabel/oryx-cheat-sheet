@@ -48,6 +48,12 @@ const CATEGORY_PLURAL_LABELS = {
   'chatgpt-shortcut-slash': 'ChatGPT Shortcuts'
 };
 
+// Short, plain-English explanation shown at the top of a category view.
+// Add more keys here to give other categories their own explainer.
+const CATEGORY_EXPLAINERS = {
+  skills: 'A Claude Skill is like a helper that already knows how to do a specific job. You give it the instructions once, and Claude can use them whenever you need that job done.'
+};
+
 const CATEGORY_ICON_PATHS = {
   skills: '<path d="M12 2l2.4 6.9L21 11l-6.6 2.1L12 20l-2.4-6.9L3 11l6.6-2.1z"/>',
   commands: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/>',

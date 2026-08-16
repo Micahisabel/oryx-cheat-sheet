@@ -10,6 +10,7 @@ const PAGE_SIZE = 8;
 const grid = document.getElementById('grid');
 const pagination = document.getElementById('pagination');
 const countRow = document.getElementById('countRow');
+const catExplainer = document.getElementById('catExplainer');
 const sideNav = document.getElementById('sideNav');
 const otherToolsNav = document.getElementById('otherToolsNav');
 const shortcutNav = document.getElementById('shortcutNav');
