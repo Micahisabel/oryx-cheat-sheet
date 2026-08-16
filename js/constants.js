@@ -80,6 +80,19 @@ const CATEGORY_EXPLAINERS = {
   }
 };
 
+// Explainers for the shortcut sub-categories, shown in the Claude/ChatGPT Shortcuts view.
+// Keyed directly by the shortcut category id.
+const SHORTCUT_EXPLAINERS = {
+  'shortcut-prompts': 'Ready-made instructions you can give Claude to help you get the result you need.',
+  'shortcut-desktop': 'Use Claude from your computer to help with your everyday work.',
+  'shortcut-code': 'Use Claude to help create, change, or understand computer programs.',
+  'shortcut-slash': 'Quick shortcuts that let you tell Claude what you want without typing the full instruction.',
+  'chatgpt-shortcut-prompts': 'Ready-made instructions you can give ChatGPT to help you get the result you need.',
+  'chatgpt-shortcut-desktop': 'Use ChatGPT from your computer to help with your everyday work.',
+  'chatgpt-shortcut-code': 'Use ChatGPT to help create, change, or understand computer programs.',
+  'chatgpt-shortcut-slash': 'Quick shortcuts that let you tell ChatGPT what you want without typing the full instruction.'
+};
+
 // Optional "learn more" link shown under an explainer. Same platform/category keys as above.
 const CATEGORY_EXPLAINER_LINKS = {
   claude: {

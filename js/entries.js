@@ -219,12 +219,22 @@ function render(){
 
   // Category explainer — show only in library view, for a category that has one, and not while searching.
   // Text is platform-specific; "All Platforms" and any other platform fall back to the Claude wording.
-  // Only show for a specific platform (Claude / ChatGPT). On "All Platforms" the list mixes both,
-  // so a single platform's wording and how-to link would be half-wrong — hide it there.
-  const explainerSet = CATEGORY_EXPLAINERS[activePlatform];
-  const explainer = (explainerSet && viewMode !== 'shortcuts' && !searchTerm) ? explainerSet[activeCat] : null;
+  // Category explainer. In the shortcuts view it's keyed by the shortcut sub-category. In the
+  // library it's platform-specific and hidden on All Platforms (which mixes platforms, so a single
+  // platform's wording and how-to link would be half-wrong). Hidden while searching.
+  let explainer = null, link = null;
+  if(!searchTerm){
+    if(viewMode === 'shortcuts'){
+      explainer = SHORTCUT_EXPLAINERS[activeCat] || null;
+    } else {
+      const explainerSet = CATEGORY_EXPLAINERS[activePlatform];
+      if(explainerSet){
+        explainer = explainerSet[activeCat] || null;
+        link = (CATEGORY_EXPLAINER_LINKS[activePlatform] || {})[activeCat] || null;
+      }
+    }
+  }
   if(explainer){
-    const link = (CATEGORY_EXPLAINER_LINKS[activePlatform] || {})[activeCat];
     // Content is developer-defined constants, but escape anyway to keep the innerHTML sink safe.
     const linkHtml = link
       ? `<a class="cat-explainer-link" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`
