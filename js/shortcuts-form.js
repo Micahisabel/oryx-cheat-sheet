@@ -14,7 +14,6 @@ function applyShortcutFormMode(cat){
   document.getElementById('scExampleGroup').style.display = isPrompt ? 'none' : '';
   document.getElementById('scNotesGroup').style.display = isPrompt ? 'none' : '';
   document.getElementById('scSamplePromptGroup').style.display = isPrompt ? '' : 'none';
-  document.getElementById('scEli5Group').style.display = isPrompt ? '' : 'none';
   document.getElementById('scTitleLabel').textContent = isPrompt ? 'Name' : 'Label';
 }
 
@@ -51,7 +50,6 @@ function openEditShortcut(entry){
   document.getElementById('scHowToUse').value = entry.howToUse || '';
   document.getElementById('scExample').value = entry.example || '';
   document.getElementById('scNotes').value = entry.notes || '';
-  document.getElementById('scEli5').value = entry.eli5 || '';
   document.getElementById('scAuthor').value = entry.author || '';
 }
 
@@ -65,7 +63,6 @@ function closeShortcutOverlay(){
   document.getElementById('scHowToUse').value = '';
   document.getElementById('scExample').value = '';
   document.getElementById('scNotes').value = '';
-  document.getElementById('scEli5').value = '';
   document.getElementById('errScTitle').style.display = 'none';
   document.getElementById('errScKey').style.display = 'none';
   document.getElementById('errScPurpose').style.display = 'none';
@@ -133,7 +130,6 @@ saveAddShortcut.addEventListener('click', async () => {
     howToUse: document.getElementById('scHowToUse').value.trim(),
     example: isPrompt ? '' : document.getElementById('scExample').value.trim(),
     notes: isPrompt ? '' : document.getElementById('scNotes').value.trim(),
-    eli5: isPrompt ? document.getElementById('scEli5').value.trim() : '',
     link: '', tag: '', body: '', department: '',
     platform: shortcutGroup === 'chatgpt' ? 'chatgpt' : 'claude',
     author: author || 'Anonymous',

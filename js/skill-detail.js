@@ -60,8 +60,7 @@ function openNoteDetail(entry){
   } else if(isPromptShortcutCategory(entry.category)){
     html += optionalBlock('Purpose', entry.purpose)
       + copyableBlock('Sample Prompt', entry.samplePrompt, 'detail-value', 'samplePrompt')
-      + optionalBlock('How to Use It', entry.howToUse)
-      + optionalBlock('ELI5', entry.eli5);
+      + optionalBlock('How to Use It', entry.howToUse);
   } else if(isShortcutCategory(entry.category)){
     html += copyableBlock('Shortcut / Command', entry.shortcutKey, 'detail-value mono', 'shortcutKey')
       + optionalBlock('Purpose', entry.purpose)
