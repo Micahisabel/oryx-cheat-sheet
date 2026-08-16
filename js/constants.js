@@ -67,6 +67,13 @@ const CATEGORY_EXPLAINERS = {
   }
 };
 
+// Optional "learn more" link shown under an explainer. Same platform/category keys as above.
+const CATEGORY_EXPLAINER_LINKS = {
+  claude: {
+    skills: { url: 'https://youtu.be/kS1MJFZWMq4?si=qSlIawPKHZP0YnqF', label: 'Click here to learn how to create a Skill in Claude' }
+  }
+};
+
 const CATEGORY_ICON_PATHS = {
   skills: '<path d="M12 2l2.4 6.9L21 11l-6.6 2.1L12 20l-2.4-6.9L3 11l6.6-2.1z"/>',
   commands: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/>',

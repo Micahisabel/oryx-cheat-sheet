@@ -219,10 +219,15 @@ function render(){
 
   // Category explainer — show only in library view, for a category that has one, and not while searching.
   // Text is platform-specific; "All Platforms" and any other platform fall back to the Claude wording.
-  const explainerSet = CATEGORY_EXPLAINERS[activePlatform] || CATEGORY_EXPLAINERS.claude;
-  const explainer = (viewMode !== 'shortcuts' && !searchTerm) ? explainerSet[activeCat] : null;
+  const explainerPlatform = CATEGORY_EXPLAINERS[activePlatform] ? activePlatform : 'claude';
+  const explainer = (viewMode !== 'shortcuts' && !searchTerm) ? CATEGORY_EXPLAINERS[explainerPlatform][activeCat] : null;
   if(explainer){
-    catExplainer.textContent = explainer;
+    const link = (CATEGORY_EXPLAINER_LINKS[explainerPlatform] || {})[activeCat];
+    // Content is developer-defined constants, but escape anyway to keep the innerHTML sink safe.
+    const linkHtml = link
+      ? `<a class="cat-explainer-link" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`
+      : '';
+    catExplainer.innerHTML = escapeHtml(explainer) + linkHtml;
     catExplainer.style.display = '';
   }else{
     catExplainer.style.display = 'none';
