@@ -17,9 +17,11 @@ const CATEGORY_LABELS = {
   'shortcut-desktop': 'Claude Desktop',
   'shortcut-code': 'Claude Code',
   'shortcut-slash': 'Slash Command',
+  'shortcut-prompts': 'Claude Prompt',
   'chatgpt-shortcut-desktop': 'ChatGPT Desktop',
   'chatgpt-shortcut-code': 'ChatGPT Code',
   'chatgpt-shortcut-slash': 'Slash Command',
+  'chatgpt-shortcut-prompts': 'ChatGPT Prompt',
   // legacy labels kept so older entries still display a clean tag
   prompting: 'Prompting Technique',
   resources: 'Resource'
@@ -43,9 +45,11 @@ const CATEGORY_PLURAL_LABELS = {
   'shortcut-desktop': 'Claude Shortcuts',
   'shortcut-code': 'Claude Shortcuts',
   'shortcut-slash': 'Claude Shortcuts',
+  'shortcut-prompts': 'Claude Shortcuts',
   'chatgpt-shortcut-desktop': 'ChatGPT Shortcuts',
   'chatgpt-shortcut-code': 'ChatGPT Shortcuts',
-  'chatgpt-shortcut-slash': 'ChatGPT Shortcuts'
+  'chatgpt-shortcut-slash': 'ChatGPT Shortcuts',
+  'chatgpt-shortcut-prompts': 'ChatGPT Shortcuts'
 };
 
 // Short, plain-English explanation shown at the top of a category view.
@@ -118,8 +122,8 @@ function isRichCategory(cat){ return RICH_CATEGORIES.includes(cat); }
 const OTHER_TOOLS_CATS = ['other-writing', 'other-video', 'other-images', 'other-research', 'other-design', 'other-audio', 'other-automation'];
 function isOtherToolsCategory(cat){ return cat === 'other-tools' || OTHER_TOOLS_CATS.includes(cat); }
 
-const CLAUDE_SHORTCUT_CATS = ['shortcut-desktop', 'shortcut-code', 'shortcut-slash'];
-const CHATGPT_SHORTCUT_CATS = ['chatgpt-shortcut-desktop', 'chatgpt-shortcut-code', 'chatgpt-shortcut-slash'];
+const CLAUDE_SHORTCUT_CATS = ['shortcut-desktop', 'shortcut-code', 'shortcut-slash', 'shortcut-prompts'];
+const CHATGPT_SHORTCUT_CATS = ['chatgpt-shortcut-desktop', 'chatgpt-shortcut-code', 'chatgpt-shortcut-slash', 'chatgpt-shortcut-prompts'];
 const SHORTCUT_CATEGORIES = [...CLAUDE_SHORTCUT_CATS, ...CHATGPT_SHORTCUT_CATS];
 function isShortcutCategory(cat){ return SHORTCUT_CATEGORIES.includes(cat); }
 function shortcutBadgeHtml(key){
