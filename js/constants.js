@@ -71,7 +71,8 @@ const CATEGORY_EXPLAINERS = {
 const CATEGORY_EXPLAINER_LINKS = {
   claude: {
     skills: { url: 'https://youtu.be/kS1MJFZWMq4?si=qSlIawPKHZP0YnqF', label: 'Click here to learn how to create a Skill in Claude' },
-    agents: { url: 'https://youtu.be/I4mVeNKPqPc?si=jJYlzvK1bheDJ6OM', label: 'Click here to learn how to create an AI Agent in Claude' }
+    agents: { url: 'https://youtu.be/I4mVeNKPqPc?si=jJYlzvK1bheDJ6OM', label: 'Click here to learn how to create an AI Agent in Claude' },
+    mcps: { url: 'https://youtu.be/kkBFmwkDzdo?si=eSmnE2Wvy81WxDIi', label: 'Click here to learn how to set up an MCP in Claude' }
   }
 };
 
