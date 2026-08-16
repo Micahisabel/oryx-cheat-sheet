@@ -49,9 +49,22 @@ const CATEGORY_PLURAL_LABELS = {
 };
 
 // Short, plain-English explanation shown at the top of a category view.
-// Add more keys here to give other categories their own explainer.
+// Keyed by platform, then category. The "All Platforms" view falls back to the Claude wording.
 const CATEGORY_EXPLAINERS = {
-  skills: 'A Claude Skill is like a helper that already knows how to do a specific job. You give it the instructions once, and Claude can use them whenever you need that job done.'
+  claude: {
+    skills: 'A Claude Skill is like a helper that already knows how to do a specific job. You give it the instructions once, and Claude can use them whenever you need that job done.',
+    agents: 'A Claude AI Agent is like a worker that can handle a task for you. You give it a goal, and it can work through the steps needed to complete it.',
+    mcps: 'A Claude MCP is like a bridge that connects Claude to other tools or systems. It allows Claude to access information or use tools outside of the chat.',
+    plugins: 'A Claude Plugin is like an extra tool for Claude. It adds new abilities or makes it easier to connect Claude with other tools and services.',
+    discoveries: 'Short and useful videos that help the team learn new Claude features, tips, shortcuts, and ways to use Claude at work.'
+  },
+  chatgpt: {
+    skills: 'A ChatGPT Skill is like a helper that knows how to handle a specific type of task. It gives ChatGPT instructions or knowledge that helps it perform that task more effectively.',
+    agents: 'A ChatGPT AI Agent is like a worker that can handle a task for you. You give it a goal, and it can take several steps to work toward completing it.',
+    mcps: 'A ChatGPT MCP is like a bridge that connects ChatGPT to other tools or systems. It allows ChatGPT to work with information and services outside of the chat.',
+    plugins: 'A ChatGPT Plugin is like an extra tool that gives ChatGPT additional abilities or connects it to other services.',
+    discoveries: 'Short and useful videos that help the team learn new ChatGPT features, tips, shortcuts, and ways to use ChatGPT at work.'
+  }
 };
 
 const CATEGORY_ICON_PATHS = {

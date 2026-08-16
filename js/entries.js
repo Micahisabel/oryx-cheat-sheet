@@ -218,7 +218,9 @@ function render(){
   }
 
   // Category explainer — show only in library view, for a category that has one, and not while searching.
-  const explainer = (viewMode !== 'shortcuts' && !searchTerm) ? CATEGORY_EXPLAINERS[activeCat] : null;
+  // Text is platform-specific; "All Platforms" and any other platform fall back to the Claude wording.
+  const explainerSet = CATEGORY_EXPLAINERS[activePlatform] || CATEGORY_EXPLAINERS.claude;
+  const explainer = (viewMode !== 'shortcuts' && !searchTerm) ? explainerSet[activeCat] : null;
   if(explainer){
     catExplainer.textContent = explainer;
     catExplainer.style.display = '';
