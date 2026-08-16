@@ -126,6 +126,8 @@ const CLAUDE_SHORTCUT_CATS = ['shortcut-desktop', 'shortcut-code', 'shortcut-sla
 const CHATGPT_SHORTCUT_CATS = ['chatgpt-shortcut-desktop', 'chatgpt-shortcut-code', 'chatgpt-shortcut-slash', 'chatgpt-shortcut-prompts'];
 const SHORTCUT_CATEGORIES = [...CLAUDE_SHORTCUT_CATS, ...CHATGPT_SHORTCUT_CATS];
 function isShortcutCategory(cat){ return SHORTCUT_CATEGORIES.includes(cat); }
+const PROMPT_SHORTCUT_CATS = ['shortcut-prompts', 'chatgpt-shortcut-prompts'];
+function isPromptShortcutCategory(cat){ return PROMPT_SHORTCUT_CATS.includes(cat); }
 function shortcutBadgeHtml(key){
   if(!key) return '';
   return `<div class="card-placeholder"><span class="shortcut-key-text">${escapeHtml(key)}</span></div>`;

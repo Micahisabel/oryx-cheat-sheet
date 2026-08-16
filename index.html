@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.3";</script>
+<script>window.APP_VERSION = "2026-08-16.4";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -352,26 +352,43 @@
       <option value="shortcut-slash">Slash Command</option>
     </select>
 
-    <label for="scTitle">Label</label>
+    <label for="scTitle" id="scTitleLabel">Label</label>
     <input type="text" id="scTitle" placeholder="e.g. Compact Context">
     <div class="field-error" id="errScTitle">Give it a label.</div>
 
-    <label for="scKey">Shortcut / Command</label>
-    <input type="text" id="scKey" placeholder="e.g. /compact or Shift + Tab">
-    <div class="field-error" id="errScKey">Add the shortcut or command.</div>
+    <div id="scKeyGroup">
+      <label for="scKey">Shortcut / Command</label>
+      <input type="text" id="scKey" placeholder="e.g. /compact or Shift + Tab">
+      <div class="field-error" id="errScKey">Add the shortcut or command.</div>
+    </div>
 
     <label for="scPurpose">Purpose</label>
     <textarea id="scPurpose" placeholder="What does it do?"></textarea>
     <div class="field-error" id="errScPurpose">Add a purpose.</div>
 
+    <div id="scSamplePromptGroup">
+      <label for="scSamplePrompt">Sample prompt</label>
+      <textarea id="scSamplePrompt" placeholder="The prompt to copy and paste"></textarea>
+      <div class="field-error" id="errScSamplePrompt">Add the sample prompt.</div>
+    </div>
+
     <label for="scHowToUse">How to use it <span class="optional-tag">(optional)</span></label>
     <textarea id="scHowToUse" placeholder="Steps to trigger it"></textarea>
 
-    <label for="scExample">Example <span class="optional-tag">(optional)</span></label>
-    <textarea id="scExample" placeholder="A real example"></textarea>
+    <div id="scExampleGroup">
+      <label for="scExample">Example <span class="optional-tag">(optional)</span></label>
+      <textarea id="scExample" placeholder="A real example"></textarea>
+    </div>
 
-    <label for="scNotes">Notes <span class="optional-tag">(optional)</span></label>
-    <textarea id="scNotes" placeholder="Gotchas, aliases, limitations"></textarea>
+    <div id="scNotesGroup">
+      <label for="scNotes">Notes <span class="optional-tag">(optional)</span></label>
+      <textarea id="scNotes" placeholder="Gotchas, aliases, limitations"></textarea>
+    </div>
+
+    <div id="scEli5Group">
+      <label for="scEli5">ELI5 <span class="optional-tag">(explain like I'm 5)</span></label>
+      <textarea id="scEli5" placeholder="Explain it in the simplest way possible"></textarea>
+    </div>
 
     <label for="scAuthor">Your name</label>
     <input type="text" id="scAuthor" placeholder="e.g. Sara">
@@ -563,13 +580,13 @@
 
 <script src="js/firebase.js?v=18"></script>
 <script src="js/utils.js?v=21"></script>
-<script src="js/constants.js?v=25"></script>
+<script src="js/constants.js?v=26"></script>
 <script src="js/state.js?v=16"></script>
 <script src="js/sidebar.js?v=26"></script>
-<script src="js/entries.js?v=26"></script>
-<script src="js/skill-detail.js?v=23"></script>
+<script src="js/entries.js?v=27"></script>
+<script src="js/skill-detail.js?v=24"></script>
 <script src="js/add-entry.js?v=21"></script>
-<script src="js/shortcuts-form.js?v=16"></script>
+<script src="js/shortcuts-form.js?v=17"></script>
 <script src="js/admin.js?v=20"></script>
 <script src="js/suggest.js?v=29"></script>
 <script src="js/favorites.js?v=4"></script>

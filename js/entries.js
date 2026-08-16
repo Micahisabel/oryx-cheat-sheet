@@ -190,7 +190,7 @@ function render(){
     filtered = shortcutEntries.filter(e => {
       if(!groupCats.includes(e.category)) return false;
       if(!searchTerm) return e.category === activeCat;
-      const haystack = [e.title, e.shortcutKey, e.purpose, e.howToUse, e.example, e.notes]
+      const haystack = [e.title, e.shortcutKey, e.purpose, e.samplePrompt, e.howToUse, e.example, e.notes, e.eli5]
         .filter(Boolean).join(' ').toLowerCase();
       return haystack.includes(searchTerm);
     }).sort((a,b) => b.createdAt - a.createdAt);

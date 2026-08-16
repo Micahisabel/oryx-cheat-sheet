@@ -57,6 +57,11 @@ function openNoteDetail(entry){
       + detailSection('Tips',
         detailList([{label: 'Notes', value: entry.notes}])
         + detailTipParagraph('How This Helps Oryx Doors & Windows', entry.oryxTip));
+  } else if(isPromptShortcutCategory(entry.category)){
+    html += optionalBlock('Purpose', entry.purpose)
+      + copyableBlock('Sample Prompt', entry.samplePrompt, 'detail-value', 'samplePrompt')
+      + optionalBlock('How to Use It', entry.howToUse)
+      + optionalBlock('ELI5', entry.eli5);
   } else if(isShortcutCategory(entry.category)){
     html += copyableBlock('Shortcut / Command', entry.shortcutKey, 'detail-value mono', 'shortcutKey')
       + optionalBlock('Purpose', entry.purpose)
