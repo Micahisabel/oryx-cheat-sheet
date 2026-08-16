@@ -219,10 +219,12 @@ function render(){
 
   // Category explainer — show only in library view, for a category that has one, and not while searching.
   // Text is platform-specific; "All Platforms" and any other platform fall back to the Claude wording.
-  const explainerPlatform = CATEGORY_EXPLAINERS[activePlatform] ? activePlatform : 'claude';
-  const explainer = (viewMode !== 'shortcuts' && !searchTerm) ? CATEGORY_EXPLAINERS[explainerPlatform][activeCat] : null;
+  // Only show for a specific platform (Claude / ChatGPT). On "All Platforms" the list mixes both,
+  // so a single platform's wording and how-to link would be half-wrong — hide it there.
+  const explainerSet = CATEGORY_EXPLAINERS[activePlatform];
+  const explainer = (explainerSet && viewMode !== 'shortcuts' && !searchTerm) ? explainerSet[activeCat] : null;
   if(explainer){
-    const link = (CATEGORY_EXPLAINER_LINKS[explainerPlatform] || {})[activeCat];
+    const link = (CATEGORY_EXPLAINER_LINKS[activePlatform] || {})[activeCat];
     // Content is developer-defined constants, but escape anyway to keep the innerHTML sink safe.
     const linkHtml = link
       ? `<a class="cat-explainer-link" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`
