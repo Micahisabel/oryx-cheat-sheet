@@ -122,7 +122,7 @@ function isRichCategory(cat){ return RICH_CATEGORIES.includes(cat); }
 const OTHER_TOOLS_CATS = ['other-writing', 'other-video', 'other-images', 'other-research', 'other-design', 'other-audio', 'other-automation'];
 function isOtherToolsCategory(cat){ return cat === 'other-tools' || OTHER_TOOLS_CATS.includes(cat); }
 
-const CLAUDE_SHORTCUT_CATS = ['shortcut-desktop', 'shortcut-code', 'shortcut-slash', 'shortcut-prompts'];
+const CLAUDE_SHORTCUT_CATS = ['shortcut-prompts', 'shortcut-desktop', 'shortcut-code', 'shortcut-slash'];
 const CHATGPT_SHORTCUT_CATS = ['chatgpt-shortcut-desktop', 'chatgpt-shortcut-code', 'chatgpt-shortcut-slash', 'chatgpt-shortcut-prompts'];
 const SHORTCUT_CATEGORIES = [...CLAUDE_SHORTCUT_CATS, ...CHATGPT_SHORTCUT_CATS];
 function isShortcutCategory(cat){ return SHORTCUT_CATEGORIES.includes(cat); }
