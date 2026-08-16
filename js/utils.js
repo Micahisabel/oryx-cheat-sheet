@@ -251,6 +251,23 @@ function buildGenericMarkdown(entry){
     section('Details', entry.body);
   }
   section('Link', entry.link);
+
+  // Claude/ChatGPT Prompt entries get a ready-made instruction telling the AI to remember the
+  // shortcut. Built dynamically from this entry's own title/purpose/howToUse — never hard-coded.
+  if(isPromptShortcutCategory(entry.category)){
+    const oneLine = (s) => String(s || '').replace(/\s+/g, ' ').trim();
+    const title = oneLine(entry.title) || 'this shortcut';
+    const purpose = oneLine(entry.purpose);
+    const howTo = oneLine(entry.howToUse);
+    lines.push('## Memory Instruction', '');
+    lines.push('Please remember this shortcut for future conversations:', '');
+    lines.push(`When I use "${title}", apply the following:`, '');
+    if(purpose) lines.push(`- **What it means / does:** ${purpose}`);
+    if(howTo) lines.push(`- **How I use it:** ${howTo}`);
+    lines.push('');
+    lines.push(`Please save this shortcut to your memory so I can use "${title}" in future conversations without having to explain what it means again.`);
+  }
+
   return lines.join('\n');
 }
 
