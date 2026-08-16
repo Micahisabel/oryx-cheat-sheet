@@ -41,6 +41,17 @@ function renderAnalytics(){
     .sort((a, b) => (b[sortKey] || 0) - (a[sortKey] || 0))
     .slice(0, 10);
 
+  // How many entries each person has shared (counts every entry type, grouped by author).
+  const authorTotals = {};
+  entries.forEach(e => {
+    const name = (e.author || '').trim() || 'Anonymous';
+    authorTotals[name] = (authorTotals[name] || 0) + 1;
+  });
+  const sortedAuthors = Object.entries(authorTotals).sort((a, b) => b[1] - a[1]);
+  const contributorCount = sortedAuthors.length;
+  const maxAuthor = Math.max(1, ...sortedAuthors.map(a => a[1]));
+  const topAuthors = sortedAuthors.slice(0, 12);
+
   analyticsView.innerHTML = `
     <div class="analytics-page-head">
       <h2>Usage Analytics</h2>
@@ -78,7 +89,19 @@ function renderAnalytics(){
         </div>
       `).join('')}
     </div>
-    <p class="analytics-footnote">Tracking since ${ANALYTICS_TRACKING_START} · a view counts each time an entry is opened.</p>
+    <div class="analytics-section-head" style="margin-top:28px;">
+      <h3>Contributions by User</h3>
+      <span class="analytics-contrib-count">${contributorCount} ${contributorCount === 1 ? 'contributor' : 'contributors'}</span>
+    </div>
+    <div class="analytics-cats">
+      ${topAuthors.map(([name, count]) => `
+        <div class="analytics-cat-row">
+          <div class="analytics-cat-top"><span>${escapeHtml(name)}</span><span>${count}</span></div>
+          <div class="analytics-bar-track"><div class="analytics-bar-fill" style="width:${Math.round(count / maxAuthor * 100)}%;"></div></div>
+        </div>
+      `).join('')}
+    </div>
+    <p class="analytics-footnote">Tracking since ${ANALYTICS_TRACKING_START} · a view counts each time an entry is opened. Contributions count every entry a person has shared.</p>
   `;
 
   analyticsView.querySelectorAll('.analytics-seg-btn').forEach(btn => {

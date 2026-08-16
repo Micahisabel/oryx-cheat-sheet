@@ -81,6 +81,7 @@
   .analytics-kpi-value--text{font-size:17px;}
   .analytics-section-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px;}
   .analytics-section-head h3{font-family:var(--font-display);font-size:14px;color:var(--oryx-blue);margin:0;}
+  .analytics-contrib-count{font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--silver);}
   .analytics-seg{display:flex;gap:2px;background:var(--panel);border:1px solid var(--line-soft);border-radius:999px;padding:2px;}
   .analytics-seg-btn{appearance:none;border:none;background:none;font-family:var(--font-display);font-size:11px;font-weight:600;color:var(--silver);padding:6px 12px;border-radius:999px;cursor:pointer;}
   .analytics-seg-btn.active{background:var(--oryx-blue);color:var(--white);}
