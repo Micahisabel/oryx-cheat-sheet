@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Knowledge Hub</title>
+<!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
+     that should push an update to open tabs (see the version-check script before </body>). -->
+<script>window.APP_VERSION = "2026-08-16.2";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -575,6 +578,36 @@
 <script src="js/review.js?v=15"></script>
 <script src="js/analytics.js?v=3"></script>
 <script src="js/app.js?v=15"></script>
+
+<!-- Auto-update check. Polls version.json; if the deployed version is newer than the
+     one this page loaded with (window.APP_VERSION), it reloads once with a cache-busting
+     URL so embedded tabs (e.g. Zoho Cliq) pick up updates without a manual refresh.
+     A sessionStorage guard prevents reload loops if the HTML cache won't clear. -->
+<script>
+(function(){
+  var CURRENT = window.APP_VERSION || 'dev';
+  var CHECK_INTERVAL_MS = 5 * 60 * 1000; // every 5 minutes
+  function checkVersion(){
+    fetch('version.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(data){
+        if(!data || !data.version) return;
+        var remote = String(data.version);
+        if(remote === CURRENT) return;
+        var lastTried = null;
+        try { lastTried = sessionStorage.getItem('kb_reload_target'); } catch(e){}
+        if(lastTried === remote) return; // already tried this version — don't loop
+        try { sessionStorage.setItem('kb_reload_target', remote); } catch(e){}
+        location.replace(location.pathname + '?_v=' + encodeURIComponent(remote));
+      })
+      .catch(function(){ /* offline or blocked — ignore */ });
+  }
+  setTimeout(checkVersion, 3000);
+  setInterval(checkVersion, CHECK_INTERVAL_MS);
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) checkVersion(); });
+  window.addEventListener('focus', checkVersion);
+})();
+</script>
 
 </body>
 </html>
