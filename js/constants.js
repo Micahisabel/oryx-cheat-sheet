@@ -75,7 +75,8 @@ const CATEGORY_EXPLAINER_LINKS = {
     mcps: { url: 'https://youtu.be/kkBFmwkDzdo?si=eSmnE2Wvy81WxDIi', label: 'Click here to learn how to set up an MCP in Claude' }
   },
   chatgpt: {
-    skills: { url: 'https://youtu.be/qh93rLRPw80?si=jribn9jMDYo9KZOe', label: 'Click here to learn how to create a Skill in ChatGPT' }
+    skills: { url: 'https://youtu.be/qh93rLRPw80?si=jribn9jMDYo9KZOe', label: 'Click here to learn how to create a Skill in ChatGPT' },
+    mcps: { url: 'https://youtu.be/G_AqysfbikA?si=izGMGdGKDeH_TcZn', label: 'Click here to learn how to set up an MCP in ChatGPT' }
   }
 };
 
