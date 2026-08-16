@@ -203,12 +203,11 @@ function syncHeaderHeightVar(){
 syncHeaderHeightVar();
 new ResizeObserver(syncHeaderHeightVar).observe(siteHeaderEl);
 
-// Default the landing view to Claude instead of All Platforms. The hub is Claude-first, and a
-// specific platform means the category explainer (and its how-to link) show correctly on first load.
-// Reuses the real click handler so submenu, indicator, and state all set up exactly as a user click.
+// Default the landing view to All Platforms (the full, unfiltered library).
+// Reuses the real click handler so state, indicator, and category selection set up exactly as a user click.
 // Deferred to 'load' so every script (e.g. exitAnalyticsMode in analytics.js) is defined first.
 window.addEventListener('load', () => {
-  const defaultPlatformBtn = platformNav.querySelector('[data-platform="claude"]');
+  const defaultPlatformBtn = platformNav.querySelector('[data-platform="all"]');
   if(defaultPlatformBtn) defaultPlatformBtn.click();
 });
 
