@@ -64,6 +64,15 @@ const CATEGORY_EXPLAINERS = {
     mcps: 'A ChatGPT MCP is like a bridge that connects ChatGPT to other tools or systems. It allows ChatGPT to work with information and services outside of the chat.',
     plugins: 'A ChatGPT Plugin is like an extra tool that gives ChatGPT additional abilities or connects it to other services.',
     discoveries: 'Short and useful videos that help the team learn new ChatGPT features, tips, shortcuts, and ways to use ChatGPT at work.'
+  },
+  other: {
+    'other-writing': 'AI tools that help you write, rewrite, summarise, and improve text, emails, documents, and other written content.',
+    'other-video': 'AI tools that help you create, edit, and improve videos using simple instructions, images, or text.',
+    'other-images': 'AI tools that help you create, edit, and improve images, graphics, and visual content using AI.',
+    'other-research': 'AI tools that help you find, understand, summarise, and organise information quickly.',
+    'other-design': 'AI tools that help you create presentations, layouts, graphics, marketing materials, and other designs.',
+    'other-audio': 'AI tools that help you create, edit, improve, or work with voice, music, and other audio content.',
+    'other-automation': 'AI tools that help you automate repetitive tasks, connect different apps, and make work happen automatically with less manual effort.'
   }
 };
 
