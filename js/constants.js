@@ -70,7 +70,8 @@ const CATEGORY_EXPLAINERS = {
 // Optional "learn more" link shown under an explainer. Same platform/category keys as above.
 const CATEGORY_EXPLAINER_LINKS = {
   claude: {
-    skills: { url: 'https://youtu.be/kS1MJFZWMq4?si=qSlIawPKHZP0YnqF', label: 'Click here to learn how to create a Skill in Claude' }
+    skills: { url: 'https://youtu.be/kS1MJFZWMq4?si=qSlIawPKHZP0YnqF', label: 'Click here to learn how to create a Skill in Claude' },
+    agents: { url: 'https://youtu.be/I4mVeNKPqPc?si=jJYlzvK1bheDJ6OM', label: 'Click here to learn how to create an AI Agent in Claude' }
   }
 };
 
