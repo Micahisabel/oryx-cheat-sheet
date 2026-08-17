@@ -294,8 +294,17 @@ function render(){
     const platformTagLabel = e.platform === 'other' ? 'Other AI Tools' : platformMeta(e.platform).label;
     const cardTagLabel = isRichCategory(e.category) && e.department ? e.department : (e.category === 'discoveries' ? platformTagLabel : (CATEGORY_LABELS[e.category] || e.category));
     const isFav = favoriteIds.has(e.id);
+    // In the mixed "All Platforms" view, show a Claude/ChatGPT badge so users can tell them apart.
+    // (Skipped in single-platform views where it would be redundant, and for Other AI Tools /
+    // Video Discoveries, which already identify themselves.)
+    const showPlatformBadge = activePlatform === 'all' && (e.platform === 'claude' || e.platform === 'chatgpt') && e.category !== 'discoveries';
+    const pmBadge = platformMeta(e.platform);
+    const platformBadgeHtml = showPlatformBadge
+      ? `<span class="card-platform-badge"><span class="platform-dot" style="background:${pmBadge.color}"></span>${escapeHtml(pmBadge.label)}</span>`
+      : '';
     return `
       <div class="card" data-id="${e.id}">
+        ${platformBadgeHtml}
         <button class="card-fav-btn${isFav ? ' active' : ''}" data-id="${e.id}" aria-label="${isFav ? 'Remove from favorites' : 'Add to favorites'}">${FAV_STAR_SVG}</button>
         ${thumbHtml}
         <span class="card-tag">${escapeHtml(cardTagLabel)}</span>
