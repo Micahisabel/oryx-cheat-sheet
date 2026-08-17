@@ -196,6 +196,8 @@ function render(){
     const groupCats = shortcutGroup === 'chatgpt' ? CHATGPT_SHORTCUT_CATS : CLAUDE_SHORTCUT_CATS;
     filtered = shortcutEntries.filter(e => {
       if(!groupCats.includes(e.category)) return false;
+      // Code categories are admin-only — keep them out of non-admin views and search results.
+      if(!isAdmin && (e.category === 'shortcut-code' || e.category === 'chatgpt-shortcut-code')) return false;
       if(!searchTerm) return e.category === activeCat;
       const haystack = [e.title, e.shortcutKey, e.purpose, e.samplePrompt, e.howToUse, e.example, e.notes]
         .filter(Boolean).join(' ').toLowerCase();
