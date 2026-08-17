@@ -153,6 +153,13 @@ function renderRecentStrip(libraryEntries){
   });
 }
 
+// Grid order: favourited entries first, then most-recent first. (favoriteIds lives in favorites.js;
+// toggling a star re-renders, so a favourited card jumps to the front automatically.)
+function favThenRecent(a, b){
+  const fa = favoriteIds.has(a.id) ? 1 : 0, fb = favoriteIds.has(b.id) ? 1 : 0;
+  return fb - fa || ((b.createdAt || 0) - (a.createdAt || 0));
+}
+
 function render(){
   updateActivityBadge();
   const libraryEntries = entries.filter(e => !isShortcutCategory(e.category));
@@ -193,7 +200,7 @@ function render(){
       const haystack = [e.title, e.shortcutKey, e.purpose, e.samplePrompt, e.howToUse, e.example, e.notes]
         .filter(Boolean).join(' ').toLowerCase();
       return haystack.includes(searchTerm);
-    }).sort((a,b) => b.createdAt - a.createdAt);
+    }).sort(favThenRecent);
   } else {
     filtered = libraryEntries.filter(e => {
       const platformMatch = activePlatform === 'all' || (e.platform || 'claude') === activePlatform;
@@ -206,7 +213,7 @@ function render(){
       const haystack = [e.title, e.body, e.purpose, e.bestFor, e.notes, e.department, e.samplePrompt, e.exampleOutput, e.oryxTip, e.howToAccess]
         .filter(Boolean).join(' ').toLowerCase();
       return haystack.includes(searchTerm);
-    }).sort((a,b) => b.createdAt - a.createdAt);
+    }).sort(favThenRecent);
 
     const platformFilteredEntries = activePlatform === 'all' ? libraryEntries : libraryEntries.filter(e => (e.platform || 'claude') === activePlatform);
     const counts = { all: platformFilteredEntries.length, skills: 0, commands: 0, agents: 0, mcps: 0, plugins: 0, discoveries: 0, 'other-tools': 0 };
