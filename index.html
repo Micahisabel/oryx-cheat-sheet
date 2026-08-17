@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.10";</script>
+<script>window.APP_VERSION = "2026-08-16.11";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -402,8 +402,10 @@
     <h2>Suggest a Resource</h2>
     <p class="sub" id="suggestSub">Found something useful, or want a new skill built? Choose which below.</p>
 
-    <label for="sMode">What would you like to do?</label>
-    <select id="sMode">
+    <!-- Mode selector hidden for now — the "Request something new" flow is disabled, so the
+         panel stays in discovery mode. Restore by removing the two display:none styles below. -->
+    <label for="sMode" style="display:none;">What would you like to do?</label>
+    <select id="sMode" style="display:none;">
       <option value="discovery">Share something you found</option>
       <option value="request">Request something new</option>
     </select>
