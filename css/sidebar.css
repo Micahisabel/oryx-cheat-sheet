@@ -108,3 +108,10 @@
     color:var(--white);padding:2px 9px;border-radius:10px;min-width:20px;text-align:center;
   }
   .cat-tab.active .cat-badge{background:rgba(255,255,255,0.26);color:var(--white);}
+  /* Secondary "real term" tag kept quietly beside the plain-language label */
+  .cat-tab-tag{
+    font-family:var(--font-display);font-weight:600;font-size:9.5px;letter-spacing:0.08em;
+    text-transform:uppercase;color:rgba(255,255,255,0.34);margin-left:-3px;
+  }
+  .cat-tab:hover .cat-tab-tag{color:rgba(255,255,255,0.5);}
+  .cat-tab.active .cat-tab-tag{color:rgba(255,255,255,0.55);}
