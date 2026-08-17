@@ -25,6 +25,7 @@ function openNoteDetail(entry){
         <button class="skill-back" id="skillBack">${BACK_ARROW_SVG} Back to ${escapeHtml(CATEGORY_PLURAL_LABELS[entry.category] || 'All Entries')}</button>
         <div class="skill-eyebrow">
           <span class="tag">${escapeHtml(catLabel)}</span>
+          ${CATEGORY_TECH_TERMS[entry.category] ? `<span class="tag tag-tech">${escapeHtml(CATEGORY_TECH_TERMS[entry.category])}</span>` : ''}
           <span class="tag platform"><span class="platform-dot" style="background:${pm.color}"></span>${escapeHtml(pm.label)}</span>
         </div>
         <div class="skill-title-row">

@@ -227,7 +227,9 @@ function buildClaudeSkillMd(entry){
 
 function buildGenericMarkdown(entry){
   const pm = platformMeta(entry.platform);
-  const catLabel = CATEGORY_LABELS[entry.category] || entry.category;
+  const plainLabel = CATEGORY_LABELS[entry.category] || entry.category;
+  const techTerm = CATEGORY_TECH_TERMS[entry.category];
+  const catLabel = techTerm ? `${plainLabel} (${techTerm})` : plainLabel;
   const dateStr = new Date(entry.createdAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'});
   const lines = [];
   lines.push(`# ${entry.title || 'Untitled'}`, '');

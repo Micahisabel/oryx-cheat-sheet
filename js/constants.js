@@ -2,8 +2,8 @@
 const CATEGORY_LABELS = {
   skills: 'Skill',
   commands: 'Command',
-  agents: 'AI Agent',
-  mcps: 'MCP',
+  agents: 'Assistant',
+  mcps: 'Connection',
   plugins: 'Plugin',
   discoveries: 'Video Discovery',
   'other-tools': 'Other AI Tool',
@@ -16,22 +16,31 @@ const CATEGORY_LABELS = {
   'other-automation': 'Automation',
   'shortcut-desktop': 'Claude Desktop',
   'shortcut-code': 'Claude Code',
-  'shortcut-slash': 'Slash Command',
+  'shortcut-slash': 'Quick Command',
   'shortcut-prompts': 'Claude Prompt',
   'chatgpt-shortcut-desktop': 'ChatGPT Desktop',
   'chatgpt-shortcut-code': 'ChatGPT Code',
-  'chatgpt-shortcut-slash': 'Slash Command',
+  'chatgpt-shortcut-slash': 'Quick Command',
   'chatgpt-shortcut-prompts': 'ChatGPT Prompt',
   // legacy labels kept so older entries still display a clean tag
   prompting: 'Prompting Technique',
   resources: 'Resource'
 };
 
+// Real technical term for categories renamed to plain language, shown as a small "learn" tag
+// beside the friendly label (nav tabs, entry detail) so staff still pick up the real vocabulary.
+const CATEGORY_TECH_TERMS = {
+  agents: 'AI Agent',
+  mcps: 'MCP',
+  'shortcut-slash': 'Slash Command',
+  'chatgpt-shortcut-slash': 'Slash Command'
+};
+
 const CATEGORY_PLURAL_LABELS = {
   skills: 'Skills',
   commands: 'Commands',
-  agents: 'AI Agents',
-  mcps: 'MCPs',
+  agents: 'Assistants',
+  mcps: 'Connections',
   plugins: 'Plugins',
   discoveries: 'Video Discoveries',
   'other-tools': 'Other AI Tools',
