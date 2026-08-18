@@ -7,11 +7,34 @@ const fCategory = document.getElementById('fCategory');
 const simpleFields = document.getElementById('simpleFields');
 const skillFields = document.getElementById('skillFields');
 const overlayHeading = document.querySelector('#overlay h2');
-const SKILL_FIELD_IDS = ['fDepartment','fPurpose','fSamplePrompt','fBestFor','fExampleOutput','fNotes','fHowToAccess','fOryxTip'];
+const SKILL_FIELD_IDS = ['fPurpose','fSamplePrompt','fBestFor','fExampleOutput','fNotes','fHowToAccess','fOryxTip'];
 const SKILL_FIELD_KEYS = {
-  fDepartment:'department', fPurpose:'purpose', fSamplePrompt:'samplePrompt', fBestFor:'bestFor',
+  fPurpose:'purpose', fSamplePrompt:'samplePrompt', fBestFor:'bestFor',
   fExampleOutput:'exampleOutput', fNotes:'notes', fHowToAccess:'howToAccess', fOryxTip:'oryxTip'
 };
+
+// ---- Departments multi-select (chips) — applies to every resource type -------
+// Stored back into the existing `department` field as a comma-separated string, so no new
+// Firestore field is introduced (keeps the entry write within the rules' allowed shape).
+const deptPickerEl = document.getElementById('fDepartments');
+function buildDeptPicker(){
+  deptPickerEl.innerHTML = LIBRARY_DEPARTMENTS.map(d =>
+    `<button type="button" class="dept-chip" data-dept="${escapeHtml(d)}">${escapeHtml(d)}</button>`
+  ).join('');
+  deptPickerEl.querySelectorAll('.dept-chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('selected'));
+  });
+}
+buildDeptPicker();
+function setSelectedDepartments(list){
+  const wanted = new Set((list || []).map(s => s.toLowerCase()));
+  deptPickerEl.querySelectorAll('.dept-chip').forEach(chip => {
+    chip.classList.toggle('selected', wanted.has(chip.dataset.dept.toLowerCase()));
+  });
+}
+function getSelectedDepartments(){
+  return [...deptPickerEl.querySelectorAll('.dept-chip.selected')].map(c => c.dataset.dept);
+}
 let editingEntryId = null;
 
 function toggleEntryFields(){
@@ -97,6 +120,7 @@ document.getElementById('aiFill').addEventListener('click', () => {
   if(data.body != null) document.getElementById('fBody').value = data.body;
 
   Object.keys(SKILL_FIELD_KEYS).forEach(id => { if(data[SKILL_FIELD_KEYS[id]] != null) document.getElementById(id).value = data[SKILL_FIELD_KEYS[id]]; });
+  if(data.department) setSelectedDepartments(entryDepartments({ department: String(data.department) }));
 
   toggleEntryFields();
   setAiStatus('✓ Form filled. Review the fields below, then Save entry.');
@@ -127,6 +151,7 @@ function openOverlay(){
   document.getElementById('errSamplePrompt').style.display = 'none';
   document.getElementById('errHowToAccess').style.display = 'none';
   SKILL_FIELD_IDS.forEach(id => { document.getElementById(id).value = ''; });
+  setSelectedDepartments([]);
   aiInput.value = '';
   aiResult.value = '';
   setAiStatus('');
@@ -150,6 +175,7 @@ function closeOverlay(){
   document.getElementById('errSamplePrompt').style.display = 'none';
   document.getElementById('errHowToAccess').style.display = 'none';
   SKILL_FIELD_IDS.forEach(id => { document.getElementById(id).value = ''; });
+  setSelectedDepartments([]);
   aiInput.value = '';
   aiResult.value = '';
   setAiStatus('');
@@ -176,6 +202,7 @@ function openEditEntry(entry){
   document.getElementById('fAuthor').value = entry.author || '';
 
   SKILL_FIELD_IDS.forEach(id => { document.getElementById(id).value = entry[SKILL_FIELD_KEYS[id]] || ''; });
+  setSelectedDepartments(entryDepartments(entry));
 
   aiInput.value = '';
   aiResult.value = '';
@@ -252,7 +279,7 @@ saveAdd.addEventListener('click', async () => {
     author: author || 'Anonymous',
     suggestedBy: currentSuggestedBy || '',
     body: isSkill ? '' : body,
-    department: isSkill ? skillValues.fDepartment : '',
+    department: getSelectedDepartments().join(', '),
     purpose: isSkill ? skillValues.fPurpose : '',
     samplePrompt: isSkill ? skillValues.fSamplePrompt : '',
     bestFor: isSkill ? skillValues.fBestFor : '',

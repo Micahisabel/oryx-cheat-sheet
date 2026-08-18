@@ -184,3 +184,21 @@ function isOtherToolUsed(entry){
   if(!list) return true;
   return list.includes(normalizeToolName(entry.title));
 }
+
+// --- Library department filter -----------------------------------------------
+// The department options for the main library filter and the Add/Edit picker. These are the
+// business departments an AI resource can be tagged with. Stored (comma-separated) in an
+// entry's existing `department` field, so no new Firestore field is introduced.
+const LIBRARY_DEPARTMENTS = ['HR', 'Sales', 'Marketing', 'Finance', 'Business Support', 'IT', 'Operations'];
+
+// Which of the known departments an entry belongs to. Matches whole words case-insensitively,
+// so it reads both new comma lists ("HR, Finance") and legacy free text ("Sales and Marketing")
+// without false hits like "IT" inside "digital".
+function entryDepartments(entry){
+  const text = (entry && entry.department ? String(entry.department) : '').toLowerCase();
+  if(!text) return [];
+  return LIBRARY_DEPARTMENTS.filter(d => {
+    const needle = d.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp('(^|[^a-z])' + needle + '([^a-z]|$)').test(text);
+  });
+}

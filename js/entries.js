@@ -4,6 +4,13 @@ searchInput.addEventListener('input', () => {
   render();
 });
 
+const deptFilterEl = document.getElementById('deptFilter');
+deptFilterEl.addEventListener('change', () => {
+  activeDepartment = deptFilterEl.value;
+  currentPage = 1;
+  render();
+});
+
 let knownEntryIds = null;
 
 const FAV_STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 17.3l-6.2 3.7 1.6-7L2 9.3l7.1-.6L12 2l2.9 6.7 7.1.6-5.4 4.7 1.6 7z"/></svg>';
@@ -221,6 +228,9 @@ function render(){
     document.querySelectorAll(`[data-count-for="${cat}"]`).forEach(el => { el.textContent = shortcutCounts[cat]; });
   });
 
+  // The department filter only makes sense for library resources, not shortcut commands.
+  deptFilterEl.style.display = (viewMode === 'shortcuts') ? 'none' : '';
+
   let filtered;
   if(viewMode === 'shortcuts'){
     // While searching, look across all sub-tabs of the current shortcut group (Desktop/Code/Slash)
@@ -239,6 +249,8 @@ function render(){
     filtered = libraryEntries.filter(e => {
       const platformMatch = activePlatform === 'all' || (e.platform || 'claude') === activePlatform;
       if(!platformMatch) return false;
+      // Department filter — works alongside search (e.g. "Excel" + Finance).
+      if(activeDepartment !== 'all' && !entryDepartments(e).includes(activeDepartment)) return false;
       if(!searchTerm){
         return activeCat === 'all' || e.category === activeCat;
       }

@@ -6,6 +6,7 @@ let otherToolsUsage = {};
 let activeCat = 'skills';
 let activePlatform = 'all';
 let searchTerm = '';
+let activeDepartment = 'all';
 let currentPage = 1;
 let viewMode = 'library';
 let shortcutGroup = 'claude';
