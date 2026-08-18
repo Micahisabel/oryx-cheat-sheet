@@ -303,9 +303,13 @@ function render(){
     const platformBadgeHtml = showPlatformBadge
       ? `<span class="card-platform-badge"><span class="platform-dot" style="background:${pmBadge.color}"></span>${escapeHtml(pmBadge.label)}</span>`
       : '';
+    // Other AI Tools the team hasn't used yet get a subtle frosted/glass look.
+    const isUnusedTool = isOtherToolsCategory(e.category) && !isOtherToolUsed(e);
+    const unusedBadgeHtml = isUnusedTool ? `<span class="card-unused-badge">Not used yet</span>` : '';
     return `
-      <div class="card" data-id="${e.id}">
+      <div class="card${isUnusedTool ? ' card-unused' : ''}" data-id="${e.id}">
         ${platformBadgeHtml}
+        ${unusedBadgeHtml}
         <button class="card-fav-btn${isFav ? ' active' : ''}" data-id="${e.id}" aria-label="${isFav ? 'Remove from favorites' : 'Add to favorites'}">${FAV_STAR_SVG}</button>
         ${thumbHtml}
         <span class="card-tag">${escapeHtml(cardTagLabel)}</span>

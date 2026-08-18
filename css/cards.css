@@ -91,6 +91,43 @@
     font-family:var(--font-display);font-weight:600;font-size:10.5px;letter-spacing:0.03em;color:var(--oryx-blue);
   }
   .card-platform-badge .platform-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+  /* Other AI Tools not yet used by the team: a subtle, professional frosted-glass
+     look. Imagery and supporting text soften; the tool name stays fully sharp and
+     readable. Hovering a card clears the effect so it can be inspected in full. */
+  .card-unused .card-thumb-link,
+  .card-unused .card-thumb,
+  .card-unused .card-placeholder,
+  .card-unused .link-thumb-wrap,
+  .card-unused .card-body,
+  .card-unused .card-link,
+  .card-unused .card-tag-chip,
+  .card-unused .card-tag{
+    filter:blur(1.6px) saturate(0.5);
+    opacity:0.7;
+    transition:filter 0.25s ease, opacity 0.25s ease;
+  }
+  .card-unused .card-title{ opacity:0.92; }        /* stays crisp for readability */
+  .card-unused{ background:linear-gradient(180deg, rgba(2,42,58,0.015), rgba(2,42,58,0.04)); }
+  .card-unused:hover .card-thumb-link,
+  .card-unused:hover .card-thumb,
+  .card-unused:hover .card-placeholder,
+  .card-unused:hover .link-thumb-wrap,
+  .card-unused:hover .card-body,
+  .card-unused:hover .card-link,
+  .card-unused:hover .card-tag-chip,
+  .card-unused:hover .card-tag{ filter:none; opacity:1; }
+  .card-unused:hover .card-title{ opacity:1; }
+  .card-unused-badge{
+    position:absolute;top:14px;left:14px;z-index:3;
+    display:inline-flex;align-items:center;
+    background:rgba(2,42,58,0.06);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    border:1px solid rgba(2,42,58,0.12);
+    border-radius:999px;padding:4px 10px;
+    font-family:var(--font-display);font-weight:600;font-size:9.5px;letter-spacing:0.06em;
+    text-transform:uppercase;color:var(--oryx-blue);
+  }
   .card-fav-btn{
     position:absolute;top:14px;right:14px;z-index:2;
     width:30px;height:30px;border-radius:50%;border:none;background:rgba(255,255,255,0.92);

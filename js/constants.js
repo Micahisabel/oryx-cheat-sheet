@@ -154,3 +154,28 @@ function shortcutBadgeHtml(key){
   if(!key) return '';
   return `<div class="card-placeholder"><span class="shortcut-key-text">${escapeHtml(key)}</span></div>`;
 }
+
+// --- "Already used" reference for Other AI Tools ------------------------------
+// Tools the team has actually used. Cards NOT listed here get a subtle frosted /
+// glass treatment (see .card-unused in cards.css) so it's clear at a glance which
+// tools are in use and which are not yet tried. Names are matched loosely
+// (case-insensitive, punctuation/spacing ignored) so "NotebookLM" == "Notebook LM".
+// An empty array means "none used yet" -> the whole category shows as unused.
+const USED_OTHER_TOOLS = {
+  'other-writing':    ['claude', 'chatgpt', 'gemini'],
+  'other-video':      ['kling', 'higgsfield'],
+  'other-images':     ['fal', 'nanobanana', 'chatgpt'],
+  'other-research':   ['notebooklm'],
+  'other-design':     ['canva', 'pomelli'],
+  'other-audio':      ['elevenlabs'],
+  'other-automation': []
+};
+function normalizeToolName(s){ return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+// Returns true when a card should render normally; false when it needs the glass effect.
+// Only Other AI Tools cards are governed — everything else is always "used" (unaffected).
+function isOtherToolUsed(entry){
+  if(!entry || !isOtherToolsCategory(entry.category)) return true;
+  const list = USED_OTHER_TOOLS[entry.category];
+  if(!list) return true;
+  return list.includes(normalizeToolName(entry.title));
+}
