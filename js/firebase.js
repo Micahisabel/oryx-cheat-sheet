@@ -14,11 +14,18 @@ const suggestionsCollection = db.collection('suggestions');
 const favoritesCollection = db.collection('favorites');
 const notificationSubsCollection = db.collection('notificationSubs');
 const adminStateCollection = db.collection('adminState');
-const deptFilesCollection = db.collection('departmentFiles');
-// Firebase Storage holds the actual uploaded files (the Firestore doc only holds the details
-// + download link). Requires the storage-compat script in index.html and Storage enabled in
-// the Firebase console (see the Department Files setup notes).
-const storage = firebase.storage();
+
+// --- Supabase (Department Files) -------------------------------------------------
+// Department Files are stored entirely in Supabase (a Postgres table + a public Storage
+// bucket), not Firebase — Supabase gives real file uploads on a free plan with no card.
+// This key is the public "publishable" key: safe to expose in client-side code. Access is
+// governed by the row-level rules on the department_files table and department-files bucket.
+const SUPABASE_URL = 'https://ylhdsvwzqcshffwohhfy.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_-8lQTmwPyAsmJXKATTcbpg_OtKG9qJF';
+const DEPT_FILES_BUCKET = 'department-files';
+const sbClient = (typeof supabase !== 'undefined')
+  ? supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+  : null;
 const AUTHOR_KEY = 'oryx-cheatsheet-author-name';
 // Google Apps Script Web App that forwards new requests to Slack — the real Slack webhook
 // lives only inside that script, never in this public client-side file.

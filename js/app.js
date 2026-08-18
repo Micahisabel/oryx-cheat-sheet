@@ -1,4 +1,4 @@
 applyAdminUI();
 listenForEntries();
 listenForOtherToolsUsage();
-listenForDeptFiles();
+loadDeptFiles();

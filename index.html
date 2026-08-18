@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.21";</script>
+<script>window.APP_VERSION = "2026-08-16.22";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="css/style.css?v=2">
 <link rel="stylesheet" href="css/layout.css?v=7">
 <link rel="stylesheet" href="css/sidebar.css?v=9">
@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="css/cards.css?v=15">
 <link rel="stylesheet" href="css/modal.css?v=21">
 <link rel="stylesheet" href="css/forms.css?v=15">
-<link rel="stylesheet" href="css/dept-files.css?v=1">
+<link rel="stylesheet" href="css/dept-files.css?v=2">
 <link rel="stylesheet" href="css/responsive.css?v=2">
 </head>
 <body>
@@ -618,7 +618,7 @@
   </div>
 </div>
 
-<script src="js/firebase.js?v=19"></script>
+<script src="js/firebase.js?v=20"></script>
 <script src="js/utils.js?v=23"></script>
 <script src="js/constants.js?v=32"></script>
 <script src="js/state.js?v=17"></script>
@@ -634,8 +634,8 @@
 <script src="js/activity.js?v=3"></script>
 <script src="js/review.js?v=15"></script>
 <script src="js/analytics.js?v=5"></script>
-<script src="js/dept-files.js?v=1"></script>
-<script src="js/app.js?v=17"></script>
+<script src="js/dept-files.js?v=2"></script>
+<script src="js/app.js?v=18"></script>
 
 <!-- Auto-update check. Polls version.json; if the deployed version is newer than the
      one this page loaded with (window.APP_VERSION), it reloads once with a cache-busting

@@ -1,7 +1,8 @@
 // ============= Department Files — a shared, per-department library of AI files =============
-// Files are stored in Firebase Storage; the details (title, description, department, download
-// link) live in the departmentFiles Firestore collection. Any signed-in staff member can add
-// a file; everyone can view, open, and download.
+// Files live entirely in Supabase: the actual file in the "department-files" Storage bucket,
+// and its details in the "department_files" table. Any signed-in staff member can add a file;
+// everyone can view, open, and download. (Sign-in is enforced in the app UI; Supabase itself
+// uses the public key, so keep this an internal-team feature.)
 
 const DEPARTMENTS = ['HR', 'Finance', 'Projects', 'Supply Chain', 'Design', 'Installation', 'Business Support'];
 const DEPT_FILE_MAX_BYTES = 25 * 1024 * 1024; // 25 MB
@@ -33,18 +34,31 @@ function formatBytes(bytes){
 function deptFileDate(ts){
   return ts ? new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '';
 }
+function mapDeptRow(r){
+  return {
+    id: r.id, title: r.title, description: r.description, department: r.department,
+    fileName: r.file_name, fileType: r.file_type, fileSize: r.file_size,
+    fileURL: r.file_url, storagePath: r.storage_path, uploadedBy: r.uploaded_by,
+    createdAt: r.created_at ? Date.parse(r.created_at) : 0
+  };
+}
 
-// ---- Live sync --------------------------------------------------------------
-function listenForDeptFiles(){
-  deptFilesCollection.orderBy('createdAt', 'desc').onSnapshot(
-    (snap) => {
-      deptFiles = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      const badge = document.querySelector('[data-platform-count="deptfiles"]');
-      if(badge) badge.textContent = deptFiles.length;
-      if(hubMainEl.classList.contains('dept-files-mode')) renderDeptFiles();
-    },
-    (err) => { console.error('Department files sync error:', err); }
-  );
+// ---- Load from Supabase -----------------------------------------------------
+async function loadDeptFiles(){
+  if(!sbClient) return;
+  try{
+    const { data, error } = await sbClient
+      .from('department_files')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if(error) throw error;
+    deptFiles = (data || []).map(mapDeptRow);
+    const badge = document.querySelector('[data-platform-count="deptfiles"]');
+    if(badge) badge.textContent = deptFiles.length;
+    if(hubMainEl.classList.contains('dept-files-mode')) renderDeptFiles();
+  }catch(e){
+    console.error('Department files load error:', e);
+  }
 }
 
 // ---- Enter / exit the full-page view ---------------------------------------
@@ -56,6 +70,7 @@ function enterDeptFilesMode(){
   hubMainEl.classList.add('dept-files-mode');
   if(typeof repositionAllTabIndicators === 'function') repositionAllTabIndicators();
   renderDeptFiles();
+  loadDeptFiles(); // refresh in case someone else added a file
 }
 function exitDeptFilesMode(){
   if(!hubMainEl.classList.contains('dept-files-mode')) return;
@@ -73,7 +88,7 @@ function deptFileCardHtml(f){
     ? `<a class="df-btn df-open" href="${url}" target="_blank" rel="noopener">Open</a>
        <a class="df-btn df-download" href="${url}" target="_blank" rel="noopener" download="${escapeHtml(f.fileName || 'file')}">Download</a>`
     : `<span class="df-btn df-missing">File unavailable</span>`;
-  const adminRemove = isAdmin ? `<button class="df-btn df-remove" data-id="${f.id}">Remove</button>` : '';
+  const adminRemove = isAdmin ? `<button class="df-btn df-remove" data-id="${escapeHtml(f.id)}">Remove</button>` : '';
   return `
     <div class="df-card">
       <div class="df-card-icon" style="background:${kind.color}">${kind.label}</div>
@@ -95,7 +110,7 @@ function renderDeptFiles(){
   }).join('');
 
   const deptsToShow = deptFilesFilter === 'all' ? DEPARTMENTS : [deptFilesFilter];
-  let sections = deptsToShow.map(dept => {
+  const sections = deptsToShow.map(dept => {
     const files = deptFiles.filter(f => f.department === dept);
     const body = files.length
       ? `<div class="df-grid">${files.map(deptFileCardHtml).join('')}</div>`
@@ -137,7 +152,6 @@ function fillDeptSelect(){
     sel.innerHTML = '<option value="">Choose a department…</option>' +
       DEPARTMENTS.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
   }
-  // If a department is filtered, pre-select it for convenience.
   if(deptFilesFilter !== 'all') sel.value = deptFilesFilter;
 }
 async function openDeptFileModal(){
@@ -155,11 +169,12 @@ function closeDeptFileModal(){ if(!deptFileUploading) deptFileOverlay.classList.
 
 async function submitDeptFile(){
   if(deptFileUploading) return;
+  if(!sbClient){ alert('The file service is not available right now. Please refresh and try again.'); return; }
+
   const title = document.getElementById('dfTitle').value.trim();
   const dept = document.getElementById('dfDept').value;
   const desc = document.getElementById('dfDesc').value.trim();
-  const fileInput = document.getElementById('dfFile');
-  const file = fileInput.files[0];
+  const file = document.getElementById('dfFile').files[0];
 
   const show = (id, on) => { document.getElementById(id).style.display = on ? 'block' : 'none'; };
   let ok = true;
@@ -177,7 +192,7 @@ async function submitDeptFile(){
   const user = firebase.auth().currentUser;
   const uploadedBy = (user && user.displayName) || 'Anonymous';
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const path = `departmentFiles/${dept}/${Date.now()}_${safeName}`;
+  const path = `${dept.replace(/[^a-zA-Z0-9]/g, '_')}/${Date.now()}_${safeName}`;
 
   deptFileUploading = true;
   const saveBtn = document.getElementById('saveDeptFile');
@@ -185,43 +200,37 @@ async function submitDeptFile(){
   const progWrap = document.getElementById('dfProgress');
   const progBar = document.getElementById('dfProgressBar');
   const progText = document.getElementById('dfProgressText');
-  progWrap.style.display = 'block'; progBar.style.width = '0%'; progText.textContent = 'Uploading…';
+  progWrap.style.display = 'block'; progBar.classList.add('indeterminate'); progText.textContent = 'Uploading…';
 
   try{
-    const ref = storage.ref().child(path);
-    const task = ref.put(file, { contentType: file.type || 'application/octet-stream' });
-    await new Promise((resolve, reject) => {
-      task.on('state_changed',
-        (snap) => {
-          const pct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 0;
-          progBar.style.width = pct + '%'; progText.textContent = 'Uploading… ' + pct + '%';
-        },
-        reject,
-        resolve
-      );
-    });
-    const url = await ref.getDownloadURL();
-    await deptFilesCollection.add({
+    const up = await sbClient.storage.from(DEPT_FILES_BUCKET)
+      .upload(path, file, { contentType: file.type || 'application/octet-stream', upsert: false });
+    if(up.error) throw up.error;
+
+    const { data: pub } = sbClient.storage.from(DEPT_FILES_BUCKET).getPublicUrl(path);
+    const fileURL = pub.publicUrl;
+
+    const ins = await sbClient.from('department_files').insert({
       title, description: desc, department: dept,
-      fileName: file.name, fileType: file.type || '', fileSize: file.size,
-      fileURL: url, storagePath: path,
-      uploadedBy, createdAt: Date.now()
+      file_name: file.name, file_type: file.type || '', file_size: file.size,
+      file_url: fileURL, storage_path: path, uploaded_by: uploadedBy
     });
+    if(ins.error) throw ins.error;
+
     deptFileUploading = false;
+    progBar.classList.remove('indeterminate');
     saveBtn.disabled = false; saveBtn.textContent = 'Add file';
     deptFileOverlay.classList.remove('open');
-    // Jump the view to the department we just added to.
     deptFilesFilter = dept;
+    await loadDeptFiles();
     if(hubMainEl.classList.contains('dept-files-mode')) renderDeptFiles();
   }catch(e){
     console.error('Department file upload failed:', e);
     deptFileUploading = false;
+    progBar.classList.remove('indeterminate');
     saveBtn.disabled = false; saveBtn.textContent = 'Add file';
     progWrap.style.display = 'none';
-    const msg = (e && e.code === 'storage/unauthorized')
-      ? 'Uploads are not switched on yet. Please ask the admin to enable file storage.'
-      : 'Sorry, the upload did not work. Check your connection and try again.';
-    alert(msg);
+    alert('Sorry, the upload did not work. Check your connection and try again.');
   }
 }
 
@@ -230,9 +239,12 @@ async function removeDeptFile(id){
   if(!f) return;
   if(!confirm('Remove this file for everyone? This cannot be undone.')) return;
   try{
-    if(f.storagePath){ try{ await storage.ref().child(f.storagePath).delete(); }catch(_){ /* file already gone */ } }
-    await deptFilesCollection.doc(id).delete();
+    if(f.storagePath){ await sbClient.storage.from(DEPT_FILES_BUCKET).remove([f.storagePath]); }
+    const del = await sbClient.from('department_files').delete().eq('id', id);
+    if(del.error) throw del.error;
+    await loadDeptFiles();
   }catch(e){
+    console.error('Department file remove failed:', e);
     alert('Could not remove the file. Check your connection and try again.');
   }
 }
