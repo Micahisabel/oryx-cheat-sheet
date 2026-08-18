@@ -165,7 +165,8 @@ function render(){
   const libraryEntries = entries.filter(e => !isShortcutCategory(e.category));
   const shortcutEntries = entries.filter(e => isShortcutCategory(e.category));
 
-  if(viewMode === 'shortcuts'){
+  if(viewMode === 'shortcuts' || activePlatform !== 'all'){
+    // Recently Added only appears under All Platforms, not in the Claude/ChatGPT views.
     recentStrip.style.display = 'none';
   }else{
     renderRecentStrip(libraryEntries);
