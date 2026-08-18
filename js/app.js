@@ -1,2 +1,3 @@
 applyAdminUI();
 listenForEntries();
+listenForOtherToolsUsage();

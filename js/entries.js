@@ -42,6 +42,37 @@ function listenForEntries(){
   );
 }
 
+// Live-sync the admin "used / not used" overrides for Other AI Tools. Runs for every
+// visitor (not just admins) so the glass effect reflects the latest choice for everyone.
+function listenForOtherToolsUsage(){
+  adminStateCollection.doc('otherToolsUsage').onSnapshot(
+    (doc) => {
+      const data = doc.data();
+      otherToolsUsage = (data && data.map) || {};
+      render();
+    },
+    (err) => { console.error('Other-tools usage sync error:', err); }
+  );
+}
+
+// Admin action: flip an Other AI Tools card between "used" (crisp) and "not used" (glass).
+const usageToggleInFlight = new Set();
+async function toggleOtherToolUsed(id){
+  if(usageToggleInFlight.has(id)) return;
+  const entry = entries.find(e => e.id === id);
+  if(!entry) return;
+  usageToggleInFlight.add(id);
+  const next = !isOtherToolUsed(entry);
+  try{
+    // Nested-map merge updates just this id without disturbing the others.
+    await adminStateCollection.doc('otherToolsUsage').set({ map: { [id]: next } }, { merge: true });
+  }catch(e){
+    alert('Could not update the used status. Check your connection and try again.');
+  }finally{
+    usageToggleInFlight.delete(id);
+  }
+}
+
 function detectPlatform(url){
   try{
     const host = new URL(url).hostname.replace(/^www\./, '');
@@ -306,6 +337,10 @@ function render(){
     // Other AI Tools the team hasn't used yet get a subtle frosted/glass look.
     const isUnusedTool = isOtherToolsCategory(e.category) && !isOtherToolUsed(e);
     const unusedBadgeHtml = isUnusedTool ? `<span class="card-unused-badge">Not used yet</span>` : '';
+    // Admin-only control to mark an Other AI Tools card used / not used.
+    const usedToggleHtml = (isAdmin && isOtherToolsCategory(e.category))
+      ? `<button class="card-used-toggle${isUnusedTool ? '' : ' is-used'}" data-id="${e.id}">${isUnusedTool ? 'Mark used' : 'Mark unused'}</button>`
+      : '';
     return `
       <div class="card${isUnusedTool ? ' card-unused' : ''}" data-id="${e.id}">
         ${platformBadgeHtml}
@@ -319,7 +354,7 @@ function render(){
         ${linkHtml}
         <div class="card-footer">
           <span>${escapeHtml(e.author || 'Anonymous')} · ${dateStr}</span>
-          ${isAdmin ? `<span class="card-admin-actions"><button class="card-edit" data-id="${e.id}">Edit</button><button class="card-del" data-id="${e.id}">Remove</button></span>` : ''}
+          ${isAdmin ? `<span class="card-admin-actions">${usedToggleHtml}<button class="card-edit" data-id="${e.id}">Edit</button><button class="card-del" data-id="${e.id}">Remove</button></span>` : ''}
         </div>
       </div>
     `;
@@ -342,6 +377,13 @@ function render(){
     btn.addEventListener('click', (ev) => {
       ev.stopPropagation();
       toggleFavorite(btn.dataset.id);
+    });
+  });
+
+  grid.querySelectorAll('.card-used-toggle').forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      toggleOtherToolUsed(btn.dataset.id);
     });
   });
 

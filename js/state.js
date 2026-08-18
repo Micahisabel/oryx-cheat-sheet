@@ -1,4 +1,8 @@
 let entries = [];
+// Admin overrides for whether an Other AI Tools card shows as "used" (no glass) or not.
+// Keyed by entry id -> boolean. Lives in adminState/otherToolsUsage. When an id is absent
+// here, isOtherToolUsed() falls back to the USED_OTHER_TOOLS code list in constants.js.
+let otherToolsUsage = {};
 let activeCat = 'skills';
 let activePlatform = 'all';
 let searchTerm = '';

@@ -83,6 +83,14 @@
   .card-edit:hover{background:var(--line-soft);color:var(--oryx-blue);}
   .card-del{background:#fbeceb;color:#8a2b2b;}
   .card-del:hover{background:#f5d9d7;}
+  /* Admin toggle: mark an Other AI Tools card used / not used. */
+  .card-used-toggle{
+    border:none;border-radius:7px;padding:5px 10px;cursor:pointer;
+    font-family:var(--font-display);font-weight:600;font-size:11px;
+    background:var(--panel);color:#5b6b72;transition:background 0.15s ease, color 0.15s ease;
+  }
+  .card-used-toggle:hover{background:var(--line-soft);color:var(--oryx-blue);}
+  .card-used-toggle.is-used{background:rgba(2,42,58,0.08);color:var(--oryx-blue);}
   .card-platform-badge{
     position:absolute;top:14px;left:14px;z-index:2;
     display:inline-flex;align-items:center;gap:6px;

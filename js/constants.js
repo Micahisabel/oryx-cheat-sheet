@@ -175,6 +175,11 @@ function normalizeToolName(s){ return String(s || '').toLowerCase().replace(/[^a
 // Only Other AI Tools cards are governed — everything else is always "used" (unaffected).
 function isOtherToolUsed(entry){
   if(!entry || !isOtherToolsCategory(entry.category)) return true;
+  // An admin toggle (stored in adminState/otherToolsUsage) always wins.
+  if(typeof otherToolsUsage !== 'undefined' && typeof otherToolsUsage[entry.id] === 'boolean'){
+    return otherToolsUsage[entry.id];
+  }
+  // Otherwise fall back to the code-list default.
   const list = USED_OTHER_TOOLS[entry.category];
   if(!list) return true;
   return list.includes(normalizeToolName(entry.title));
