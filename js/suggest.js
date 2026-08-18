@@ -10,7 +10,7 @@ function updateSuggestMode(){
   discoveryFields.style.display = isDiscovery ? '' : 'none';
   requestFields.style.display = isDiscovery ? 'none' : '';
   suggestSub.textContent = isDiscovery
-    ? 'Share a useful link — it publishes to Video Discoveries right away, no approval needed.'
+    ? 'Share a useful link — it publishes to the Video section right away, no approval needed.'
     : 'Describe what you need — the admin will build it, test it, and publish it.';
   saveSuggestBtn.textContent = isDiscovery ? 'Publish discovery' : 'Send request';
 }
@@ -447,7 +447,7 @@ async function submitDiscovery(){
     });
     markSubmitted();
     closeSuggestPanel();
-    alert('Published! Your discovery is live in the Video Discoveries section.');
+    alert('Published! Your video is live in the Video section.');
   }catch(e){
     alert('Could not publish that discovery. Check your connection and try again.');
   }finally{
