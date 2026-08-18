@@ -12,6 +12,18 @@
     transition:color 0.15s ease;
   }
   .cat-explainer-link:hover{color:var(--oryx-blue-tint);}
+  .cat-explainer-legend{
+    display:flex;align-items:flex-start;gap:8px;
+    margin-top:12px;padding-top:12px;border-top:1px solid rgba(2,42,58,0.10);
+    font-size:12.5px;line-height:1.5;color:#5b6b72;
+  }
+  .cat-explainer-legend::before{
+    content:"";flex-shrink:0;width:26px;height:16px;margin-top:1px;border-radius:5px;
+    background:linear-gradient(180deg, rgba(2,42,58,0.10), rgba(2,42,58,0.20));
+    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+    border:1px solid rgba(2,42,58,0.14);
+    filter:blur(0.4px);
+  }
 
   /* ---------- Grid ---------- */
   .count-row{

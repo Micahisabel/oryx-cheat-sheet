@@ -275,12 +275,18 @@ function render(){
       }
     }
   }
-  if(explainer){
+  // In the Other AI Tools view, explain what the faded/glass cards mean so every
+  // staff member understands it at a glance — no separate announcement needed.
+  const showOtherLegend = !searchTerm && viewMode !== 'shortcuts' && activePlatform === 'other';
+  const legendHtml = showOtherLegend
+    ? `<span class="cat-explainer-legend">Faded tools are ones we're still exploring — not in regular use yet. Clear tools are already in use.</span>`
+    : '';
+  if(explainer || legendHtml){
     // Content is developer-defined constants, but escape anyway to keep the innerHTML sink safe.
     const linkHtml = link
       ? `<a class="cat-explainer-link" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`
       : '';
-    catExplainer.innerHTML = escapeHtml(explainer) + linkHtml;
+    catExplainer.innerHTML = (explainer ? escapeHtml(explainer) + linkHtml : '') + legendHtml;
     catExplainer.style.display = '';
   }else{
     catExplainer.style.display = 'none';
