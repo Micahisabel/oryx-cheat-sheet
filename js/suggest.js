@@ -387,6 +387,7 @@ function closeSuggestPanel(){
   document.getElementById('dLink').value = '';
   document.getElementById('dPlatform').value = 'claude';
   dOtherCategoryField.style.display = 'none';
+  clearSuggestDepartments();
   document.getElementById('sTitle').value = '';
   document.getElementById('sText').value = '';
   document.getElementById('sType').value = 'Skill';
@@ -411,6 +412,23 @@ function markSubmitted(){
 openSuggest.addEventListener('click', openSuggestPanel);
 document.getElementById('closeSuggest').addEventListener('click', closeSuggestPanel);
 document.getElementById('cancelSuggest').addEventListener('click', closeSuggestPanel);
+
+// Departments chip picker for the Suggest form (mirrors the Add/Edit one).
+const dDeptPickerEl = document.getElementById('dDepartments');
+if(dDeptPickerEl){
+  dDeptPickerEl.innerHTML = LIBRARY_DEPARTMENTS.map(d =>
+    `<button type="button" class="dept-chip" data-dept="${escapeHtml(d)}">${escapeHtml(d)}</button>`
+  ).join('');
+  dDeptPickerEl.querySelectorAll('.dept-chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('selected'));
+  });
+}
+function getSuggestDepartments(){
+  return dDeptPickerEl ? [...dDeptPickerEl.querySelectorAll('.dept-chip.selected')].map(c => c.dataset.dept) : [];
+}
+function clearSuggestDepartments(){
+  if(dDeptPickerEl) dDeptPickerEl.querySelectorAll('.dept-chip.selected').forEach(c => c.classList.remove('selected'));
+}
 
 async function submitDiscovery(){
   if(document.getElementById('sWebsite').value.trim()){ closeSuggestPanel(); return; }
@@ -437,19 +455,37 @@ async function submitDiscovery(){
   const name = getVerifiedName();
 
   saveSuggestBtn.disabled = true; saveSuggestBtn.textContent = 'Publishing…';
+  const departments = getSuggestDepartments().join(', ');
   try{
     // The Firestore rule for entries/create (isValidDiscovery) requires category to be
     // 'discoveries' or match '^other-.*' — keep #dOtherCategory option values prefixed
     // with 'other-', or staff writes for that category will fail with permission-denied.
-    await entriesCollection.add({
+    const payload = {
       category: platform === 'other' ? otherCategory : 'discoveries', title, body: desc, link,
       platform, author: name || 'Anonymous', authorEmail: firebase.auth().currentUser.email, createdAt: Date.now()
-    });
-    markSubmitted();
-    closeSuggestPanel();
-    alert('Published! Your video is live in the Video section.');
+    };
+    // Department is optional. The strict isValidDiscovery rule may not allow this extra field
+    // yet, so if the write is refused we retry without it — the resource still publishes,
+    // just untagged — and tell the user rather than failing the whole submission.
+    if(departments) payload.department = departments;
+    try{
+      await entriesCollection.add(payload);
+      markSubmitted();
+      closeSuggestPanel();
+      alert('Published! Your resource is now live.');
+    }catch(e){
+      if(departments && e && e.code === 'permission-denied'){
+        delete payload.department;
+        await entriesCollection.add(payload);
+        markSubmitted();
+        closeSuggestPanel();
+        alert('Published! (The department tag could not be saved yet — an admin needs to switch it on. Everything else is live.)');
+      }else{
+        throw e;
+      }
+    }
   }catch(e){
-    alert('Could not publish that discovery. Check your connection and try again.');
+    alert('Could not publish that resource. Check your connection and try again.');
   }finally{
     saveSuggestBtn.disabled = false; updateSuggestMode();
   }
