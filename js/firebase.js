@@ -14,6 +14,11 @@ const suggestionsCollection = db.collection('suggestions');
 const favoritesCollection = db.collection('favorites');
 const notificationSubsCollection = db.collection('notificationSubs');
 const adminStateCollection = db.collection('adminState');
+const deptFilesCollection = db.collection('departmentFiles');
+// Firebase Storage holds the actual uploaded files (the Firestore doc only holds the details
+// + download link). Requires the storage-compat script in index.html and Storage enabled in
+// the Firebase console (see the Department Files setup notes).
+const storage = firebase.storage();
 const AUTHOR_KEY = 'oryx-cheatsheet-author-name';
 // Google Apps Script Web App that forwards new requests to Slack — the real Slack webhook
 // lives only inside that script, never in this public client-side file.
