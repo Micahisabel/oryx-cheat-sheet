@@ -10,7 +10,7 @@ function openNoteDetail(entry){
   const safeLink = entry.link && isValidLink(entry.link) ? entry.link : '';
   const thumbInner = entry.link ? linkThumbHtml(entry.link) : '';
   const thumbHtml = safeLink ? `<a class="card-thumb-link" href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${thumbInner}</a>` : '';
-  const titleFaviconUrl = isOtherToolsCategory(entry.category) && entry.link ? faviconUrlForLink(entry.link) : null;
+  const titleFaviconUrl = (isOtherToolsCategory(entry.category) || entry.category === 'mcps') && entry.link ? faviconUrlForLink(entry.link) : null;
   const titleLogoHtml = titleFaviconUrl
     ? `<img class="skill-title-logo" src="${titleFaviconUrl}" alt="" onerror="this.style.display='none';">`
     : '';
