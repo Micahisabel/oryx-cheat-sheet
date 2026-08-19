@@ -5,6 +5,7 @@ const CATEGORY_LABELS = {
   agents: 'Assistant',
   mcps: 'Connection',
   plugins: 'Plugin',
+  instructions: 'Instruction',
   discoveries: 'Video',
   'other-tools': 'Other AI Tool',
   'other-writing': 'Writing',
@@ -42,6 +43,7 @@ const CATEGORY_PLURAL_LABELS = {
   agents: 'Assistants',
   mcps: 'Connections',
   plugins: 'Plugins',
+  instructions: 'Instructions',
   discoveries: 'Video',
   'other-tools': 'Other AI Tools',
   'other-writing': 'Writing',
@@ -69,6 +71,7 @@ const CATEGORY_EXPLAINERS = {
     agents: 'A Claude AI Agent is like a worker that can handle a task for you. You give it a goal, and it can work through the steps needed to complete it.',
     mcps: 'A Claude MCP is like a bridge that connects Claude to other tools or systems. It allows Claude to access information or use tools outside of the chat.',
     plugins: 'A Claude Plugin is like an extra tool for Claude. It adds new abilities or makes it easier to connect Claude with other tools and services.',
+    instructions: 'Simple, step-by-step guides that show you how to do things here. Follow them one step at a time — written in plain words so anyone can follow along.',
     discoveries: 'Short and useful videos that help the team learn new Claude features, tips, shortcuts, and ways to use Claude at work.'
   },
   chatgpt: {
@@ -76,6 +79,7 @@ const CATEGORY_EXPLAINERS = {
     agents: 'A ChatGPT AI Agent is like a worker that can handle a task for you. You give it a goal, and it can take several steps to work toward completing it.',
     mcps: 'A ChatGPT MCP is like a bridge that connects ChatGPT to other tools or systems. It allows ChatGPT to work with information and services outside of the chat.',
     plugins: 'A ChatGPT Plugin is like an extra tool that gives ChatGPT additional abilities or connects it to other services.',
+    instructions: 'Simple, step-by-step guides that show you how to do things here. Follow them one step at a time — written in plain words so anyone can follow along.',
     discoveries: 'Short and useful videos that help the team learn new ChatGPT features, tips, shortcuts, and ways to use ChatGPT at work.'
   },
   other: {
@@ -120,6 +124,7 @@ const CATEGORY_ICON_PATHS = {
   commands: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/>',
   agents: '<rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4M9 4h6"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/>',
   mcps: '<path d="M9 2v6M15 2v6M6 8h12v3a6 6 0 0 1-12 0zM12 17v5"/>',
+  instructions: '<path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h6"/>',
   plugins: '<path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4a2 2 0 0 0-2 2v3.8h1.5a2.7 2.7 0 0 1 0 5.4H2V20a2 2 0 0 0 2 2h3.8v-1.5a2.7 2.7 0 0 1 5.4 0V22H17a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"/>',
   discoveries: '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
   'other-tools': '<path d="M12 3l2.1 4.9L19 10l-4.9 2.1L12 17l-2.1-4.9L5 10l4.9-2.1z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/>',

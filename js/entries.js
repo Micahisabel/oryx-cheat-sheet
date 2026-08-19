@@ -158,6 +158,7 @@ function renderRecentStrip(libraryEntries){
   const now = Date.now();
   const recent = libraryEntries
     .filter(e => e.createdAt && (now - e.createdAt) <= RECENT_STRIP_WINDOW_MS)
+    .filter(e => isAdmin || e.category !== 'skills')
     .sort((a,b) => b.createdAt - a.createdAt)
     .slice(0, RECENT_STRIP_MAX);
 
@@ -249,6 +250,8 @@ function render(){
     filtered = libraryEntries.filter(e => {
       const platformMatch = activePlatform === 'all' || (e.platform || 'claude') === activePlatform;
       if(!platformMatch) return false;
+      // Skills are admin-only — keep them out of non-admin views, Recently Added, and search.
+      if(!isAdmin && e.category === 'skills') return false;
       // Department filter — works alongside search (e.g. "Excel" + Finance).
       if(activeDepartment !== 'all' && !entryDepartments(e).includes(activeDepartment)) return false;
       if(!searchTerm){

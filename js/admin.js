@@ -20,6 +20,10 @@ function applyAdminUI(){
   document.querySelectorAll('[data-cat="shortcut-code"], [data-cat="chatgpt-shortcut-code"]').forEach(btn => {
     btn.style.display = isAdmin ? '' : 'none';
   });
+  // Skills are managed by admins — staff use the "Instruction" tab instead.
+  document.querySelectorAll('.cat-tab[data-cat="skills"]').forEach(btn => {
+    btn.style.display = isAdmin ? '' : 'none';
+  });
   updateAddShortcutVisibility();
   render();  // re-render cards so Remove buttons show/hide
 }

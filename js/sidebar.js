@@ -60,7 +60,7 @@ function exitShortcutsMode(){
     otherToolsNav.style.display = 'flex';
     otherToolsNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
   }else{
-    activeCat = 'skills';
+    activeCat = 'instructions';
     sideNav.style.display = '';
     otherToolsNav.style.display = 'none';
     sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
@@ -156,9 +156,9 @@ platformNav.addEventListener('click', (ev) => {
     otherToolsNav.style.display = 'flex';
     otherToolsNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
   } else {
-    // Claude / ChatGPT — always land on the Skills tab so the view is consistent
-    // (and the category explainer shows) instead of keeping a stale/"all" selection.
-    activeCat = 'skills';
+    // Claude / ChatGPT — always land on the Instruction tab (visible to everyone) so the
+    // view is consistent and the category explainer shows, instead of a stale/"all" selection.
+    activeCat = 'instructions';
     sideNav.style.display = '';
     otherToolsNav.style.display = 'none';
     sideNav.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));

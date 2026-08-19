@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.27";</script>
+<script>window.APP_VERSION = "2026-08-16.28";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -177,7 +177,8 @@
       </nav>
       <nav class="cat-tabbar" id="sideNav">
         <div class="cat-tab-indicator"></div>
-        <button class="cat-tab active" data-cat="skills"><span class="cat-icon"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.9L21 11l-6.6 2.1L12 20l-2.4-6.9L3 11l6.6-2.1z"/></svg></span>Skills<span class="cat-badge" data-count-for="skills">0</span></button>
+        <button class="cat-tab active" data-cat="instructions"><span class="cat-icon"><svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h6"/></svg></span>Instruction<span class="cat-badge" data-count-for="instructions">0</span></button>
+        <button class="cat-tab" data-cat="skills"><span class="cat-icon"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.9L21 11l-6.6 2.1L12 20l-2.4-6.9L3 11l6.6-2.1z"/></svg></span>Skills<span class="cat-badge" data-count-for="skills">0</span></button>
         <button class="cat-tab" data-cat="discoveries"><span class="cat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg></span>Video<span class="cat-badge" data-count-for="discoveries">0</span></button>
         <button class="cat-tab" data-cat="commands" style="display:none;"><span class="cat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg></span>Commands<span class="cat-badge" data-count-for="commands">0</span></button>
         <button class="cat-tab" data-cat="agents"><span class="cat-icon"><svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4M9 4h6"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/></svg></span>Assistants<span class="cat-tab-tag">AI Agent</span><span class="cat-badge" data-count-for="agents">0</span></button>
@@ -275,6 +276,7 @@
       <option value="agents">AI Agent</option>
       <option value="mcps">MCP</option>
       <option value="plugins">Plugin</option>
+      <option value="instructions">Instruction</option>
       <option value="discoveries">Video</option>
       <optgroup label="Other AI Tool">
         <option value="other-writing">Writing</option>
@@ -632,14 +634,14 @@
 
 <script src="js/firebase.js?v=20"></script>
 <script src="js/utils.js?v=23"></script>
-<script src="js/constants.js?v=34"></script>
-<script src="js/state.js?v=18"></script>
-<script src="js/sidebar.js?v=27"></script>
-<script src="js/entries.js?v=38"></script>
+<script src="js/constants.js?v=35"></script>
+<script src="js/state.js?v=19"></script>
+<script src="js/sidebar.js?v=28"></script>
+<script src="js/entries.js?v=39"></script>
 <script src="js/skill-detail.js?v=28"></script>
 <script src="js/add-entry.js?v=22"></script>
 <script src="js/shortcuts-form.js?v=18"></script>
-<script src="js/admin.js?v=21"></script>
+<script src="js/admin.js?v=22"></script>
 <script src="js/suggest.js?v=31"></script>
 <script src="js/favorites.js?v=4"></script>
 <script src="js/notifications.js?v=7"></script>

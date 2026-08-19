@@ -3,7 +3,7 @@ let entries = [];
 // Keyed by entry id -> boolean. Lives in adminState/otherToolsUsage. When an id is absent
 // here, isOtherToolUsed() falls back to the USED_OTHER_TOOLS code list in constants.js.
 let otherToolsUsage = {};
-let activeCat = 'skills';
+let activeCat = 'instructions';
 let activePlatform = 'all';
 let searchTerm = '';
 let activeDepartment = 'all';
