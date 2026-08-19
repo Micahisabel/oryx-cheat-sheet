@@ -54,7 +54,7 @@ function openNoteDetail(entry){
         + detailList([{label: 'Example Output', value: entry.exampleOutput}]))
       + detailSection('Setup',
         detailList([{label: 'How to Install and Use It in Claude', value: entry.howToAccess}])
-        + detailParagraph(INSTALL_HELP_TEXT))
+        + (entry.category === 'mcps' ? '' : detailParagraph(INSTALL_HELP_TEXT)))
       + detailSection('Tips',
         detailList([{label: 'Notes', value: entry.notes}])
         + detailTipParagraph('How This Helps Oryx Doors & Windows', entry.oryxTip));
@@ -84,7 +84,7 @@ function openNoteDetail(entry){
     + optionalBlock('Last edited by', lastEditedStr);
 
   if(!isLinkResource){
-    const isSkillFile = isRichCategory(entry.category);
+    const isSkillFile = isRichCategory(entry.category) && entry.category !== 'mcps';
     html += `
       <div class="skill-download-bar">
         <h3>${isSkillFile ? 'Download this Claude Skill' : 'Download this entry'}</h3>
