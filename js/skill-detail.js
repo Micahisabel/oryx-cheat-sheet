@@ -42,6 +42,7 @@ function openNoteDetail(entry){
   }
 
   const isLinkResource = entry.category === 'discoveries' || isOtherToolsCategory(entry.category);
+  const isInstruction = entry.category === 'instructions';
 
   if(isRichCategory(entry.category)){
     html += detailSection('Overview', detailList([
@@ -69,8 +70,10 @@ function openNoteDetail(entry){
       + copyableBlock('Example', entry.example, 'detail-value mono', 'example')
       + optionalBlock('Notes', entry.notes);
   } else {
+    const howTitle = isLinkResource ? 'How to Use' : (isInstruction ? 'Make it your own' : 'How to Download');
+    const howText = isLinkResource ? USE_LINK_HELP_TEXT : (isInstruction ? INSTRUCTION_HELP_TEXT : DOWNLOAD_HELP_TEXT);
     html += optionalBlock('Details', entry.body)
-      + detailBlock(isLinkResource ? 'How to Use' : 'How to Download', isLinkResource ? USE_LINK_HELP_TEXT : DOWNLOAD_HELP_TEXT);
+      + detailBlock(howTitle, howText);
   }
 
   const lastEditedStr = entry.lastEditedBy
@@ -87,10 +90,12 @@ function openNoteDetail(entry){
     const isSkillFile = isRichCategory(entry.category) && entry.category !== 'mcps';
     html += `
       <div class="skill-download-bar">
-        <h3>${isSkillFile ? 'Download this Claude Skill' : 'Download this entry'}</h3>
+        <h3>${isSkillFile ? 'Download this Claude Skill' : (isInstruction ? 'Download & make it your own' : 'Download this entry')}</h3>
         <p>${isSkillFile
           ? 'Get a ready-to-use SKILL.md file — drop it into a folder named after the skill and Claude can run it directly, no copy-pasting needed.'
-          : 'Save this entry as a Markdown (.md) file to keep, share, or upload into Claude.'}</p>
+          : (isInstruction
+            ? 'Download this guide, then edit it to match your working style — add your own steps, notes, or examples.'
+            : 'Save this entry as a Markdown (.md) file to keep, share, or upload into Claude.')}</p>
         <button class="download-btn" id="downloadSkill">${DOWNLOAD_ICON_SVG} ${isSkillFile ? 'Download SKILL.md' : `Download ${escapeHtml(CATEGORY_LABELS[entry.category] || 'Entry')} (.md)`}</button>
       </div>`;
   }

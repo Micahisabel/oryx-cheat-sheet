@@ -173,6 +173,7 @@ function platformMeta(platform){
 }
 
 const DOWNLOAD_HELP_TEXT = 'Click the "Download Skill (.md)" button at the bottom of this page. The file saves to your device as a Markdown (.md) file you can open, edit, or share with the team.';
+const INSTRUCTION_HELP_TEXT = 'This guide is yours to adapt. Download it with the button below, then change it to fit the way you and your team work — add your own steps, wording, or examples. When it is helpful, share your version back with the team.';
 const USE_LINK_HELP_TEXT = 'Open the link above to visit this tool.';
 const INSTALL_HELP_TEXT = 'Click "Download SKILL.md" below, then put the file in its own folder named after the skill (e.g. showroom-follow-up/SKILL.md) inside your Claude Skills folder, or upload that folder into a Claude Project. Claude will read it and offer the skill automatically — no copy-pasting needed. To try it right away without installing, just paste the sample prompt above into a new Claude chat.';
 
