@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.28";</script>
+<script>window.APP_VERSION = "2026-08-16.30";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,7 +39,7 @@
     <div class="header-actions">
       <span class="stat-pill">Total Entries: <strong id="totalCount">0</strong></span>
       <span class="sync-status" id="syncStatus">Connecting…</span>
-      <button class="add-btn" id="openSuggest">+ Suggest a Resource</button>
+      <button class="add-btn" id="openSuggest">+ Share a Resource</button>
       <button class="btn-outline" id="openReview" style="display:none;">Review <span class="review-count" id="reviewCount">0</span></button>
       <button class="add-btn" id="openAdd" style="display:none;">+ Add Entry</button>
     </div>
@@ -417,8 +417,8 @@
 <div class="overlay" id="suggestOverlay">
   <div class="panel">
     <button class="close-x" id="closeSuggest">&times;</button>
-    <h2>Suggest a Resource</h2>
-    <p class="sub" id="suggestSub">Found something useful, or want a new skill built? Choose which below.</p>
+    <h2>Share a Resource</h2>
+    <p class="sub" id="suggestSub">Found something useful? Share it with the team below.</p>
 
     <!-- Mode selector hidden for now — the "Request something new" flow is disabled, so the
          panel stays in discovery mode. Restore by removing the two display:none styles below. -->
@@ -431,18 +431,25 @@
     <input type="text" id="sWebsite" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true">
 
     <div id="discoveryFields">
-      <label for="dTitle">Resource title</label>
+      <label for="dShareType">What are you sharing?</label>
+      <select id="dShareType">
+        <option value="resource">A tool or resource I found</option>
+        <option value="instruction">An instruction / how-to guide</option>
+      </select>
+
+      <label for="dTitle" id="dTitleLabel">Resource title</label>
       <input type="text" id="dTitle" placeholder="e.g. the title of the video or article">
       <div class="field-error" id="errDTitle">Give it a title.</div>
 
-      <label for="dDesc">Short description</label>
+      <label for="dDesc" id="dDescLabel">Short description</label>
       <textarea id="dDesc" placeholder="A sentence on why it's useful"></textarea>
       <div class="field-error" id="errDDesc">Add a short description.</div>
 
-      <label for="dLink">Resource link</label>
+      <label for="dLink" id="dLinkLabel">Resource link</label>
       <input type="text" id="dLink" placeholder="https://…">
       <div class="field-error" id="errDLink">Add the link.</div>
 
+      <div id="dPlatformField">
       <label for="dPlatform">Platform</label>
       <select id="dPlatform">
         <option value="claude">Claude</option>
@@ -461,6 +468,7 @@
           <option value="other-audio">Audio</option>
           <option value="other-automation">Automation</option>
         </select>
+      </div>
       </div>
 
       <label>Departments <span class="optional-tag">(optional — who is this useful for?)</span></label>
@@ -642,7 +650,7 @@
 <script src="js/add-entry.js?v=22"></script>
 <script src="js/shortcuts-form.js?v=18"></script>
 <script src="js/admin.js?v=22"></script>
-<script src="js/suggest.js?v=31"></script>
+<script src="js/suggest.js?v=32"></script>
 <script src="js/favorites.js?v=4"></script>
 <script src="js/notifications.js?v=7"></script>
 <script src="js/activity.js?v=3"></script>

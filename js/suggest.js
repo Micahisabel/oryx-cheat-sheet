@@ -22,6 +22,32 @@ dPlatform.addEventListener('change', () => {
   dOtherCategoryField.style.display = dPlatform.value === 'other' ? '' : 'none';
 });
 
+// Share type: "resource" (a link staff found) vs "instruction" (a how-to guide).
+// Instructions publish to the Instruction section, need no link, and have no platform choice.
+const dShareType = document.getElementById('dShareType');
+const dPlatformField = document.getElementById('dPlatformField');
+function updateShareType(){
+  const isInstruction = dShareType.value === 'instruction';
+  document.getElementById('dTitleLabel').textContent = isInstruction ? 'Instruction title' : 'Resource title';
+  document.getElementById('dDescLabel').textContent = isInstruction ? 'The steps — what to do' : 'Short description';
+  document.getElementById('dLinkLabel').innerHTML = isInstruction
+    ? 'Link <span class="optional-tag">(optional)</span>'
+    : 'Resource link';
+  document.getElementById('dTitle').placeholder = isInstruction
+    ? 'e.g. How to log a showroom enquiry'
+    : 'e.g. the title of the video or article';
+  document.getElementById('dDesc').placeholder = isInstruction
+    ? 'Write the steps, one per line'
+    : "A sentence on why it's useful";
+  dPlatformField.style.display = isInstruction ? 'none' : '';
+  document.getElementById('errDLink').style.display = 'none';
+  suggestSub.textContent = isInstruction
+    ? 'Share a step-by-step guide — it publishes to the Instruction section right away, no approval needed.'
+    : 'Share a useful link — it publishes to the Video section right away, no approval needed.';
+  saveSuggestBtn.textContent = isInstruction ? 'Publish instruction' : 'Publish discovery';
+}
+dShareType.addEventListener('change', updateShareType);
+
 function getVerifiedName(){
   const user = firebase.auth().currentUser;
   return user ? (user.displayName || user.email) : '';
@@ -379,6 +405,8 @@ function openSuggestPanel(){
   suggestOverlay.classList.add('open');
   sMode.value = 'discovery';
   updateSuggestMode();
+  dShareType.value = 'resource';
+  updateShareType();
 }
 function closeSuggestPanel(){
   suggestOverlay.classList.remove('open');
@@ -386,6 +414,7 @@ function closeSuggestPanel(){
   document.getElementById('dDesc').value = '';
   document.getElementById('dLink').value = '';
   document.getElementById('dPlatform').value = 'claude';
+  dShareType.value = 'resource';
   dOtherCategoryField.style.display = 'none';
   clearSuggestDepartments();
   document.getElementById('sTitle').value = '';
@@ -439,11 +468,13 @@ async function submitDiscovery(){
   const link = document.getElementById('dLink').value.trim();
   const platform = document.getElementById('dPlatform').value;
   const otherCategory = document.getElementById('dOtherCategory').value;
+  const isInstruction = dShareType.value === 'instruction';
 
   let ok = true;
   if(!title){ document.getElementById('errDTitle').style.display = 'block'; ok = false; } else document.getElementById('errDTitle').style.display = 'none';
   if(!desc){ document.getElementById('errDDesc').style.display = 'block'; ok = false; } else document.getElementById('errDDesc').style.display = 'none';
-  if(!link){ document.getElementById('errDLink').style.display = 'block'; ok = false; } else document.getElementById('errDLink').style.display = 'none';
+  // A link is required for a found resource, but optional for an instruction / how-to.
+  if(!isInstruction && !link){ document.getElementById('errDLink').style.display = 'block'; ok = false; } else document.getElementById('errDLink').style.display = 'none';
   if(link && !isValidLink(link)){
     alert('That link doesn\'t look valid. Make sure it starts with https://');
     ok = false;
@@ -461,8 +492,10 @@ async function submitDiscovery(){
     // 'discoveries' or match '^other-.*' — keep #dOtherCategory option values prefixed
     // with 'other-', or staff writes for that category will fail with permission-denied.
     const payload = {
-      category: platform === 'other' ? otherCategory : 'discoveries', title, body: desc, link,
-      platform, author: name || 'Anonymous', authorEmail: firebase.auth().currentUser.email, createdAt: Date.now()
+      category: isInstruction ? 'instructions' : (platform === 'other' ? otherCategory : 'discoveries'),
+      title, body: desc, link,
+      platform: isInstruction ? 'claude' : platform,
+      author: name || 'Anonymous', authorEmail: firebase.auth().currentUser.email, createdAt: Date.now()
     };
     // Department is optional. The strict isValidDiscovery rule may not allow this extra field
     // yet, so if the write is refused we retry without it — the resource still publishes,
@@ -472,7 +505,7 @@ async function submitDiscovery(){
       await entriesCollection.add(payload);
       markSubmitted();
       closeSuggestPanel();
-      alert('Published! Your resource is now live.');
+      alert(isInstruction ? 'Published! Your instruction is now live.' : 'Published! Your resource is now live.');
     }catch(e){
       if(departments && e && e.code === 'permission-denied'){
         delete payload.department;
