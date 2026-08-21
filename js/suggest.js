@@ -22,29 +22,57 @@ dPlatform.addEventListener('change', () => {
   dOtherCategoryField.style.display = dPlatform.value === 'other' ? '' : 'none';
 });
 
-// Share type: "resource" (a link staff found) vs "instruction" (a how-to guide).
-// Instructions publish to the Instruction section, need no link, and have no platform choice.
+// Share type: "resource" (a link staff found), "instruction" (a how-to guide), or "file"
+// (upload a document to a department). Instructions publish to the Instruction section and need
+// no link; files upload to Supabase and appear inside the chosen department under Other AI Tools.
 const dShareType = document.getElementById('dShareType');
 const dPlatformField = document.getElementById('dPlatformField');
+const dLinkField = document.getElementById('dLinkField');
+const dFileField = document.getElementById('dFileField');
+const dFileDeptField = document.getElementById('dFileDeptField');
+const dDeptPickerField = document.getElementById('dDeptPickerField');
+const dFileDeptSel = document.getElementById('dFileDept');
+
+// Fill the file's department picker from the Other AI Tools departments, so a shared file
+// lands in the same department taxonomy shown in the tabs.
+if(dFileDeptSel && !dFileDeptSel.options.length && typeof OTHER_TOOLS_CATS !== 'undefined'){
+  dFileDeptSel.innerHTML = '<option value="">Choose a department…</option>' +
+    OTHER_TOOLS_CATS.map(c => {
+      const label = (CATEGORY_LABELS[c] || c);
+      return `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`;
+    }).join('');
+}
+
 function updateShareType(){
-  const isInstruction = dShareType.value === 'instruction';
-  document.getElementById('dTitleLabel').textContent = isInstruction ? 'Instruction title' : 'Resource title';
+  const type = dShareType.value; // 'resource' | 'instruction' | 'file'
+  const isInstruction = type === 'instruction';
+  const isFile = type === 'file';
+
+  document.getElementById('dTitleLabel').textContent = isFile ? 'File title' : (isInstruction ? 'Instruction title' : 'Resource title');
   document.getElementById('dDescLabel').textContent = isInstruction ? 'The steps — what to do' : 'Short description';
+  document.getElementById('dTitle').placeholder = isFile ? 'e.g. Leave request form'
+    : (isInstruction ? 'e.g. How to log a showroom enquiry' : 'e.g. the title of the video or article');
+  document.getElementById('dDesc').placeholder = isFile ? 'A sentence on what this file is for'
+    : (isInstruction ? 'Write the steps, one per line' : "A sentence on why it's useful");
   document.getElementById('dLinkLabel').innerHTML = isInstruction
     ? 'Link <span class="optional-tag">(optional)</span>'
     : 'Resource link';
-  document.getElementById('dTitle').placeholder = isInstruction
-    ? 'e.g. How to log a showroom enquiry'
-    : 'e.g. the title of the video or article';
-  document.getElementById('dDesc').placeholder = isInstruction
-    ? 'Write the steps, one per line'
-    : "A sentence on why it's useful";
-  dPlatformField.style.display = isInstruction ? 'none' : '';
-  document.getElementById('errDLink').style.display = 'none';
-  suggestSub.textContent = isInstruction
-    ? 'Share a step-by-step guide — it publishes to the Instruction section right away, no approval needed.'
-    : 'Share a useful link — it publishes to the Video section right away, no approval needed.';
-  saveSuggestBtn.textContent = isInstruction ? 'Publish instruction' : 'Publish discovery';
+
+  // Link field: resource + instruction. File field + department: file only. Platform: resource only.
+  if(dLinkField) dLinkField.style.display = isFile ? 'none' : '';
+  if(dFileField) dFileField.style.display = isFile ? '' : 'none';
+  if(dFileDeptField) dFileDeptField.style.display = isFile ? '' : 'none';
+  if(dDeptPickerField) dDeptPickerField.style.display = isFile ? 'none' : '';
+  dPlatformField.style.display = (isInstruction || isFile) ? 'none' : '';
+
+  ['errDLink', 'errDFile2', 'errDFileDept'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
+
+  suggestSub.textContent = isFile
+    ? 'Upload a file to a department — it appears under Other AI Tools right away.'
+    : (isInstruction
+      ? 'Share a step-by-step guide — it publishes to the Instruction section right away, no approval needed.'
+      : 'Share a useful link — it publishes to the Video section right away, no approval needed.');
+  saveSuggestBtn.textContent = isFile ? 'Upload file' : (isInstruction ? 'Publish instruction' : 'Publish discovery');
 }
 dShareType.addEventListener('change', updateShareType);
 
@@ -416,6 +444,9 @@ function closeSuggestPanel(){
   document.getElementById('dPlatform').value = 'claude';
   dShareType.value = 'resource';
   dOtherCategoryField.style.display = 'none';
+  const fileInput = document.getElementById('dFile2'); if(fileInput) fileInput.value = '';
+  const fileDept = document.getElementById('dFileDept'); if(fileDept) fileDept.value = '';
+  updateShareType();
   clearSuggestDepartments();
   document.getElementById('sTitle').value = '';
   document.getElementById('sText').value = '';
@@ -459,9 +490,51 @@ function clearSuggestDepartments(){
   if(dDeptPickerEl) dDeptPickerEl.querySelectorAll('.dept-chip.selected').forEach(c => c.classList.remove('selected'));
 }
 
+async function submitSharedFile(){
+  const title = document.getElementById('dTitle').value.trim();
+  const desc = document.getElementById('dDesc').value.trim();
+  const dept = document.getElementById('dFileDept').value;
+  const file = document.getElementById('dFile2').files[0];
+
+  const show = (id, on) => { const el = document.getElementById(id); if(el) el.style.display = on ? 'block' : 'none'; };
+  let ok = true;
+  show('errDTitle', !title); if(!title) ok = false;
+  show('errDDesc', !desc); if(!desc) ok = false;
+  show('errDFileDept', !dept); if(!dept) ok = false;
+  show('errDFile2', !file); if(!file) ok = false;
+  if(!ok) return;
+
+  if(file.size > 25 * 1024 * 1024){
+    alert('That file is larger than 25 MB. Please upload a smaller file, or share it as a link instead.');
+    return;
+  }
+  if(typeof uploadDepartmentFile !== 'function' || typeof sbClient === 'undefined' || !sbClient){
+    alert('The file service is not available right now. Please refresh and try again.');
+    return;
+  }
+
+  const signedIn = await ensureStaffSignedIn();
+  if(!signedIn) return;
+
+  saveSuggestBtn.disabled = true; saveSuggestBtn.textContent = 'Uploading…';
+  try{
+    await uploadDepartmentFile({ title, description: desc, department: dept, file });
+    markSubmitted();
+    closeSuggestPanel();
+    alert('Uploaded! Your file is now in ' + dept + ', under Other AI Tools.');
+  }catch(e){
+    console.error('Shared file upload failed:', e);
+    alert('Sorry, the upload did not work. Check your connection and try again.');
+  }finally{
+    saveSuggestBtn.disabled = false; updateShareType();
+  }
+}
+
 async function submitDiscovery(){
   if(document.getElementById('sWebsite').value.trim()){ closeSuggestPanel(); return; }
   if(submitOnCooldown()){ alert('Please wait a moment before sending another one.'); return; }
+
+  if(dShareType.value === 'file'){ return submitSharedFile(); }
 
   const title = document.getElementById('dTitle').value.trim();
   const desc = document.getElementById('dDesc').value.trim();

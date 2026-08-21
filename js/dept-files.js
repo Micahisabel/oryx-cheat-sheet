@@ -4,7 +4,9 @@
 // everyone can view, open, and download. (Sign-in is enforced in the app UI; Supabase itself
 // uses the public key, so keep this an internal-team feature.)
 
-const DEPARTMENTS = ['HR', 'Finance', 'Projects', 'Supply Chain', 'Design', 'Installation', 'Business Support'];
+// Kept in step with the Other AI Tools department tabs (constants.js OTHER_TOOLS_CATS labels),
+// so a file's department always matches a department shown under Other AI Tools.
+const DEPARTMENTS = ['HR', 'Marketing', 'Sales', 'Business Support', 'Fabrication', 'Finance', 'Installation Operation', 'Procurement', 'Projects', 'Quarter Master'];
 const DEPT_FILE_MAX_BYTES = 25 * 1024 * 1024; // 25 MB
 
 let deptFiles = [];
@@ -56,6 +58,9 @@ async function loadDeptFiles(){
     const badge = document.querySelector('[data-platform-count="deptfiles"]');
     if(badge) badge.textContent = deptFiles.length;
     if(hubMainEl.classList.contains('dept-files-mode')) renderDeptFiles();
+    // Files now appear inline within the Other AI Tools department views, so refresh that
+    // view once the list loads (or changes).
+    if(typeof activePlatform !== 'undefined' && activePlatform === 'other' && typeof render === 'function') render();
   }catch(e){
     console.error('Department files load error:', e);
   }
@@ -249,8 +254,52 @@ async function removeDeptFile(id){
   }
 }
 
+// ---- Inline "Files" section (shown inside an Other AI Tools department view) ----
+// Returns the HTML for a department's files: a "Files" heading plus a grid of file cards
+// (or a gentle empty note). Filtered to `deptLabel`, and further by `term` while searching.
+function deptFilesSectionHtml(deptLabel, term){
+  let files = deptFiles.filter(f => f.department === deptLabel);
+  if(term){
+    const t = term.toLowerCase();
+    files = files.filter(f => [f.title, f.description, f.fileName].filter(Boolean).join(' ').toLowerCase().includes(t));
+  }
+  const count = files.length;
+  const body = count
+    ? `<div class="df-grid">${files.map(deptFileCardHtml).join('')}</div>`
+    : `<p class="df-empty">No files here yet. Use “Share a Resource” to add one.</p>`;
+  return `
+    <div class="dept-inline-head">Files <span class="dept-inline-count">${count}</span></div>
+    ${body}`;
+}
+
+// Upload a file to a department (used by the Share a Resource form). Resolves true on success.
+async function uploadDepartmentFile({ title, description, department, file }){
+  if(!sbClient) throw new Error('file-service-unavailable');
+  if(file.size > DEPT_FILE_MAX_BYTES) throw new Error('file-too-large');
+  const user = firebase.auth().currentUser;
+  const uploadedBy = (user && user.displayName) || 'Anonymous';
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const path = `${department.replace(/[^a-zA-Z0-9]/g, '_')}/${Date.now()}_${safeName}`;
+
+  const up = await sbClient.storage.from(DEPT_FILES_BUCKET)
+    .upload(path, file, { contentType: file.type || 'application/octet-stream', upsert: false });
+  if(up.error) throw up.error;
+
+  const { data: pub } = sbClient.storage.from(DEPT_FILES_BUCKET).getPublicUrl(path);
+  const ins = await sbClient.from('department_files').insert({
+    title, description, department,
+    file_name: file.name, file_type: file.type || '', file_size: file.size,
+    file_url: pub.publicUrl, storage_path: path, uploaded_by: uploadedBy
+  });
+  if(ins.error) throw ins.error;
+  await loadDeptFiles();
+  return true;
+}
+
 // ---- Wiring -----------------------------------------------------------------
 openDeptFilesNav.addEventListener('click', enterDeptFilesMode);
+// Load the file list up front so it's ready when a department view is opened.
+loadDeptFiles();
 document.getElementById('closeDeptFile').addEventListener('click', closeDeptFileModal);
 document.getElementById('cancelDeptFile').addEventListener('click', closeDeptFileModal);
 document.getElementById('saveDeptFile').addEventListener('click', submitDeptFile);

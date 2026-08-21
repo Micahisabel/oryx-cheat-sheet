@@ -199,10 +199,31 @@ function favThenRecent(a, b){
   return fb - fa || ((b.createdAt || 0) - (a.createdAt || 0));
 }
 
+// Within an Other AI Tools department view, show that department's uploaded files below its
+// tools (Department Files is merged into Other AI Tools). Elsewhere this section stays hidden.
+function renderOtherFilesSection(inOtherDept){
+  const sec = document.getElementById('otherFilesSection');
+  const head = document.getElementById('toolsInlineHead');
+  if(head) head.style.display = inOtherDept ? '' : 'none';
+  if(!sec) return;
+  if(!inOtherDept || typeof deptFilesSectionHtml !== 'function'){
+    sec.style.display = 'none';
+    sec.innerHTML = '';
+    return;
+  }
+  const deptLabel = CATEGORY_LABELS[activeCat] || '';
+  sec.style.display = '';
+  sec.innerHTML = deptFilesSectionHtml(deptLabel, searchTerm);
+  if(typeof removeDeptFile === 'function'){
+    sec.querySelectorAll('.df-remove').forEach(btn => btn.addEventListener('click', () => removeDeptFile(btn.dataset.id)));
+  }
+}
+
 function render(){
   updateActivityBadge();
   const libraryEntries = entries.filter(e => !isShortcutCategory(e.category));
   const shortcutEntries = entries.filter(e => isShortcutCategory(e.category));
+  const inOtherDept = viewMode !== 'shortcuts' && activePlatform === 'other' && OTHER_TOOLS_CATS.includes(activeCat);
 
   if(viewMode === 'shortcuts' || activePlatform !== 'all'){
     // Recently Added only appears under All Platforms, not in the Claude/ChatGPT views.
@@ -310,8 +331,10 @@ function render(){
   countRow.textContent = filtered.length + (filtered.length === 1 ? ' entry' : ' entries');
 
   if(filtered.length === 0){
-    grid.innerHTML = '<div class="empty">No entries here yet. Be the first to add one.</div>';
+    grid.innerHTML = `<div class="empty">${inOtherDept ? 'No tools in this department yet.' : 'No entries here yet. Be the first to add one.'}</div>`;
     pagination.innerHTML = '';
+    renderOtherFilesSection(inOtherDept);
+    if(typeof layoutOtherToolsOverflow === 'function') layoutOtherToolsOverflow();
     return;
   }
 
@@ -434,6 +457,8 @@ function render(){
       }
     });
   });
+
+  renderOtherFilesSection(inOtherDept);
 
   // Keep the department "More" overflow menu (and its badge counts) in sync after a re-render.
   if(typeof layoutOtherToolsOverflow === 'function') layoutOtherToolsOverflow();

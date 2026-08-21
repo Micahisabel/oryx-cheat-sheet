@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.36";</script>
+<script>window.APP_VERSION = "2026-08-16.37";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="css/cards.css?v=15">
 <link rel="stylesheet" href="css/modal.css?v=21">
 <link rel="stylesheet" href="css/forms.css?v=16">
-<link rel="stylesheet" href="css/dept-files.css?v=2">
+<link rel="stylesheet" href="css/dept-files.css?v=3">
 <link rel="stylesheet" href="css/responsive.css?v=2">
 </head>
 <body>
@@ -115,7 +115,10 @@
           <span class="platform-item-label"><span class="platform-icon"><svg viewBox="0 0 24 24"><path d="M12 3l2.1 4.9L19 10l-4.9 2.1L12 17l-2.1-4.9L5 10l4.9-2.1z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/></svg></span>Other AI Tools</span>
           <span class="platform-badge" data-platform-count="other">0</span>
         </button>
-        <button class="sidebar-analytics-item" id="openDeptFilesNav">
+        <!-- Department Files is now merged into Other AI Tools (files show inside each
+             department view), so this standalone entry is hidden. Kept in the DOM because
+             dept-files.js still references it. -->
+        <button class="sidebar-analytics-item" id="openDeptFilesNav" style="display:none;">
           <span class="platform-item-label"><span class="platform-icon"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>Department Files</span>
           <span class="platform-badge" data-platform-count="deptfiles">0</span>
         </button>
@@ -226,8 +229,11 @@
       </div>
 
       <div class="count-row" id="countRow">Loading entries…</div>
+      <div class="dept-inline-head" id="toolsInlineHead" style="display:none;">Tools</div>
       <div class="grid" id="grid"></div>
       <div class="pagination" id="pagination"></div>
+      <!-- In an Other AI Tools department view, that department's uploaded files render here. -->
+      <div id="otherFilesSection" style="display:none;"></div>
       <div class="analytics-view" id="analyticsView" style="display:none;"></div>
       <div class="dept-files-view" id="deptFilesView" style="display:none;"></div>
     </main>
@@ -441,6 +447,7 @@
       <select id="dShareType">
         <option value="resource">A tool or resource I found</option>
         <option value="instruction">An instruction / how-to guide</option>
+        <option value="file">A file to upload</option>
       </select>
 
       <label for="dTitle" id="dTitleLabel">Resource title</label>
@@ -451,9 +458,23 @@
       <textarea id="dDesc" placeholder="A sentence on why it's useful"></textarea>
       <div class="field-error" id="errDDesc">Add a short description.</div>
 
-      <label for="dLink" id="dLinkLabel">Resource link</label>
-      <input type="text" id="dLink" placeholder="https://…">
-      <div class="field-error" id="errDLink">Add the link.</div>
+      <div id="dLinkField">
+        <label for="dLink" id="dLinkLabel">Resource link</label>
+        <input type="text" id="dLink" placeholder="https://…">
+        <div class="field-error" id="errDLink">Add the link.</div>
+      </div>
+
+      <div id="dFileField" style="display:none;">
+        <label for="dFile2" id="dFileLabel">Choose a file</label>
+        <input type="file" id="dFile2">
+        <div class="field-error" id="errDFile2">Please choose a file (max 25 MB).</div>
+      </div>
+
+      <div id="dFileDeptField" style="display:none;">
+        <label for="dFileDept">Department</label>
+        <select id="dFileDept"></select>
+        <div class="field-error" id="errDFileDept">Choose a department.</div>
+      </div>
 
       <div id="dPlatformField">
       <label for="dPlatform">Platform</label>
@@ -480,8 +501,10 @@
       </div>
       </div>
 
-      <label>Departments <span class="optional-tag">(optional — who is this useful for?)</span></label>
-      <div class="dept-picker" id="dDepartments"></div>
+      <div id="dDeptPickerField">
+        <label>Departments <span class="optional-tag">(optional — who is this useful for?)</span></label>
+        <div class="dept-picker" id="dDepartments"></div>
+      </div>
     </div>
 
     <div id="requestFields" style="display:none;">
@@ -654,18 +677,18 @@
 <script src="js/constants.js?v=36"></script>
 <script src="js/state.js?v=19"></script>
 <script src="js/sidebar.js?v=28"></script>
-<script src="js/entries.js?v=40"></script>
+<script src="js/entries.js?v=41"></script>
 <script src="js/skill-detail.js?v=29"></script>
 <script src="js/add-entry.js?v=22"></script>
 <script src="js/shortcuts-form.js?v=18"></script>
 <script src="js/admin.js?v=22"></script>
-<script src="js/suggest.js?v=32"></script>
+<script src="js/suggest.js?v=33"></script>
 <script src="js/favorites.js?v=4"></script>
 <script src="js/notifications.js?v=7"></script>
 <script src="js/activity.js?v=3"></script>
 <script src="js/review.js?v=15"></script>
 <script src="js/analytics.js?v=5"></script>
-<script src="js/dept-files.js?v=2"></script>
+<script src="js/dept-files.js?v=3"></script>
 <script src="js/app.js?v=18"></script>
 <script src="js/tab-overflow.js?v=4"></script>
 
