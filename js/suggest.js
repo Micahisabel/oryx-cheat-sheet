@@ -59,17 +59,22 @@ function updateShareType(){
   const isInstruction = type === 'instruction';
   const isFile = type === 'file';
 
-  document.getElementById('dTitleLabel').textContent = isFile ? 'File title' : (isInstruction ? 'Instruction title' : 'Resource title');
-  document.getElementById('dDescLabel').textContent = isInstruction ? 'The steps — what to do' : 'Short description';
-  document.getElementById('dTitle').placeholder = isFile ? 'e.g. Leave request form'
-    : (isInstruction ? 'e.g. How to log a showroom enquiry' : 'e.g. the title of the video or article');
-  document.getElementById('dDesc').placeholder = isFile ? 'A sentence on what this file is for'
-    : (isInstruction ? 'Write the steps, one per line' : "A sentence on why it's useful");
-  document.getElementById('dLinkLabel').innerHTML = isInstruction
-    ? 'Link <span class="optional-tag">(optional)</span>'
-    : 'Resource link';
+  // Name — same friendly label for every type, with an example that fits.
+  document.getElementById('dTitleLabel').textContent = 'Give it a name';
+  document.getElementById('dTitle').placeholder = isFile ? 'e.g. Price list 2026'
+    : (isInstruction ? 'e.g. How to log a showroom enquiry' : 'e.g. Canva — for making posters');
 
-  // Link field: resource + instruction. File field + department: file only. Platform: resource only.
+  // What is it for? (for directions, this is the steps)
+  document.getElementById('dDescLabel').textContent = isInstruction ? 'Write the steps' : 'What is it for?';
+  document.getElementById('dDesc').placeholder = isInstruction ? 'Write one step on each line'
+    : (isFile ? 'e.g. The latest price list for windows' : 'e.g. A free website for making posters');
+
+  document.getElementById('dLinkLabel').innerHTML = isInstruction
+    ? 'Paste the link <span class="optional-tag">(you can leave this empty)</span>'
+    : 'Paste the link';
+  document.getElementById('dLink').placeholder = 'e.g. https://www.canva.com';
+
+  // Link field: link + directions. File + team pickers: file only. "Which AI tool" only for a link.
   if(dLinkField) dLinkField.style.display = isFile ? 'none' : '';
   if(dFileField) dFileField.style.display = isFile ? '' : 'none';
   if(dFileDeptField) dFileDeptField.style.display = isFile ? '' : 'none';
@@ -79,11 +84,11 @@ function updateShareType(){
   ['errDLink', 'errDFile2', 'errDFileDept'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
 
   suggestSub.textContent = isFile
-    ? 'Upload a file to a department — it appears under Other AI Tools right away.'
+    ? 'Add a file for the team. It shows up straight away — no waiting.'
     : (isInstruction
-      ? 'Share a step-by-step guide — it publishes to the Instruction section right away, no approval needed.'
-      : 'Share a useful link — it publishes to the Video section right away, no approval needed.');
-  saveSuggestBtn.textContent = isFile ? 'Upload file' : (isInstruction ? 'Publish instruction' : 'Publish discovery');
+      ? 'Share simple step-by-step directions. They show up straight away — no waiting.'
+      : 'Share a helpful link with the team. It shows up straight away — no waiting.');
+  saveSuggestBtn.textContent = 'Share with the team';
 }
 dShareType.addEventListener('change', updateShareType);
 
@@ -604,7 +609,7 @@ async function submitDiscovery(){
   }catch(e){
     alert('Could not publish that resource. Check your connection and try again.');
   }finally{
-    saveSuggestBtn.disabled = false; updateSuggestMode();
+    saveSuggestBtn.disabled = false; updateShareType();
   }
 }
 

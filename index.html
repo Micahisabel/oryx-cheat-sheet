@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.40";</script>
+<script>window.APP_VERSION = "2026-08-16.41";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -449,47 +449,47 @@
     <div id="discoveryFields">
       <label for="dShareType">What are you sharing?</label>
       <select id="dShareType">
-        <option value="resource">A tool or resource I found</option>
-        <option value="instruction">An instruction / how-to guide</option>
-        <option value="file">A file to upload</option>
+        <option value="resource">A link (a website, video, or online tool)</option>
+        <option value="instruction">Step-by-step directions (how to do something)</option>
+        <option value="file">A file from my computer (like a PDF)</option>
       </select>
 
-      <label for="dTitle" id="dTitleLabel">Resource title</label>
-      <input type="text" id="dTitle" placeholder="e.g. the title of the video or article">
-      <div class="field-error" id="errDTitle">Give it a title.</div>
+      <label for="dTitle" id="dTitleLabel">Give it a name</label>
+      <input type="text" id="dTitle" placeholder="e.g. Canva — for making posters">
+      <div class="field-error" id="errDTitle">Please add a name.</div>
 
-      <label for="dDesc" id="dDescLabel">Short description</label>
-      <textarea id="dDesc" placeholder="A sentence on why it's useful"></textarea>
-      <div class="field-error" id="errDDesc">Add a short description.</div>
+      <label for="dDesc" id="dDescLabel">What is it for?</label>
+      <textarea id="dDesc" placeholder="e.g. A free website for making posters"></textarea>
+      <div class="field-error" id="errDDesc">Please say what it is for.</div>
 
       <div id="dLinkField">
-        <label for="dLink" id="dLinkLabel">Resource link</label>
-        <input type="text" id="dLink" placeholder="https://…">
-        <div class="field-error" id="errDLink">Add the link.</div>
+        <label for="dLink" id="dLinkLabel">Paste the link</label>
+        <input type="text" id="dLink" placeholder="e.g. https://www.canva.com">
+        <div class="field-error" id="errDLink">Please paste the link.</div>
       </div>
 
       <div id="dFileField" style="display:none;">
-        <label for="dFile2" id="dFileLabel">Choose a file</label>
+        <label for="dFile2" id="dFileLabel">Pick a file from your computer</label>
         <input type="file" id="dFile2">
-        <div class="field-error" id="errDFile2">Please choose a file (max 25 MB).</div>
+        <div class="field-error" id="errDFile2">Please pick a file (up to 25 MB).</div>
       </div>
 
       <div id="dFileDeptField" style="display:none;">
-        <label for="dFileDept">Department</label>
+        <label for="dFileDept">Which team is this for?</label>
         <select id="dFileDept"></select>
-        <div class="field-error" id="errDFileDept">Choose a department.</div>
+        <div class="field-error" id="errDFileDept">Please choose a team.</div>
       </div>
 
       <div id="dPlatformField">
-      <label for="dPlatform">Platform</label>
+      <label for="dPlatform">Which AI tool is this for?</label>
       <select id="dPlatform">
         <option value="claude">Claude</option>
         <option value="chatgpt">ChatGPT</option>
-        <option value="other">Other AI tools</option>
+        <option value="other">Another AI tool</option>
       </select>
 
       <div id="dOtherCategoryField" style="display:none;">
-        <label for="dOtherCategory">Category</label>
+        <label for="dOtherCategory">Which team is this for?</label>
         <select id="dOtherCategory">
           <option value="other-hr">HR</option>
           <option value="other-marketing">Marketing</option>
@@ -506,7 +506,7 @@
       </div>
 
       <div id="dDeptPickerField">
-        <label>Departments <span class="optional-tag">(optional — who is this useful for?)</span></label>
+        <label>Which teams is this useful for? <span class="optional-tag">(pick any — or skip)</span></label>
         <div class="dept-picker" id="dDepartments"></div>
       </div>
     </div>
@@ -686,7 +686,7 @@
 <script src="js/add-entry.js?v=22"></script>
 <script src="js/shortcuts-form.js?v=18"></script>
 <script src="js/admin.js?v=22"></script>
-<script src="js/suggest.js?v=34"></script>
+<script src="js/suggest.js?v=35"></script>
 <script src="js/favorites.js?v=4"></script>
 <script src="js/notifications.js?v=7"></script>
 <script src="js/activity.js?v=3"></script>
