@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.43";</script>
+<script>window.APP_VERSION = "2026-08-16.45";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="css/cards.css?v=15">
 <link rel="stylesheet" href="css/modal.css?v=21">
 <link rel="stylesheet" href="css/forms.css?v=16">
-<link rel="stylesheet" href="css/dept-files.css?v=4">
+<link rel="stylesheet" href="css/dept-files.css?v=5">
 <link rel="stylesheet" href="css/responsive.css?v=2">
 </head>
 <body>
@@ -233,11 +233,11 @@
       </div>
 
       <div class="count-row" id="countRow">Loading entries…</div>
+      <!-- In an Other AI Tools department view, that department's files render here — above the tools. -->
+      <div id="otherFilesSection" style="display:none;"></div>
       <div class="dept-inline-head" id="toolsInlineHead" style="display:none;">Tools</div>
       <div class="grid" id="grid"></div>
       <div class="pagination" id="pagination"></div>
-      <!-- In an Other AI Tools department view, that department's uploaded files render here. -->
-      <div id="otherFilesSection" style="display:none;"></div>
       <div class="analytics-view" id="analyticsView" style="display:none;"></div>
       <div class="dept-files-view" id="deptFilesView" style="display:none;"></div>
     </main>
