@@ -20,7 +20,18 @@ const dPlatform = document.getElementById('dPlatform');
 const dOtherCategoryField = document.getElementById('dOtherCategoryField');
 dPlatform.addEventListener('change', () => {
   dOtherCategoryField.style.display = dPlatform.value === 'other' ? '' : 'none';
+  updateDeptPickerVisibility();
 });
+
+// The optional "Departments" chip picker is only shown when it isn't already covered elsewhere.
+// It's redundant for Other AI Tools (the Category dropdown IS the department) and for file
+// uploads (which pick a department directly), so hide it there.
+function updateDeptPickerVisibility(){
+  if(!dDeptPickerField) return;
+  const type = dShareType.value;
+  const redundant = type === 'file' || (type !== 'instruction' && dPlatform.value === 'other');
+  dDeptPickerField.style.display = redundant ? 'none' : '';
+}
 
 // Share type: "resource" (a link staff found), "instruction" (a how-to guide), or "file"
 // (upload a document to a department). Instructions publish to the Instruction section and need
@@ -62,8 +73,8 @@ function updateShareType(){
   if(dLinkField) dLinkField.style.display = isFile ? 'none' : '';
   if(dFileField) dFileField.style.display = isFile ? '' : 'none';
   if(dFileDeptField) dFileDeptField.style.display = isFile ? '' : 'none';
-  if(dDeptPickerField) dDeptPickerField.style.display = isFile ? 'none' : '';
   dPlatformField.style.display = (isInstruction || isFile) ? 'none' : '';
+  updateDeptPickerVisibility();
 
   ['errDLink', 'errDFile2', 'errDFileDept'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
 
