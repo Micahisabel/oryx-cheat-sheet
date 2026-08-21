@@ -57,6 +57,7 @@ async function loadDeptFiles(){
     deptFiles = (data || []).map(mapDeptRow);
     const badge = document.querySelector('[data-platform-count="deptfiles"]');
     if(badge) badge.textContent = deptFiles.length;
+    markDeptFileTabs();
     if(hubMainEl.classList.contains('dept-files-mode')) renderDeptFiles();
     // Files now appear inline within the Other AI Tools department views, so refresh that
     // view once the list loads (or changes).
@@ -270,6 +271,28 @@ function deptFilesSectionHtml(deptLabel, term){
   return `
     <div class="dept-inline-head">Department Files <span class="dept-inline-count">${count}</span></div>
     ${body}`;
+}
+
+// A small paperclip, so a department tab shows "there are files here" at a glance — even when
+// its tool count is 0. Widely understood (email attachments) and needs no words on the bar.
+const CAT_CLIP_SVG = '<span class="cat-clip" title="This team has files"><svg viewBox="0 0 24 24"><path d="M21.4 11.05l-8.5 8.49a5 5 0 0 1-7.07-7.07l8.49-8.49a3.33 3.33 0 1 1 4.71 4.71l-8.49 8.49a1.67 1.67 0 0 1-2.36-2.36l7.78-7.78"/></svg></span>';
+
+// Mark every Other AI Tools department tab that currently has files, and clear the rest.
+// Called after the file list loads or changes. The clip is a child of the tab, so it survives
+// the overflow-menu hide/show; we also refresh the More menu so hidden tabs show it too.
+function markDeptFileTabs(){
+  const nav = document.getElementById('otherToolsNav');
+  if(!nav || typeof CATEGORY_LABELS === 'undefined') return;
+  const withFiles = new Set(deptFiles.map(f => f.department));
+  nav.querySelectorAll('.cat-tab').forEach(tab => {
+    const label = CATEGORY_LABELS[tab.dataset.cat];
+    const has = label && withFiles.has(label);
+    tab.classList.toggle('has-files', !!has);
+    const existing = tab.querySelector('.cat-clip');
+    if(has && !existing) tab.insertAdjacentHTML('beforeend', CAT_CLIP_SVG);
+    else if(!has && existing) existing.remove();
+  });
+  if(typeof window.layoutOtherToolsOverflow === 'function') window.layoutOtherToolsOverflow();
 }
 
 // Upload a file to a department (used by the Share a Resource form). Resolves true on success.

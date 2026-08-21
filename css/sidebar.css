@@ -149,3 +149,19 @@
   .cat-more-item .cat-badge{margin-left:auto;}
   .cat-more-item:hover{background:rgba(255,255,255,0.08);color:var(--white);}
   .cat-more-item.active{background:rgba(255,255,255,0.14);color:var(--white);}
+
+  /* ---------- "Has files" paperclip marker on department tabs ---------- */
+  /* Shown only on departments that currently have files, so a tab reading "0"
+     tools still signals there's something inside. */
+  .cat-clip{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:15px;height:15px;flex-shrink:0;margin-left:-1px;color:rgba(255,255,255,0.85);
+  }
+  .cat-clip svg{width:13px;height:13px;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .cat-tab.active .cat-clip{color:var(--white);}
+  .cat-more-item .cat-clip{margin-left:6px;color:rgba(255,255,255,0.8);}
+
+  /* Tool count moved to the "Tools" section heading (beside the tools it describes),
+     so the department bar and its overflow menu no longer carry a per-tab "0". */
+  #otherToolsNav .cat-badge{display:none;}
+  .cat-more-item .cat-badge{display:none;}

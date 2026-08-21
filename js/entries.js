@@ -201,10 +201,18 @@ function favThenRecent(a, b){
 
 // Within an Other AI Tools department view, show that department's uploaded files below its
 // tools (Department Files is merged into Other AI Tools). Elsewhere this section stays hidden.
-function renderOtherFilesSection(inOtherDept){
+function renderOtherFilesSection(inOtherDept, toolCount){
   const sec = document.getElementById('otherFilesSection');
   const head = document.getElementById('toolsInlineHead');
-  if(head) head.style.display = inOtherDept ? '' : 'none';
+  if(head){
+    head.style.display = inOtherDept ? '' : 'none';
+    // Count now lives beside the section heading (not on the department tab), matching
+    // Department Files, so a team's tool total reads next to the tools themselves.
+    if(inOtherDept){
+      const n = toolCount || 0;
+      head.innerHTML = 'Tools <span class="dept-inline-count">' + n + '</span>';
+    }
+  }
   if(!sec) return;
   if(!inOtherDept || typeof deptFilesSectionHtml !== 'function'){
     sec.style.display = 'none';
@@ -333,7 +341,7 @@ function render(){
   if(filtered.length === 0){
     grid.innerHTML = `<div class="empty">${inOtherDept ? 'No tools in this department yet.' : 'No entries here yet. Be the first to add one.'}</div>`;
     pagination.innerHTML = '';
-    renderOtherFilesSection(inOtherDept);
+    renderOtherFilesSection(inOtherDept, filtered.length);
     if(typeof layoutOtherToolsOverflow === 'function') layoutOtherToolsOverflow();
     return;
   }
@@ -458,7 +466,7 @@ function render(){
     });
   });
 
-  renderOtherFilesSection(inOtherDept);
+  renderOtherFilesSection(inOtherDept, filtered.length);
 
   // Keep the department "More" overflow menu (and its badge counts) in sync after a re-render.
   if(typeof layoutOtherToolsOverflow === 'function') layoutOtherToolsOverflow();

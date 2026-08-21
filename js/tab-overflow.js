@@ -83,10 +83,13 @@
       const label = CATEGORY_LABELS[cat] || cat;
       const icon = CATEGORY_ICON_PATHS[cat] || '';
       const count = (t.querySelector('.cat-badge') || {}).textContent || '0';
+      const clip = t.classList.contains('has-files')
+        ? '<span class="cat-clip" title="This team has files"><svg viewBox="0 0 24 24"><path d="M21.4 11.05l-8.5 8.49a5 5 0 0 1-7.07-7.07l8.49-8.49a3.33 3.33 0 1 1 4.71 4.71l-8.49 8.49a1.67 1.67 0 0 1-2.36-2.36l7.78-7.78"/></svg></span>'
+        : '';
       return '<button class="cat-more-item' + (cat === activeCat ? ' active' : '') + '" role="menuitem" data-cat="' + cat + '">'
         + '<span class="cat-icon"><svg viewBox="0 0 24 24">' + icon + '</svg></span>'
         + escapeHtml(label)
-        + '<span class="cat-badge">' + escapeHtml(count) + '</span></button>';
+        + '<span class="cat-badge">' + escapeHtml(count) + '</span>' + clip + '</button>';
     }).join('');
 
     // If the selected department is hidden, surface it on the More button itself.
