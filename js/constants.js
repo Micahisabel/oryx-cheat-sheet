@@ -201,7 +201,7 @@ function isOtherToolUsed(entry){
 // The department options for the main library filter and the Add/Edit picker. These are the
 // business departments an AI resource can be tagged with. Stored (comma-separated) in an
 // entry's existing `department` field, so no new Firestore field is introduced.
-const LIBRARY_DEPARTMENTS = ['HR', 'Sales', 'Marketing', 'Finance', 'Business Support', 'Operations'];
+const LIBRARY_DEPARTMENTS = ['HR', 'Marketing', 'Sales', 'Business Support', 'Fabrication', 'Finance', 'Installation Operation', 'Procurement', 'Projects', 'Quarter Master'];
 
 // Which of the known departments an entry belongs to. Matches whole words case-insensitively,
 // so it reads both new comma lists ("HR, Finance") and legacy free text ("Sales and Marketing")

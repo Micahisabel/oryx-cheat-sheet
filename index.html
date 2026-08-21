@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.38";</script>
+<script>window.APP_VERSION = "2026-08-16.39";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -220,11 +220,15 @@
         <select class="filter-select" id="deptFilter" aria-label="Filter by department">
           <option value="all">All Departments</option>
           <option value="HR">HR</option>
-          <option value="Sales">Sales</option>
           <option value="Marketing">Marketing</option>
-          <option value="Finance">Finance</option>
+          <option value="Sales">Sales</option>
           <option value="Business Support">Business Support</option>
-          <option value="Operations">Operations</option>
+          <option value="Fabrication">Fabrication</option>
+          <option value="Finance">Finance</option>
+          <option value="Installation Operation">Installation Operation</option>
+          <option value="Procurement">Procurement</option>
+          <option value="Projects">Projects</option>
+          <option value="Quarter Master">Quarter Master</option>
         </select>
       </div>
 
@@ -674,7 +678,7 @@
 
 <script src="js/firebase.js?v=20"></script>
 <script src="js/utils.js?v=24"></script>
-<script src="js/constants.js?v=36"></script>
+<script src="js/constants.js?v=37"></script>
 <script src="js/state.js?v=19"></script>
 <script src="js/sidebar.js?v=28"></script>
 <script src="js/entries.js?v=41"></script>
