@@ -88,7 +88,7 @@
   .dept-inline-head{
     display:flex;align-items:center;gap:8px;
     font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:0.09em;
-    text-transform:uppercase;color:var(--silver);
+    text-transform:uppercase;color:var(--oryx-blue);
     margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line-soft);
   }
   #toolsInlineHead{margin-top:4px;}
