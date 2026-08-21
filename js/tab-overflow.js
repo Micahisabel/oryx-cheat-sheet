@@ -31,31 +31,50 @@
 
   function deptTabs(){ return Array.from(nav.querySelectorAll('.cat-tab')); }
 
-  // Keep the top three departments (HR, Marketing, Sales) in the bar; everything else lives
-  // in the More menu. Fixed count, not width-based, so the bar always looks the same.
-  const VISIBLE = 3;
-
+  // Fill the row with as many department tabs as fit the available width; the rest collapse
+  // into the More menu. Width-based, so we use whatever space there is.
   function layout(){
     if(laying) return;
     if(nav.offsetParent === null) return; // nav is hidden (not on the Other AI Tools view)
     laying = true;
 
     const all = deptTabs();
-    const hidden = all.slice(VISIBLE);
-    all.forEach((t, i) => t.classList.toggle('cat-hidden', i >= VISIBLE));
+    all.forEach(t => t.classList.remove('cat-hidden'));
+    moreBtn.style.display = 'none';
+    moreBtn.classList.remove('active');
 
-    // Nothing to collapse -> no More button.
-    if(!hidden.length){
-      moreBtn.style.display = 'none';
-      moreBtn.classList.remove('active');
+    const cs = getComputedStyle(nav);
+    const padL = parseFloat(cs.paddingLeft) || 0;
+    const padR = parseFloat(cs.paddingRight) || 0;
+    const gap = parseFloat(cs.columnGap || cs.gap) || 6;
+    const inner = nav.clientWidth - padL - padR;
+
+    // Everything already fits -> no More button needed.
+    let total = 0;
+    all.forEach((t, i) => { total += t.offsetWidth + (i ? gap : 0); });
+    if(total <= inner + 0.5){
       menu.innerHTML = '';
       menu.hidden = true;
       moreBtn.setAttribute('aria-expanded', 'false');
+      const lbl = moreBtn.querySelector('.cat-more-label'); if(lbl) lbl.textContent = 'More';
       laying = false;
       return;
     }
 
+    // Reserve room for the More button, then keep tabs left-to-right until they'd overflow.
     moreBtn.style.display = '';
+    const budget = inner - (moreBtn.offsetWidth + gap);
+    let used = 0, overflowing = false;
+    const hidden = [];
+    all.forEach((t, i) => {
+      const w = t.offsetWidth + (i ? gap : 0);
+      if(!overflowing && used + w <= budget){ used += w; }
+      else { overflowing = true; hidden.push(t); }
+    });
+    // Always keep at least the first department in the bar.
+    while(hidden.length && (all.length - hidden.length) < 1){ hidden.shift(); }
+
+    hidden.forEach(t => t.classList.add('cat-hidden'));
     nav.scrollLeft = 0;
 
     // Build the dropdown from the hidden tabs, mirroring their live badge counts.
