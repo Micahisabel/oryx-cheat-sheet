@@ -434,4 +434,7 @@ function render(){
       }
     });
   });
+
+  // Keep the department "More" overflow menu (and its badge counts) in sync after a re-render.
+  if(typeof layoutOtherToolsOverflow === 'function') layoutOtherToolsOverflow();
 }

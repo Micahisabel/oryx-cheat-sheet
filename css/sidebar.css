@@ -115,3 +115,37 @@
   }
   .cat-tab:hover .cat-tab-tag{color:rgba(255,255,255,0.5);}
   .cat-tab.active .cat-tab-tag{color:rgba(255,255,255,0.55);}
+
+  /* ---------- Overflow "More" menu (tabs that don't fit drop into a menu) ---------- */
+  .cat-tab.cat-hidden{display:none !important;}
+  /* Department bar packs more names per row, so trim its tabs a touch. */
+  #otherToolsNav{gap:4px;}
+  #otherToolsNav .cat-tab{padding:10px 13px;gap:7px;}
+  .cat-more-btn{
+    display:flex;align-items:center;gap:8px;flex-shrink:0;cursor:pointer;position:relative;z-index:1;
+    padding:10px 14px;border:1px solid transparent;border-radius:10px;background:none;
+    font-family:var(--font-display);font-weight:600;font-size:13px;color:rgba(255,255,255,0.72);
+    transition:background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .cat-more-btn:hover{color:var(--white);background:rgba(255,255,255,0.06);}
+  .cat-more-btn.active,
+  .cat-more-btn[aria-expanded="true"]{color:var(--white);background:rgba(255,255,255,0.12);}
+  .cat-more-caret{width:13px;height:13px;display:block;opacity:0.7;transition:transform 0.2s ease;}
+  .cat-more-caret svg{width:13px;height:13px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .cat-more-btn[aria-expanded="true"] .cat-more-caret{transform:rotate(180deg);}
+
+  .cat-more-menu{
+    position:fixed;z-index:60;min-width:214px;max-height:60vh;overflow-y:auto;
+    background:var(--oryx-blue);border:1px solid rgba(255,255,255,0.14);
+    border-radius:12px;padding:6px;box-shadow:0 16px 40px rgba(0,0,0,0.35);
+    display:flex;flex-direction:column;gap:2px;
+  }
+  .cat-more-menu[hidden]{display:none;}
+  .cat-more-item{
+    display:flex;align-items:center;gap:10px;width:100%;cursor:pointer;text-align:left;
+    padding:9px 12px;border:0;border-radius:8px;background:none;
+    font-family:var(--font-display);font-weight:600;font-size:13px;color:rgba(255,255,255,0.8);
+  }
+  .cat-more-item .cat-badge{margin-left:auto;}
+  .cat-more-item:hover{background:rgba(255,255,255,0.08);color:var(--white);}
+  .cat-more-item.active{background:rgba(255,255,255,0.14);color:var(--white);}
