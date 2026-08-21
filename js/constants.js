@@ -8,13 +8,16 @@ const CATEGORY_LABELS = {
   instructions: 'Instruction',
   discoveries: 'Video',
   'other-tools': 'Other AI Tool',
-  'other-writing': 'Writing',
-  'other-video': 'Video',
-  'other-images': 'Images',
-  'other-research': 'Research',
-  'other-design': 'Design',
-  'other-audio': 'Audio',
-  'other-automation': 'Automation',
+  'other-hr': 'HR',
+  'other-marketing': 'Marketing',
+  'other-sales': 'Sales',
+  'other-business-support': 'Business Support',
+  'other-fabrication': 'Fabrication',
+  'other-finance': 'Finance',
+  'other-installation': 'Installation Operation',
+  'other-procurement': 'Procurement',
+  'other-projects': 'Projects',
+  'other-quartermaster': 'Quarter Master',
   'shortcut-desktop': 'Claude Desktop',
   'shortcut-code': 'Claude Code',
   'shortcut-slash': 'Quick Command',
@@ -46,13 +49,16 @@ const CATEGORY_PLURAL_LABELS = {
   instructions: 'Instructions',
   discoveries: 'Video',
   'other-tools': 'Other AI Tools',
-  'other-writing': 'Writing',
-  'other-video': 'Video',
-  'other-images': 'Images',
-  'other-research': 'Research',
-  'other-design': 'Design',
-  'other-audio': 'Audio',
-  'other-automation': 'Automation',
+  'other-hr': 'HR',
+  'other-marketing': 'Marketing',
+  'other-sales': 'Sales',
+  'other-business-support': 'Business Support',
+  'other-fabrication': 'Fabrication',
+  'other-finance': 'Finance',
+  'other-installation': 'Installation Operation',
+  'other-procurement': 'Procurement',
+  'other-projects': 'Projects',
+  'other-quartermaster': 'Quarter Master',
   'shortcut-desktop': 'Claude Shortcuts',
   'shortcut-code': 'Claude Shortcuts',
   'shortcut-slash': 'Claude Shortcuts',
@@ -83,13 +89,16 @@ const CATEGORY_EXPLAINERS = {
     discoveries: 'Short and useful videos that help the team learn new ChatGPT features, tips, shortcuts, and ways to use ChatGPT at work.'
   },
   other: {
-    'other-writing': 'AI tools that help you write, rewrite, summarise, and improve text, emails, documents, and other written content.',
-    'other-video': 'AI tools that help you create, edit, and improve videos using simple instructions, images, or text.',
-    'other-images': 'AI tools that help you create, edit, and improve images, graphics, and visual content using AI.',
-    'other-research': 'AI tools that help you find, understand, summarise, and organise information quickly.',
-    'other-design': 'AI tools that help you create presentations, layouts, graphics, marketing materials, and other designs.',
-    'other-audio': 'AI tools that help you create, edit, improve, or work with voice, music, and other audio content.',
-    'other-automation': 'AI tools that help you automate repetitive tasks, connect different apps, and make work happen automatically with less manual effort.'
+    'other-hr': 'AI tools that help the HR team with hiring, staff records, training, and everyday people tasks.',
+    'other-marketing': 'AI tools that help the Marketing team create content, campaigns, social posts, and brand materials.',
+    'other-sales': 'AI tools that help the Sales team with quotes, follow-ups, proposals, and winning new business.',
+    'other-business-support': 'AI tools that help the Business Support team with admin, coordination, and day-to-day office work.',
+    'other-fabrication': 'AI tools that help the Fabrication team plan, measure, and manage production work.',
+    'other-finance': 'AI tools that help the Finance team with numbers, reports, invoices, and budgets.',
+    'other-installation': 'AI tools that help the Installation team plan jobs, schedules, and on-site work.',
+    'other-procurement': 'AI tools that help the Procurement team source, compare, and order materials and supplies.',
+    'other-projects': 'AI tools that help the Projects team plan, track, and deliver projects on time.',
+    'other-quartermaster': 'AI tools that help the Quarter Master team manage stock, tools, and equipment.'
   }
 };
 
@@ -128,13 +137,16 @@ const CATEGORY_ICON_PATHS = {
   plugins: '<path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4a2 2 0 0 0-2 2v3.8h1.5a2.7 2.7 0 0 1 0 5.4H2V20a2 2 0 0 0 2 2h3.8v-1.5a2.7 2.7 0 0 1 5.4 0V22H17a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"/>',
   discoveries: '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
   'other-tools': '<path d="M12 3l2.1 4.9L19 10l-4.9 2.1L12 17l-2.1-4.9L5 10l4.9-2.1z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/>',
-  'other-writing': '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
-  'other-video': '<rect x="2" y="5" width="15" height="14" rx="2"/><path d="M17 10l5-3v10l-5-3z"/>',
-  'other-images': '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
-  'other-research': '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
-  'other-design': '<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.3c1.8 0 3.2-1.4 3.2-3.2C20.5 6.6 16.7 3 12 3z"/><circle cx="7.5" cy="10.5" r="1"/><circle cx="10.5" cy="7" r="1"/>',
-  'other-audio': '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
-  'other-automation': '<path d="M12 2l1.5 3.6L17 7l-3.5 1.4L12 12l-1.5-3.6L7 7l3.5-1.4z"/><path d="M5 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>'
+  'other-hr': '<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.5"/><path d="M17.5 14a6 6 0 0 1 3.5 6"/>',
+  'other-marketing': '<path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M16 9a4 4 0 0 1 0 6"/>',
+  'other-sales': '<path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/>',
+  'other-business-support': '<path d="M4 13a8 8 0 0 1 16 0"/><rect x="2" y="13" width="4" height="7" rx="1"/><rect x="18" y="13" width="4" height="7" rx="1"/>',
+  'other-fabrication': '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>',
+  'other-finance': '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.3a2.4 2.4 0 0 1 5 0c0 3-5 1-5 4a2.4 2.4 0 0 0 5 0"/>',
+  'other-installation': '<rect x="5" y="3" width="14" height="18" rx="1"/><circle cx="15" cy="12" r="1"/>',
+  'other-procurement': '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.4 12h11l2-8H6"/>',
+  'other-projects': '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8 12h8M8 16h5"/>',
+  'other-quartermaster': '<path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/>'
 };
 function cardPlaceholderHtml(category){
   const path = CATEGORY_ICON_PATHS[category];
@@ -146,7 +158,7 @@ function cardPlaceholderHtml(category){
 const RICH_CATEGORIES = ['skills', 'commands', 'agents', 'mcps', 'plugins'];
 function isRichCategory(cat){ return RICH_CATEGORIES.includes(cat); }
 
-const OTHER_TOOLS_CATS = ['other-writing', 'other-video', 'other-images', 'other-research', 'other-design', 'other-audio', 'other-automation'];
+const OTHER_TOOLS_CATS = ['other-hr', 'other-marketing', 'other-sales', 'other-business-support', 'other-fabrication', 'other-finance', 'other-installation', 'other-procurement', 'other-projects', 'other-quartermaster'];
 function isOtherToolsCategory(cat){ return cat === 'other-tools' || OTHER_TOOLS_CATS.includes(cat); }
 
 const CLAUDE_SHORTCUT_CATS = ['shortcut-prompts', 'shortcut-desktop', 'shortcut-code', 'shortcut-slash'];
@@ -166,15 +178,10 @@ function shortcutBadgeHtml(key){
 // tools are in use and which are not yet tried. Names are matched loosely
 // (case-insensitive, punctuation/spacing ignored) so "NotebookLM" == "Notebook LM".
 // An empty array means "none used yet" -> the whole category shows as unused.
-const USED_OTHER_TOOLS = {
-  'other-writing':    ['claude', 'chatgpt', 'gemini'],
-  'other-video':      ['kling', 'higgsfield'],
-  'other-images':     ['fal', 'nanobanana', 'chatgpt'],
-  'other-research':   ['notebooklm'],
-  'other-design':     ['canva', 'pomelli'],
-  'other-audio':      ['elevenlabs'],
-  'other-automation': []
-};
+// Now that Other AI Tools are grouped by department (not use-case), there's no fixed
+// code-list of "known used" tools — cards show normally by default, and admins can flag a
+// card as "not used yet" per entry via the toggle (stored in adminState/otherToolsUsage).
+const USED_OTHER_TOOLS = {};
 function normalizeToolName(s){ return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
 // Returns true when a card should render normally; false when it needs the glass effect.
 // Only Other AI Tools cards are governed — everything else is always "used" (unaffected).
