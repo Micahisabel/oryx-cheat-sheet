@@ -16,9 +16,7 @@
   moreBtn.setAttribute('aria-expanded', 'false');
   moreBtn.style.display = 'none';
   moreBtn.innerHTML =
-    '<span class="cat-icon"><svg viewBox="0 0 24 24" style="fill:currentColor;stroke:none">'
-    + '<circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/>'
-    + '</svg></span><span class="cat-more-label">More</span>'
+    '<span class="cat-more-label">More</span>'
     + '<span class="cat-more-caret"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>';
   nav.appendChild(moreBtn);
 
@@ -33,27 +31,23 @@
 
   function deptTabs(){ return Array.from(nav.querySelectorAll('.cat-tab')); }
 
-  // Decide which tabs fit; hide the rest into the menu.
+  // Keep the top three departments (HR, Marketing, Sales) in the bar; everything else lives
+  // in the More menu. Fixed count, not width-based, so the bar always looks the same.
+  const VISIBLE = 3;
+
   function layout(){
     if(laying) return;
     if(nav.offsetParent === null) return; // nav is hidden (not on the Other AI Tools view)
     laying = true;
 
     const all = deptTabs();
-    all.forEach(t => t.classList.remove('cat-hidden'));
-    moreBtn.style.display = 'none';
-    moreBtn.classList.remove('active');
+    const hidden = all.slice(VISIBLE);
+    all.forEach((t, i) => t.classList.toggle('cat-hidden', i >= VISIBLE));
 
-    const cs = getComputedStyle(nav);
-    const padL = parseFloat(cs.paddingLeft) || 0;
-    const padR = parseFloat(cs.paddingRight) || 0;
-    const gap = parseFloat(cs.columnGap || cs.gap) || 6;
-    const inner = nav.clientWidth - padL - padR;
-
-    // Everything fits on one row -> no More button needed.
-    let total = 0;
-    all.forEach((t, i) => { total += t.offsetWidth + (i ? gap : 0); });
-    if(total <= inner + 0.5){
+    // Nothing to collapse -> no More button.
+    if(!hidden.length){
+      moreBtn.style.display = 'none';
+      moreBtn.classList.remove('active');
       menu.innerHTML = '';
       menu.hidden = true;
       moreBtn.setAttribute('aria-expanded', 'false');
@@ -61,27 +55,7 @@
       return;
     }
 
-    // Reserve room for the More button, then fill the row left-to-right.
     moreBtn.style.display = '';
-    const budget = inner - (moreBtn.offsetWidth + gap);
-    let used = 0, overflowing = false;
-    const hidden = [];
-    all.forEach((t, i) => {
-      const w = t.offsetWidth + (i ? gap : 0);
-      if(!overflowing && used + w <= budget){ used += w; }
-      else { overflowing = true; hidden.push(t); }
-    });
-
-    // Always keep at least the first few departments (HR, Marketing, Sales) in the bar, even
-    // when space is tight — return the leftmost overflowed tabs to the row until we hit the
-    // minimum. Worst case the row scrolls slightly, which beats a near-empty bar of just "More".
-    const MIN_VISIBLE = 3;
-    while(hidden.length && (all.length - hidden.length) < MIN_VISIBLE){
-      hidden.shift();
-    }
-
-    hidden.forEach(t => t.classList.add('cat-hidden'));
-    // Keep the highest-priority department (HR) flush-left if the forced minimum overflows.
     nav.scrollLeft = 0;
 
     // Build the dropdown from the hidden tabs, mirroring their live badge counts.
@@ -103,6 +77,7 @@
       moreBtn.classList.add('active');
       labelEl.textContent = CATEGORY_LABELS[activeCat] || 'More';
     } else {
+      moreBtn.classList.remove('active');
       labelEl.textContent = 'More';
     }
 
