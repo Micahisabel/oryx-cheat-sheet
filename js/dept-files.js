@@ -268,7 +268,7 @@ function deptFilesSectionHtml(deptLabel, term){
     ? `<div class="df-grid">${files.map(deptFileCardHtml).join('')}</div>`
     : `<p class="df-empty">No files here yet. Use “Share a Resource” to add one.</p>`;
   return `
-    <div class="dept-inline-head">Files <span class="dept-inline-count">${count}</span></div>
+    <div class="dept-inline-head">Department Files <span class="dept-inline-count">${count}</span></div>
     ${body}`;
 }
 
