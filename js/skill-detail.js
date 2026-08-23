@@ -9,6 +9,11 @@ function instructionStepsList(steps){
   return '<ol class="howto-list">' + steps.map(s => '<li>' + escapeHtml(s) + '</li>').join('') + '</ol>';
 }
 function instructionHowToHtml(hasFile){
+  // Built-in guidance shown automatically on every instruction — a one-line summary, then the
+  // step-by-step for each tool. This is the same for all instructions; it is not the sharer's note.
+  const lead = hasFile
+    ? 'Open the attached file, copy all the text inside, then paste it into your Claude or ChatGPT instructions.'
+    : 'Copy the instructions above, then paste them into your Claude or ChatGPT instructions.';
   const copyStep = hasFile
     ? 'Open the attached file above and copy the text inside it.'
     : 'Copy the instructions above (use the Copy button).';
@@ -26,7 +31,8 @@ function instructionHowToHtml(hasFile){
     'Paste the instructions in and save.',
     'ChatGPT now follows them across your chats.'
   ];
-  return '<div class="howto-grid">'
+  return '<p class="howto-lead">' + escapeHtml(lead) + '</p>'
+    + '<div class="howto-grid">'
     + '<div class="howto-card"><h4><span class="howto-dot" style="background:#F5A623"></span>Add it to Claude</h4>' + instructionStepsList(claude) + '</div>'
     + '<div class="howto-card"><h4><span class="howto-dot" style="background:#34D399"></span>Add it to ChatGPT</h4>' + instructionStepsList(chatgpt) + '</div>'
     + '</div>';
