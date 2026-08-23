@@ -295,6 +295,21 @@ function markDeptFileTabs(){
   if(typeof window.layoutOtherToolsOverflow === 'function') window.layoutOtherToolsOverflow();
 }
 
+// Upload a standalone attachment (used when an instruction is shared as a file). Stores the
+// file in the same bucket and returns its public URL — no department_files row, so it doesn't
+// show as a Department File; the URL is attached to the instruction entry instead.
+async function uploadAttachmentFile(file){
+  if(!sbClient) throw new Error('file-service-unavailable');
+  if(file.size > DEPT_FILE_MAX_BYTES) throw new Error('file-too-large');
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const path = `instructions/${Date.now()}_${safeName}`;
+  const up = await sbClient.storage.from(DEPT_FILES_BUCKET)
+    .upload(path, file, { contentType: file.type || 'application/octet-stream', upsert: false });
+  if(up.error) throw up.error;
+  const { data: pub } = sbClient.storage.from(DEPT_FILES_BUCKET).getPublicUrl(path);
+  return pub.publicUrl;
+}
+
 // Upload a file to a department (used by the Share a Resource form). Resolves true on success.
 async function uploadDepartmentFile({ title, description, department, file }){
   if(!sbClient) throw new Error('file-service-unavailable');

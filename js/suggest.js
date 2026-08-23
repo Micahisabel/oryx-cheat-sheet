@@ -39,6 +39,7 @@ function updateDeptPickerVisibility(){
 const dShareType = document.getElementById('dShareType');
 const dPlatformField = document.getElementById('dPlatformField');
 const dLinkField = document.getElementById('dLinkField');
+const dInstrFileField = document.getElementById('dInstrFileField');
 const dFileField = document.getElementById('dFileField');
 const dFileDeptField = document.getElementById('dFileDeptField');
 const dDeptPickerField = document.getElementById('dDeptPickerField');
@@ -76,8 +77,10 @@ function updateShareType(){
   document.getElementById('dTitle').placeholder = isFile ? 'e.g. Price list 2026'
     : (isInstruction ? 'e.g. How to log a showroom enquiry' : 'e.g. Canva — for making posters');
 
-  // What is it for? (for directions, this is the steps)
-  document.getElementById('dDescLabel').textContent = isInstruction ? 'Write the steps' : 'What is it for?';
+  // What is it for? (for directions, this is the steps — which are optional if a file is added)
+  document.getElementById('dDescLabel').innerHTML = isInstruction
+    ? 'Write the steps <span class="optional-tag">(or add a file below instead)</span>'
+    : 'What is it for?';
   document.getElementById('dDesc').placeholder = isInstruction ? 'Write one step on each line'
     : (isFile ? 'e.g. The latest price list for windows' : 'e.g. A free website for making posters');
 
@@ -87,7 +90,8 @@ function updateShareType(){
   document.getElementById('dLink').placeholder = 'e.g. https://www.canva.com';
 
   // Link field: link + directions. File + team pickers: file only. "Which AI tool" only for a link.
-  if(dLinkField) dLinkField.style.display = isFile ? 'none' : '';
+  if(dLinkField) dLinkField.style.display = (isFile || isInstruction) ? 'none' : '';
+  if(dInstrFileField) dInstrFileField.style.display = isInstruction ? '' : 'none';
   if(dFileField) dFileField.style.display = isFile ? '' : 'none';
   if(dFileDeptField) dFileDeptField.style.display = isFile ? '' : 'none';
   dPlatformField.style.display = (isInstruction || isFile) ? 'none' : '';
@@ -528,6 +532,7 @@ function closeSuggestPanel(){
   closeShareTypeMenu();
   dOtherCategoryField.style.display = 'none';
   const fileInput = document.getElementById('dFile2'); if(fileInput) fileInput.value = '';
+  const instrFileInput = document.getElementById('dInstrFile'); if(instrFileInput) instrFileInput.value = '';
   const fileDept = document.getElementById('dFileDept'); if(fileDept) fileDept.value = '';
   updateShareType();
   clearSuggestDepartments();
@@ -630,14 +635,22 @@ async function submitDiscovery(){
   const platform = document.getElementById('dPlatform').value;
   const otherCategory = document.getElementById('dOtherCategory').value;
   const isInstruction = dShareType.value === 'instruction';
+  const instrFile = isInstruction ? (document.getElementById('dInstrFile').files[0] || null) : null;
+  // Instructions have no "Paste the link" field, so never carry a pasted link.
+  const effectiveLink = isInstruction ? '' : link;
 
   let ok = true;
   if(!title){ document.getElementById('errDTitle').style.display = 'block'; ok = false; } else document.getElementById('errDTitle').style.display = 'none';
-  if(!desc){ document.getElementById('errDDesc').style.display = 'block'; ok = false; } else document.getElementById('errDDesc').style.display = 'none';
+  // Steps are needed — unless the instruction is being shared as a file instead.
+  if(!desc && !(isInstruction && instrFile)){ document.getElementById('errDDesc').style.display = 'block'; ok = false; } else document.getElementById('errDDesc').style.display = 'none';
   // A link is required for a found resource, but optional for an instruction / how-to.
   if(!isInstruction && !link){ document.getElementById('errDLink').style.display = 'block'; ok = false; } else document.getElementById('errDLink').style.display = 'none';
-  if(link && !isValidLink(link)){
+  if(effectiveLink && !isValidLink(effectiveLink)){
     alert('That link doesn\'t look valid. Make sure it starts with https://');
+    ok = false;
+  }
+  if(instrFile && instrFile.size > DEPT_FILE_MAX_BYTES){
+    alert('That file is larger than 25 MB. Please add a smaller file, or paste a link instead.');
     ok = false;
   }
   if(!ok) return;
@@ -649,12 +662,24 @@ async function submitDiscovery(){
   saveSuggestBtn.disabled = true; saveSuggestBtn.textContent = 'Publishing…';
   const departments = getSuggestDepartments().join(', ');
   try{
+    // If the instruction is a file, upload it and use its link — the entry then shows an
+    // "open" button, no special file rendering needed. A pasted link is kept only if no file.
+    let finalLink = effectiveLink;
+    if(instrFile){
+      try{
+        finalLink = await uploadAttachmentFile(instrFile);
+      }catch(err){
+        saveSuggestBtn.disabled = false; updateShareType();
+        alert('Sorry, the file did not upload. Check your connection and try again.');
+        return;
+      }
+    }
     // The Firestore rule for entries/create (isValidDiscovery) requires category to be
     // 'discoveries' or match '^other-.*' — keep #dOtherCategory option values prefixed
     // with 'other-', or staff writes for that category will fail with permission-denied.
     const payload = {
       category: isInstruction ? 'instructions' : (platform === 'other' ? otherCategory : 'discoveries'),
-      title, body: desc, link,
+      title, body: desc, link: finalLink,
       platform: isInstruction ? 'claude' : platform,
       author: name || 'Anonymous', authorEmail: firebase.auth().currentUser.email, createdAt: Date.now()
     };
