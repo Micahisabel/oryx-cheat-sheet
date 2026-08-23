@@ -98,7 +98,7 @@ function updateShareType(){
   suggestSub.textContent = isFile
     ? 'Add a file for the team. It shows up straight away — no waiting.'
     : (isInstruction
-      ? 'Share simple step-by-step directions. They show up straight away — no waiting.'
+      ? 'Share instructions your team can use with ChatGPT or Claude. They show up straight away — no waiting.'
       : 'Share a helpful link with the team. It shows up straight away — no waiting.');
   saveSuggestBtn.textContent = 'Share with the team';
   syncShareTypeCards();
@@ -111,7 +111,7 @@ dShareType.addEventListener('change', updateShareType);
 const shareTypeCards = document.getElementById('shareTypeCards');
 const shareTypeTrigger = document.getElementById('shareTypeTrigger');
 const shareTypeTriggerText = document.getElementById('shareTypeTriggerText');
-const SHARE_TYPE_TITLES = { resource: 'Website / Video / Online Tool', instruction: 'Step-by-Step Guide', file: 'File / Document' };
+const SHARE_TYPE_TITLES = { resource: 'Website / Video / Online Tool', instruction: 'Instructions for ChatGPT or Claude', file: 'File / Document' };
 
 function syncShareTypeCards(){
   const val = dShareType.value;
@@ -604,7 +604,7 @@ async function submitSharedFile(){
     await uploadDepartmentFile({ title, description: desc, department: dept, file });
     markSubmitted();
     closeSuggestPanel();
-    alert('Uploaded! Your file is now in ' + dept + ', under Other AI Tools.');
+    alert('Uploaded! Your file is now in ' + dept + ', under AI Tools & Files.');
   }catch(e){
     console.error('Shared file upload failed:', e);
     alert('Sorry, the upload did not work. Check your connection and try again.');
