@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.47";</script>
+<script>window.APP_VERSION = "2026-08-16.49";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="css/dashboard.css?v=4">
 <link rel="stylesheet" href="css/cards.css?v=15">
 <link rel="stylesheet" href="css/modal.css?v=21">
-<link rel="stylesheet" href="css/forms.css?v=16">
+<link rel="stylesheet" href="css/forms.css?v=18">
 <link rel="stylesheet" href="css/dept-files.css?v=5">
 <link rel="stylesheet" href="css/responsive.css?v=2">
 </head>
@@ -447,13 +447,37 @@
     <input type="text" id="sWebsite" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true">
 
     <div id="discoveryFields">
-      <label for="dShareType">What are you sharing?</label>
-      <select id="dShareType">
+      <label id="shareTypeLabel">I want to share…</label>
+      <div class="share-type-select" id="shareTypeSelect">
+        <button type="button" class="share-type-trigger" id="shareTypeTrigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="shareTypeLabel">
+          <span class="stt-text" id="shareTypeTriggerText">Choose an option</span>
+          <span class="stt-caret"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+        </button>
+      <div class="share-type-cards" id="shareTypeCards" role="listbox" aria-label="I want to share" hidden>
+        <button type="button" class="share-type-card" role="option" data-value="resource">
+          <span class="stc-icon stc-icon-link"><svg viewBox="0 0 24 24"><path d="M9 15l6-6"/><path d="M11.5 6.5l1-1a4 4 0 0 1 6 6l-1 1"/><path d="M12.5 17.5l-1 1a4 4 0 0 1-6-6l1-1"/></svg></span>
+          <span class="stc-text"><span class="stc-title">Website / Video / Online Tool</span><span class="stc-sub">Share a useful website, video, or online tool.</span></span>
+        </button>
+        <button type="button" class="share-type-card" role="option" data-value="instruction">
+          <span class="stc-icon stc-icon-guide"><svg viewBox="0 0 24 24"><path d="M10 6h10"/><path d="M10 12h10"/><path d="M10 18h10"/><path d="M4 5.5l1.2 1.2L7.5 4.3"/><path d="M4 11.5l1.2 1.2L7.5 10.3"/><path d="M4 17.5l1.2 1.2L7.5 16.3"/></svg></span>
+          <span class="stc-text"><span class="stc-title">Step-by-Step Guide</span><span class="stc-sub">Share step-by-step instructions or a how-to guide.</span></span>
+        </button>
+        <button type="button" class="share-type-card" role="option" data-value="file">
+          <span class="stc-icon stc-icon-file"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></span>
+          <span class="stc-text"><span class="stc-title">File / Document</span><span class="stc-sub">Share a file or document from your computer.</span></span>
+        </button>
+      </div>
+      </div>
+      <!-- Hidden source of truth: the cards above write to this select and fire its change event,
+           so all the existing share-type logic keeps working unchanged. -->
+      <select id="dShareType" class="visually-hidden" tabindex="-1" aria-hidden="true">
         <option value="resource">A link (a website, video, or online tool)</option>
         <option value="instruction">Step-by-step directions (how to do something)</option>
         <option value="file">A file from my computer (like a PDF)</option>
       </select>
 
+      <!-- The rest of the form appears only once a share type is chosen. -->
+      <div id="shareDetails" style="display:none;">
       <label for="dTitle" id="dTitleLabel">Give it a name</label>
       <input type="text" id="dTitle" placeholder="e.g. Canva — for making posters">
       <div class="field-error" id="errDTitle">Please add a name.</div>
@@ -509,6 +533,7 @@
         <label>Which teams is this useful for? <span class="optional-tag">(pick any — or skip)</span></label>
         <div class="dept-picker" id="dDepartments"></div>
       </div>
+      </div><!-- /#shareDetails -->
     </div>
 
     <div id="requestFields" style="display:none;">
@@ -686,7 +711,7 @@
 <script src="js/add-entry.js?v=22"></script>
 <script src="js/shortcuts-form.js?v=18"></script>
 <script src="js/admin.js?v=22"></script>
-<script src="js/suggest.js?v=35"></script>
+<script src="js/suggest.js?v=37"></script>
 <script src="js/favorites.js?v=4"></script>
 <script src="js/notifications.js?v=7"></script>
 <script src="js/activity.js?v=3"></script>

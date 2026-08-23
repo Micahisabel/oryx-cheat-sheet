@@ -55,7 +55,19 @@ if(dFileDeptSel && !dFileDeptSel.options.length && typeof OTHER_TOOLS_CATS !== '
 }
 
 function updateShareType(){
-  const type = dShareType.value; // 'resource' | 'instruction' | 'file'
+  const type = dShareType.value; // '' (unchosen) | 'resource' | 'instruction' | 'file'
+  const shareDetails = document.getElementById('shareDetails');
+
+  // Nothing chosen yet: keep the rest of the form hidden until a share type is picked.
+  if(!type){
+    if(shareDetails) shareDetails.style.display = 'none';
+    suggestSub.textContent = 'Choose what you’d like to share, then add the details.';
+    saveSuggestBtn.textContent = 'Share with the team';
+    syncShareTypeCards();
+    return;
+  }
+  if(shareDetails) shareDetails.style.display = '';
+
   const isInstruction = type === 'instruction';
   const isFile = type === 'file';
 
@@ -89,8 +101,61 @@ function updateShareType(){
       ? 'Share simple step-by-step directions. They show up straight away — no waiting.'
       : 'Share a helpful link with the team. It shows up straight away — no waiting.');
   saveSuggestBtn.textContent = 'Share with the team';
+  syncShareTypeCards();
 }
 dShareType.addEventListener('change', updateShareType);
+
+// "I want to share…" is a dropdown: the "Choose an option" box opens the three cards, and the
+// cards drive the hidden <select> (the source of truth). syncShareTypeCards keeps the box label,
+// caret, and highlight in step.
+const shareTypeCards = document.getElementById('shareTypeCards');
+const shareTypeTrigger = document.getElementById('shareTypeTrigger');
+const shareTypeTriggerText = document.getElementById('shareTypeTriggerText');
+const SHARE_TYPE_TITLES = { resource: 'Website / Video / Online Tool', instruction: 'Step-by-Step Guide', file: 'File / Document' };
+
+function syncShareTypeCards(){
+  const val = dShareType.value;
+  if(shareTypeCards){
+    shareTypeCards.querySelectorAll('.share-type-card').forEach(card => {
+      const on = card.dataset.value === val;
+      card.classList.toggle('selected', on);
+      card.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+  }
+  if(shareTypeTriggerText) shareTypeTriggerText.textContent = SHARE_TYPE_TITLES[val] || 'Choose an option';
+  if(shareTypeTrigger) shareTypeTrigger.classList.toggle('has-value', !!val);
+}
+function openShareTypeMenu(){
+  if(!shareTypeCards) return;
+  shareTypeCards.hidden = false;
+  if(shareTypeTrigger) shareTypeTrigger.setAttribute('aria-expanded', 'true');
+}
+function closeShareTypeMenu(){
+  if(!shareTypeCards) return;
+  shareTypeCards.hidden = true;
+  if(shareTypeTrigger) shareTypeTrigger.setAttribute('aria-expanded', 'false');
+}
+if(shareTypeTrigger){
+  shareTypeTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    shareTypeCards.hidden ? openShareTypeMenu() : closeShareTypeMenu();
+  });
+}
+if(shareTypeCards){
+  shareTypeCards.querySelectorAll('.share-type-card').forEach(card => {
+    card.addEventListener('click', () => {
+      dShareType.value = card.dataset.value;
+      closeShareTypeMenu();
+      updateShareType();
+    });
+  });
+}
+document.addEventListener('click', (e) => {
+  if(!shareTypeCards || shareTypeCards.hidden) return;
+  if(e.target.closest('#shareTypeSelect')) return;
+  closeShareTypeMenu();
+});
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeShareTypeMenu(); });
 
 function getVerifiedName(){
   const user = firebase.auth().currentUser;
@@ -449,7 +514,8 @@ function openSuggestPanel(){
   suggestOverlay.classList.add('open');
   sMode.value = 'discovery';
   updateSuggestMode();
-  dShareType.value = 'resource';
+  dShareType.value = '';
+  closeShareTypeMenu();
   updateShareType();
 }
 function closeSuggestPanel(){
@@ -458,7 +524,8 @@ function closeSuggestPanel(){
   document.getElementById('dDesc').value = '';
   document.getElementById('dLink').value = '';
   document.getElementById('dPlatform').value = 'claude';
-  dShareType.value = 'resource';
+  dShareType.value = '';
+  closeShareTypeMenu();
   dOtherCategoryField.style.display = 'none';
   const fileInput = document.getElementById('dFile2'); if(fileInput) fileInput.value = '';
   const fileDept = document.getElementById('dFileDept'); if(fileDept) fileDept.value = '';
@@ -550,6 +617,11 @@ async function submitDiscovery(){
   if(document.getElementById('sWebsite').value.trim()){ closeSuggestPanel(); return; }
   if(submitOnCooldown()){ alert('Please wait a moment before sending another one.'); return; }
 
+  if(!dShareType.value){
+    alert('Please choose what you want to share first.');
+    openShareTypeMenu();
+    return;
+  }
   if(dShareType.value === 'file'){ return submitSharedFile(); }
 
   const title = document.getElementById('dTitle').value.trim();
