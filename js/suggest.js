@@ -77,12 +77,14 @@ function updateShareType(){
   document.getElementById('dTitle').placeholder = isFile ? 'e.g. Price list 2026'
     : (isInstruction ? 'e.g. How to log a showroom enquiry' : 'e.g. Canva — for making posters');
 
-  // What is it for? (for directions, this is the steps — which are optional if a file is added)
+  // What is it for? (for instructions, this is the note — optional when a file is attached)
   document.getElementById('dDescLabel').innerHTML = isInstruction
-    ? 'Write the steps <span class="optional-tag">(or add a file below instead)</span>'
+    ? 'Write the instructions <span class="optional-tag">(you can leave this empty if you attach a file)</span>'
     : 'What is it for?';
-  document.getElementById('dDesc').placeholder = isInstruction ? 'Write one step on each line'
+  document.getElementById('dDesc').placeholder = isInstruction ? 'Type the instructions here…'
     : (isFile ? 'e.g. The latest price list for windows' : 'e.g. A free website for making posters');
+  const instrNote = document.getElementById('dInstrNote');
+  if(instrNote) instrNote.style.display = isInstruction ? '' : 'none';
 
   document.getElementById('dLinkLabel').innerHTML = isInstruction
     ? 'Paste the link <span class="optional-tag">(you can leave this empty)</span>'

@@ -294,7 +294,7 @@ function render(){
     }).sort(favThenRecent);
 
     const platformFilteredEntries = activePlatform === 'all' ? libraryEntries : libraryEntries.filter(e => (e.platform || 'claude') === activePlatform);
-    const counts = { all: platformFilteredEntries.length, skills: 0, commands: 0, agents: 0, mcps: 0, plugins: 0, discoveries: 0, 'other-tools': 0 };
+    const counts = { all: platformFilteredEntries.length, instructions: 0, skills: 0, commands: 0, agents: 0, mcps: 0, plugins: 0, discoveries: 0, 'other-tools': 0 };
     OTHER_TOOLS_CATS.forEach(c => { counts[c] = 0; });
     platformFilteredEntries.forEach(e => { if(counts[e.category] !== undefined) counts[e.category]++; });
     Object.keys(counts).forEach(cat => {
@@ -371,7 +371,11 @@ function render(){
     if(!thumbInner && (isOtherToolsCategory(e.category) || e.category === 'mcps') && e.link) thumbInner = faviconBadgeHtml(e.link, e.category);
     if(!thumbInner) thumbInner = isShortcutCategory(e.category) ? shortcutBadgeHtml(e.shortcutKey) : cardPlaceholderHtml(e.category);
     const thumbHtml = safeLink ? `<a class="card-thumb-link" href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${thumbInner}</a>` : thumbInner;
-    const linkHtml = safeLink ? `<div class="card-link"><a href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${escapeHtml(safeLink)}</a></div>` : '';
+    const linkHtml = safeLink
+      ? (isFileLink(safeLink)
+          ? `<div class="card-file"><a href="${escapeHtml(safeLink)}" target="_blank" rel="noopener" download>${FILE_ICON_SVG}<span>${escapeHtml(fileNameFromUrl(safeLink))}</span></a></div>`
+          : `<div class="card-link"><a href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${escapeHtml(safeLink)}</a></div>`)
+      : '';
     const dateStr = new Date(e.createdAt).toLocaleDateString(undefined, {month:'short', day:'numeric'});
     const preview = (isRichCategory(e.category) || isShortcutCategory(e.category)) ? (e.purpose || e.body) : e.body;
     const tagChipHtml = e.tag ? `<span class="card-tag-chip">${escapeHtml(e.tag)}</span>` : '';

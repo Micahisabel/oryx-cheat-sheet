@@ -1,6 +1,37 @@
 const BACK_ARROW_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>';
 const DOWNLOAD_ICON_SVG = '<svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM12 4v8.17l3.59-3.58L17 10l-6 6-6-6 1.41-1.41L10 12.17V4h2z"/></svg>';
 
+// A plain step-by-step guide, shown on an instruction's page, for putting the instruction into
+// Claude and into ChatGPT. Wording is kept general (find the "Instructions" box) so it stays
+// correct as those apps tweak their menus. `hasText` switches the copy step between "copy the
+// text above" and "open the attached file" for file-only instructions.
+function instructionStepsList(steps){
+  return '<ol class="howto-list">' + steps.map(s => '<li>' + escapeHtml(s) + '</li>').join('') + '</ol>';
+}
+function instructionHowToHtml(hasText){
+  const copyStep = hasText
+    ? 'Copy the instructions above (use the Copy button).'
+    : 'Open the attached file above and copy the text inside it.';
+  const claude = [
+    'Open Claude at claude.ai and sign in.',
+    copyStep,
+    'Open your Project — or click your name, then Settings — to find the “Instructions” box.',
+    'Paste the instructions in and save.',
+    'Claude now keeps them in mind across your chats.'
+  ];
+  const chatgpt = [
+    'Open ChatGPT at chatgpt.com and sign in.',
+    copyStep,
+    'Open a Project and its instructions, or go to Settings → Personalisation → Custom instructions.',
+    'Paste the instructions in and save.',
+    'ChatGPT now follows them across your chats.'
+  ];
+  return '<div class="howto-grid">'
+    + '<div class="howto-card"><h4><span class="howto-dot" style="background:#F5A623"></span>Add it to Claude</h4>' + instructionStepsList(claude) + '</div>'
+    + '<div class="howto-card"><h4><span class="howto-dot" style="background:#34D399"></span>Add it to ChatGPT</h4>' + instructionStepsList(chatgpt) + '</div>'
+    + '</div>';
+}
+
 function openNoteDetail(entry){
   incrementViewCount(entry.id);
   const inner = document.getElementById('skillPageInner');
@@ -69,9 +100,18 @@ function openNoteDetail(entry){
       + optionalBlock('How to Use It', entry.howToUse)
       + copyableBlock('Example', entry.example, 'detail-value mono', 'example')
       + optionalBlock('Notes', entry.notes);
+  } else if(isInstruction){
+    const hasText = !!(entry.body && String(entry.body).trim());
+    const hasFile = !!(entry.link && isFileLink(entry.link));
+    html += (hasText
+        ? detailSection('The instructions', copyableBlock('Copy this, then paste it into Claude or ChatGPT', entry.body, 'detail-value instruction-body', 'body'))
+        : '')
+      + (hasFile ? detailSection('The file', fileDownloadHtml(entry.link)) : '')
+      + detailSection('How to add this to Claude or ChatGPT', instructionHowToHtml(hasText))
+      + detailBlock('Make it your own', INSTRUCTION_HELP_TEXT);
   } else {
-    const howTitle = isLinkResource ? 'How to Use' : (isInstruction ? 'Make it your own' : 'How to Download');
-    const howText = isLinkResource ? USE_LINK_HELP_TEXT : (isInstruction ? INSTRUCTION_HELP_TEXT : DOWNLOAD_HELP_TEXT);
+    const howTitle = isLinkResource ? 'How to Use' : 'How to Download';
+    const howText = isLinkResource ? USE_LINK_HELP_TEXT : DOWNLOAD_HELP_TEXT;
     html += optionalBlock('Details', entry.body)
       + detailBlock(howTitle, howText);
   }
@@ -80,7 +120,7 @@ function openNoteDetail(entry){
     ? `${entry.lastEditedBy} · ${new Date(entry.lastEditedAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'})}`
     : '';
 
-  html += (entry.link ? detailBlockHtml('Link', linkHtml) : '')
+  html += ((entry.link && !isInstruction) ? detailBlockHtml('Link', linkHtml) : '')
     + optionalBlock('Suggested by', entry.suggestedBy)
     + detailBlock('Added by', entry.author || 'Anonymous')
     + detailBlock('Date added', dateStr)

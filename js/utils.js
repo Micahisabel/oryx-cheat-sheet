@@ -163,6 +163,27 @@ function faviconUrlForLink(link){
   catch(e){ return null; }
 }
 
+// A "link" that is really an uploaded file: either it lives in our department-files bucket, or it
+// ends in a common document/image extension. Used so attached files show as a tidy file chip with
+// a download button, not a long raw URL.
+function isFileLink(url){
+  if(!url) return false;
+  return /\/department-files\//.test(url) || /\.(pdf|docx?|xlsx?|pptx?|txt|csv|rtf|png|jpe?g|gif|webp)(\?|#|$)/i.test(url);
+}
+// Pull a readable file name out of the URL, dropping the upload timestamp prefix we add
+// (e.g. "1787480460331_Oryx_Brief.docx" -> "Oryx_Brief.docx").
+function fileNameFromUrl(url){
+  try{
+    let name = decodeURIComponent((new URL(url).pathname.split('/').pop()) || 'file');
+    return name.replace(/^\d{10,}_/, '') || 'file';
+  }catch(e){ return 'file'; }
+}
+const FILE_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
+// A download button labelled with the file name — used on the instruction detail page.
+function fileDownloadHtml(url){
+  return `<a class="file-download" href="${escapeHtml(url)}" target="_blank" rel="noopener" download><span class="file-download-icon">${FILE_ICON_SVG}</span><span class="file-download-name">${escapeHtml(fileNameFromUrl(url))}</span><span class="file-download-go">Open</span></a>`;
+}
+
 function platformMeta(platform){
   const map = {
     claude:  { label: 'Claude',        color: '#F5A623' },
