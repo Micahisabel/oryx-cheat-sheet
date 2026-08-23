@@ -79,9 +79,9 @@ function updateShareType(){
 
   // What is it for? (for instructions, this is the note — optional when a file is attached)
   document.getElementById('dDescLabel').innerHTML = isInstruction
-    ? 'Write the instructions <span class="optional-tag">(you can leave this empty if you attach a file)</span>'
+    ? 'Leave a note for the team <span class="optional-tag">(optional)</span>'
     : 'What is it for?';
-  document.getElementById('dDesc').placeholder = isInstruction ? 'Type the instructions here…'
+  document.getElementById('dDesc').placeholder = isInstruction ? 'e.g. Open the file and paste it into Claude’s instructions.'
     : (isFile ? 'e.g. The latest price list for windows' : 'e.g. A free website for making posters');
   const instrNote = document.getElementById('dInstrNote');
   if(instrNote) instrNote.style.display = isInstruction ? '' : 'none';

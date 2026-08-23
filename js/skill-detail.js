@@ -8,10 +8,10 @@ const DOWNLOAD_ICON_SVG = '<svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM12
 function instructionStepsList(steps){
   return '<ol class="howto-list">' + steps.map(s => '<li>' + escapeHtml(s) + '</li>').join('') + '</ol>';
 }
-function instructionHowToHtml(hasText){
-  const copyStep = hasText
-    ? 'Copy the instructions above (use the Copy button).'
-    : 'Open the attached file above and copy the text inside it.';
+function instructionHowToHtml(hasFile){
+  const copyStep = hasFile
+    ? 'Open the attached file above and copy the text inside it.'
+    : 'Copy the instructions above (use the Copy button).';
   const claude = [
     'Open Claude at claude.ai and sign in.',
     copyStep,
@@ -103,11 +103,15 @@ function openNoteDetail(entry){
   } else if(isInstruction){
     const hasText = !!(entry.body && String(entry.body).trim());
     const hasFile = !!(entry.link && isFileLink(entry.link));
+    // With a file attached, the file is the real instruction and the typed text is a note for
+    // the team. With no file, the typed text IS the instruction to paste into Claude/ChatGPT.
+    const textTitle = hasFile ? 'Note' : 'The instructions';
+    const textLabel = hasFile ? 'A note from the person who shared this' : 'Copy this, then paste it into Claude or ChatGPT';
     html += (hasText
-        ? detailSection('The instructions', copyableBlock('Copy this, then paste it into Claude or ChatGPT', entry.body, 'detail-value instruction-body', 'body'))
+        ? detailSection(textTitle, copyableBlock(textLabel, entry.body, 'detail-value instruction-body', 'body'))
         : '')
       + (hasFile ? detailSection('The file', fileDownloadHtml(entry.link)) : '')
-      + detailSection('How to add this to Claude or ChatGPT', instructionHowToHtml(hasText))
+      + detailSection('How to add this to Claude or ChatGPT', instructionHowToHtml(hasFile))
       + detailBlock('Make it your own', INSTRUCTION_HELP_TEXT);
   } else {
     const howTitle = isLinkResource ? 'How to Use' : 'How to Download';
