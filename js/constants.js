@@ -77,7 +77,7 @@ const CATEGORY_EXPLAINERS = {
     agents: 'A Claude AI Agent is like a worker that can handle a task for you. You give it a goal, and it can work through the steps needed to complete it.',
     mcps: 'A Claude MCP is like a bridge that connects Claude to other tools or systems. It allows Claude to access information or use tools outside of the chat.',
     plugins: 'A Claude Plugin is like an extra tool for Claude. It adds new abilities or makes it easier to connect Claude with other tools and services.',
-    instructions: 'Simple, step-by-step guides that show you how to do things here. Follow them one step at a time — written in plain words so anyone can follow along.',
+    instructions: 'Ready-made instructions you can give Claude so it works the way you need. Open one, copy the text (or its file), and paste it into the Claude instructions box.',
     discoveries: 'Short and useful videos that help the team learn new Claude features, tips, shortcuts, and ways to use Claude at work.'
   },
   chatgpt: {
@@ -85,7 +85,7 @@ const CATEGORY_EXPLAINERS = {
     agents: 'A ChatGPT AI Agent is like a worker that can handle a task for you. You give it a goal, and it can take several steps to work toward completing it.',
     mcps: 'A ChatGPT MCP is like a bridge that connects ChatGPT to other tools or systems. It allows ChatGPT to work with information and services outside of the chat.',
     plugins: 'A ChatGPT Plugin is like an extra tool that gives ChatGPT additional abilities or connects it to other services.',
-    instructions: 'Simple, step-by-step guides that show you how to do things here. Follow them one step at a time — written in plain words so anyone can follow along.',
+    instructions: 'Ready-made instructions you can give ChatGPT so it works the way you need. Open one, copy the text (or its file), and paste it into the ChatGPT instructions box.',
     discoveries: 'Short and useful videos that help the team learn new ChatGPT features, tips, shortcuts, and ways to use ChatGPT at work.'
   },
   other: {

@@ -39,6 +39,7 @@ function updateDeptPickerVisibility(){
 const dShareType = document.getElementById('dShareType');
 const dPlatformField = document.getElementById('dPlatformField');
 const dLinkField = document.getElementById('dLinkField');
+const dInstrToolField = document.getElementById('dInstrToolField');
 const dInstrFileField = document.getElementById('dInstrFileField');
 const dFileField = document.getElementById('dFileField');
 const dFileDeptField = document.getElementById('dFileDeptField');
@@ -93,6 +94,7 @@ function updateShareType(){
 
   // Link field: link + directions. File + team pickers: file only. "Which AI tool" only for a link.
   if(dLinkField) dLinkField.style.display = (isFile || isInstruction) ? 'none' : '';
+  if(dInstrToolField) dInstrToolField.style.display = isInstruction ? '' : 'none';
   if(dInstrFileField) dInstrFileField.style.display = isInstruction ? '' : 'none';
   if(dFileField) dFileField.style.display = isFile ? '' : 'none';
   if(dFileDeptField) dFileDeptField.style.display = isFile ? '' : 'none';
@@ -682,7 +684,7 @@ async function submitDiscovery(){
     const payload = {
       category: isInstruction ? 'instructions' : (platform === 'other' ? otherCategory : 'discoveries'),
       title, body: desc, link: finalLink,
-      platform: isInstruction ? 'claude' : platform,
+      platform: isInstruction ? (document.getElementById('dInstrTool').value || 'claude') : platform,
       author: name || 'Anonymous', authorEmail: firebase.auth().currentUser.email, createdAt: Date.now()
     };
     // Department is optional. The strict isValidDiscovery rule may not allow this extra field

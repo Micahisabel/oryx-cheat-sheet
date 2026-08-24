@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.60";</script>
+<script>window.APP_VERSION = "2026-08-16.63";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -478,6 +478,15 @@
 
       <!-- The rest of the form appears only once a share type is chosen. -->
       <div id="shareDetails" style="display:none;">
+      <!-- Instruction only: which AI this instruction is for. -->
+      <div id="dInstrToolField" style="display:none;">
+        <label for="dInstrTool">Which one is this for?</label>
+        <select id="dInstrTool">
+          <option value="claude">Claude</option>
+          <option value="chatgpt">ChatGPT</option>
+        </select>
+      </div>
+
       <label for="dTitle" id="dTitleLabel">Give it a name</label>
       <input type="text" id="dTitle" placeholder="e.g. Canva — for making posters">
       <div class="field-error" id="errDTitle">Please add a name.</div>
@@ -711,15 +720,15 @@
 
 <script src="js/firebase.js?v=20"></script>
 <script src="js/utils.js?v=25"></script>
-<script src="js/constants.js?v=37"></script>
+<script src="js/constants.js?v=39"></script>
 <script src="js/state.js?v=19"></script>
 <script src="js/sidebar.js?v=28"></script>
-<script src="js/entries.js?v=43"></script>
-<script src="js/skill-detail.js?v=33"></script>
+<script src="js/entries.js?v=44"></script>
+<script src="js/skill-detail.js?v=34"></script>
 <script src="js/add-entry.js?v=22"></script>
 <script src="js/shortcuts-form.js?v=18"></script>
 <script src="js/admin.js?v=22"></script>
-<script src="js/suggest.js?v=43"></script>
+<script src="js/suggest.js?v=44"></script>
 <script src="js/favorites.js?v=4"></script>
 <script src="js/notifications.js?v=7"></script>
 <script src="js/activity.js?v=3"></script>

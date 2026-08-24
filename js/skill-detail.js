@@ -8,34 +8,33 @@ const DOWNLOAD_ICON_SVG = '<svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM12
 function instructionStepsList(steps){
   return '<ol class="howto-list">' + steps.map(s => '<li>' + escapeHtml(s) + '</li>').join('') + '</ol>';
 }
-function instructionHowToHtml(hasFile){
+function instructionHowToHtml(hasFile, platform){
   // Built-in guidance shown automatically on every instruction — a one-line summary, then the
-  // step-by-step for each tool. This is the same for all instructions; it is not the sharer's note.
+  // step-by-step for the tool this instruction is for (Claude OR ChatGPT, not both).
+  const isChatGPT = platform === 'chatgpt';
+  const toolName = isChatGPT ? 'ChatGPT' : 'Claude';
   const lead = hasFile
-    ? 'Open the attached file, copy all the text inside, then paste it into your Claude or ChatGPT instructions.'
-    : 'Copy the instructions above, then paste them into your Claude or ChatGPT instructions.';
+    ? 'Open the attached file, copy all the text inside, then paste it into your ' + toolName + ' instructions.'
+    : 'Copy the instructions above, then paste them into your ' + toolName + ' instructions.';
   const copyStep = hasFile
     ? 'Open the attached file above and copy the text inside it.'
     : 'Copy the instructions above (use the Copy button).';
-  const claude = [
+  const steps = isChatGPT ? [
+    'Open ChatGPT at chatgpt.com and sign in.',
+    copyStep,
+    'Open a Project and its instructions, or go to Settings → Personalisation → Custom instructions.',
+    'Paste the instructions in and save.',
+    'ChatGPT now follows them across your chats.'
+  ] : [
     'Open Claude at claude.ai and sign in.',
     copyStep,
     'Open your Project — or click your name, then Settings — to find the “Instructions” box.',
     'Paste the instructions in and save.',
     'Claude now keeps them in mind across your chats.'
   ];
-  const chatgpt = [
-    'Open ChatGPT at chatgpt.com and sign in.',
-    copyStep,
-    'Open a Project and its instructions, or go to Settings → Personalisation → Custom instructions.',
-    'Paste the instructions in and save.',
-    'ChatGPT now follows them across your chats.'
-  ];
+  const dot = isChatGPT ? '#34D399' : '#F5A623';
   return '<p class="howto-lead">' + escapeHtml(lead) + '</p>'
-    + '<div class="howto-grid">'
-    + '<div class="howto-card"><h4><span class="howto-dot" style="background:#F5A623"></span>Add it to Claude</h4>' + instructionStepsList(claude) + '</div>'
-    + '<div class="howto-card"><h4><span class="howto-dot" style="background:#34D399"></span>Add it to ChatGPT</h4>' + instructionStepsList(chatgpt) + '</div>'
-    + '</div>';
+    + '<div class="howto-card"><h4><span class="howto-dot" style="background:' + dot + '"></span>Add it to ' + toolName + '</h4>' + instructionStepsList(steps) + '</div>';
 }
 
 function openNoteDetail(entry){
@@ -117,7 +116,7 @@ function openNoteDetail(entry){
         ? detailSection(textTitle, copyableBlock(textLabel, entry.body, 'detail-value instruction-body', 'body'))
         : '')
       + (hasFile ? detailSection('The file', fileDownloadHtml(entry.link)) : '')
-      + detailSection('How to add this to Claude or ChatGPT', instructionHowToHtml(hasFile))
+      + detailSection('How to add this to ' + (entry.platform === 'chatgpt' ? 'ChatGPT' : 'Claude'), instructionHowToHtml(hasFile, entry.platform))
       + detailBlock('Make it your own', INSTRUCTION_HELP_TEXT);
   } else {
     const howTitle = isLinkResource ? 'How to Use' : 'How to Download';
