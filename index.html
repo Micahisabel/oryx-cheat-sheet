@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.67";</script>
+<script>window.APP_VERSION = "2026-08-16.69";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -193,7 +193,7 @@
         <button class="cat-tab" data-cat="other-fabrication"><span class="cat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></span>Fabrication<span class="cat-badge" data-count-for="other-fabrication">0</span></button>
         <button class="cat-tab" data-cat="other-finance"><span class="cat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.3a2.4 2.4 0 0 1 5 0c0 3-5 1-5 4a2.4 2.4 0 0 0 5 0"/></svg></span>Finance<span class="cat-badge" data-count-for="other-finance">0</span></button>
         <button class="cat-tab" data-cat="other-installation"><span class="cat-icon"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1"/><circle cx="15" cy="12" r="1"/></svg></span>Installation Operation<span class="cat-badge" data-count-for="other-installation">0</span></button>
-        <button class="cat-tab" data-cat="other-procurement"><span class="cat-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.4 12h11l2-8H6"/></svg></span>Procurement<span class="cat-badge" data-count-for="other-procurement">0</span></button>
+        <button class="cat-tab" data-cat="other-supply-chain"><span class="cat-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.4 12h11l2-8H6"/></svg></span>Supply Chain<span class="cat-badge" data-count-for="other-supply-chain">0</span></button>
         <button class="cat-tab" data-cat="other-projects"><span class="cat-icon"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8 12h8M8 16h5"/></svg></span>Projects<span class="cat-badge" data-count-for="other-projects">0</span></button>
         <button class="cat-tab" data-cat="other-quartermaster"><span class="cat-icon"><svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg></span>Quarter Master<span class="cat-badge" data-count-for="other-quartermaster">0</span></button>
       </nav>
@@ -222,7 +222,7 @@
           <option value="Fabrication">Fabrication</option>
           <option value="Finance">Finance</option>
           <option value="Installation Operation">Installation Operation</option>
-          <option value="Procurement">Procurement</option>
+          <option value="Supply Chain">Supply Chain</option>
           <option value="Projects">Projects</option>
           <option value="Quarter Master">Quarter Master</option>
         </select>
@@ -295,7 +295,7 @@
         <option value="other-fabrication">Fabrication</option>
         <option value="other-finance">Finance</option>
         <option value="other-installation">Installation Operation</option>
-        <option value="other-procurement">Procurement</option>
+        <option value="other-supply-chain">Supply Chain</option>
         <option value="other-projects">Projects</option>
         <option value="other-quartermaster">Quarter Master</option>
       </optgroup>
@@ -535,7 +535,7 @@
           <option value="other-fabrication">Fabrication</option>
           <option value="other-finance">Finance</option>
           <option value="other-installation">Installation Operation</option>
-          <option value="other-procurement">Procurement</option>
+          <option value="other-supply-chain">Supply Chain</option>
           <option value="other-projects">Projects</option>
           <option value="other-quartermaster">Quarter Master</option>
         </select>
@@ -716,10 +716,10 @@
 
 <script src="js/firebase.js?v=20"></script>
 <script src="js/utils.js?v=25"></script>
-<script src="js/constants.js?v=40"></script>
+<script src="js/constants.js?v=41"></script>
 <script src="js/state.js?v=20"></script>
 <script src="js/sidebar.js?v=29"></script>
-<script src="js/entries.js?v=44"></script>
+<script src="js/entries.js?v=45"></script>
 <script src="js/skill-detail.js?v=34"></script>
 <script src="js/add-entry.js?v=23"></script>
 <script src="js/shortcuts-form.js?v=19"></script>
@@ -730,7 +730,7 @@
 <script src="js/activity.js?v=3"></script>
 <script src="js/review.js?v=15"></script>
 <script src="js/analytics.js?v=5"></script>
-<script src="js/dept-files.js?v=6"></script>
+<script src="js/dept-files.js?v=7"></script>
 <script src="js/app.js?v=18"></script>
 <script src="js/tab-overflow.js?v=6"></script>
 

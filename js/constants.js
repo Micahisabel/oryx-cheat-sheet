@@ -15,7 +15,7 @@ const CATEGORY_LABELS = {
   'other-fabrication': 'Fabrication',
   'other-finance': 'Finance',
   'other-installation': 'Installation Operation',
-  'other-procurement': 'Procurement',
+  'other-supply-chain': 'Supply Chain',
   'other-projects': 'Projects',
   'other-quartermaster': 'Quarter Master',
   'shortcut-desktop': 'Claude Desktop',
@@ -56,7 +56,7 @@ const CATEGORY_PLURAL_LABELS = {
   'other-fabrication': 'Fabrication',
   'other-finance': 'Finance',
   'other-installation': 'Installation Operation',
-  'other-procurement': 'Procurement',
+  'other-supply-chain': 'Supply Chain',
   'other-projects': 'Projects',
   'other-quartermaster': 'Quarter Master',
   'shortcut-desktop': 'Claude Shortcuts',
@@ -96,7 +96,7 @@ const CATEGORY_EXPLAINERS = {
     'other-fabrication': 'AI tools that help the Fabrication team plan, measure, and manage production work.',
     'other-finance': 'AI tools that help the Finance team with numbers, reports, invoices, and budgets.',
     'other-installation': 'AI tools that help the Installation team plan jobs, schedules, and on-site work.',
-    'other-procurement': 'AI tools that help the Procurement team source, compare, and order materials and supplies.',
+    'other-supply-chain': 'AI tools that help the Supply Chain team source, compare, and order materials and supplies.',
     'other-projects': 'AI tools that help the Projects team plan, track, and deliver projects on time.',
     'other-quartermaster': 'AI tools that help the Quarter Master team manage stock, tools, and equipment.'
   }
@@ -144,7 +144,7 @@ const CATEGORY_ICON_PATHS = {
   'other-fabrication': '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>',
   'other-finance': '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.3a2.4 2.4 0 0 1 5 0c0 3-5 1-5 4a2.4 2.4 0 0 0 5 0"/>',
   'other-installation': '<rect x="5" y="3" width="14" height="18" rx="1"/><circle cx="15" cy="12" r="1"/>',
-  'other-procurement': '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.4 12h11l2-8H6"/>',
+  'other-supply-chain': '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.4 12h11l2-8H6"/>',
   'other-projects': '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8 12h8M8 16h5"/>',
   'other-quartermaster': '<path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/>'
 };
@@ -158,7 +158,7 @@ function cardPlaceholderHtml(category){
 const RICH_CATEGORIES = ['skills', 'commands', 'agents', 'mcps', 'plugins'];
 function isRichCategory(cat){ return RICH_CATEGORIES.includes(cat); }
 
-const OTHER_TOOLS_CATS = ['other-hr', 'other-marketing', 'other-sales', 'other-business-support', 'other-fabrication', 'other-finance', 'other-installation', 'other-procurement', 'other-projects', 'other-quartermaster'];
+const OTHER_TOOLS_CATS = ['other-hr', 'other-marketing', 'other-sales', 'other-business-support', 'other-fabrication', 'other-finance', 'other-installation', 'other-supply-chain', 'other-projects', 'other-quartermaster'];
 function isOtherToolsCategory(cat){ return cat === 'other-tools' || OTHER_TOOLS_CATS.includes(cat); }
 
 const CLAUDE_SHORTCUT_CATS = ['shortcut-prompts', 'shortcut-desktop', 'shortcut-code', 'shortcut-slash'];
@@ -201,7 +201,7 @@ function isOtherToolUsed(entry){
 // The department options for the main library filter and the Add/Edit picker. These are the
 // business departments an AI resource can be tagged with. Stored (comma-separated) in an
 // entry's existing `department` field, so no new Firestore field is introduced.
-const LIBRARY_DEPARTMENTS = ['HR', 'Marketing', 'Sales', 'Business Support', 'Fabrication', 'Finance', 'Installation Operation', 'Procurement', 'Projects', 'Quarter Master'];
+const LIBRARY_DEPARTMENTS = ['HR', 'Marketing', 'Sales', 'Business Support', 'Fabrication', 'Finance', 'Installation Operation', 'Supply Chain', 'Projects', 'Quarter Master'];
 
 // Which of the known departments an entry belongs to. Matches whole words case-insensitively,
 // so it reads both new comma lists ("HR, Finance") and legacy free text ("Sales and Marketing")

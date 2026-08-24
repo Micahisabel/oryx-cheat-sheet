@@ -233,11 +233,12 @@ function render(){
   const shortcutEntries = entries.filter(e => isShortcutCategory(e.category));
   const inOtherDept = viewMode !== 'shortcuts' && activePlatform === 'other' && OTHER_TOOLS_CATS.includes(activeCat);
 
-  if(viewMode === 'shortcuts' || activePlatform !== 'all'){
-    // Recently Added only appears under All Platforms, not in the Claude/ChatGPT views.
+  if(viewMode === 'shortcuts'){
     recentStrip.style.display = 'none';
   }else{
-    renderRecentStrip(libraryEntries);
+    // Recently Added is per-platform: on Claude it shows recent Claude entries, on ChatGPT
+    // ChatGPT, on AI Tools & Files recent tools — so it never mixes platforms.
+    renderRecentStrip(libraryEntries.filter(e => (e.platform || 'claude') === activePlatform));
   }
 
   document.getElementById('totalCount').textContent = libraryEntries.length;

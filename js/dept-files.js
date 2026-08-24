@@ -6,7 +6,7 @@
 
 // Kept in step with the Other AI Tools department tabs (constants.js OTHER_TOOLS_CATS labels),
 // so a file's department always matches a department shown under Other AI Tools.
-const DEPARTMENTS = ['HR', 'Marketing', 'Sales', 'Business Support', 'Fabrication', 'Finance', 'Installation Operation', 'Procurement', 'Projects', 'Quarter Master'];
+const DEPARTMENTS = ['HR', 'Marketing', 'Sales', 'Business Support', 'Fabrication', 'Finance', 'Installation Operation', 'Supply Chain', 'Projects', 'Quarter Master'];
 const DEPT_FILE_MAX_BYTES = 25 * 1024 * 1024; // 25 MB
 
 let deptFiles = [];
