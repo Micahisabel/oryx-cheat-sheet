@@ -8,6 +8,7 @@ const CATEGORY_LABELS = {
   instructions: 'Instruction',
   discoveries: 'Video',
   'other-tools': 'Other AI Tool',
+  'other-general': 'General',
   'other-hr': 'HR',
   'other-marketing': 'Marketing',
   'other-sales': 'Sales',
@@ -49,6 +50,7 @@ const CATEGORY_PLURAL_LABELS = {
   instructions: 'Instructions',
   discoveries: 'Video',
   'other-tools': 'Other AI Tools',
+  'other-general': 'General',
   'other-hr': 'HR',
   'other-marketing': 'Marketing',
   'other-sales': 'Sales',
@@ -89,6 +91,7 @@ const CATEGORY_EXPLAINERS = {
     discoveries: 'Short and useful videos that help the team learn new ChatGPT features, tips, shortcuts, and ways to use ChatGPT at work.'
   },
   other: {
+    'other-general': 'AI tools and files for everyone — anything that isn’t tied to one team. Share whatever helps the whole company here.',
     'other-hr': 'AI tools that help the HR team with hiring, staff records, training, and everyday people tasks.',
     'other-marketing': 'AI tools that help the Marketing team create content, campaigns, social posts, and brand materials.',
     'other-sales': 'AI tools that help the Sales team with quotes, follow-ups, proposals, and winning new business.',
@@ -137,6 +140,7 @@ const CATEGORY_ICON_PATHS = {
   plugins: '<path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4a2 2 0 0 0-2 2v3.8h1.5a2.7 2.7 0 0 1 0 5.4H2V20a2 2 0 0 0 2 2h3.8v-1.5a2.7 2.7 0 0 1 5.4 0V22H17a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"/>',
   discoveries: '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
   'other-tools': '<path d="M12 3l2.1 4.9L19 10l-4.9 2.1L12 17l-2.1-4.9L5 10l4.9-2.1z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/>',
+  'other-general': '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
   'other-hr': '<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.5"/><path d="M17.5 14a6 6 0 0 1 3.5 6"/>',
   'other-marketing': '<path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M16 9a4 4 0 0 1 0 6"/>',
   'other-sales': '<path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/>',
@@ -158,7 +162,7 @@ function cardPlaceholderHtml(category){
 const RICH_CATEGORIES = ['skills', 'commands', 'agents', 'mcps', 'plugins'];
 function isRichCategory(cat){ return RICH_CATEGORIES.includes(cat); }
 
-const OTHER_TOOLS_CATS = ['other-hr', 'other-marketing', 'other-sales', 'other-business-support', 'other-fabrication', 'other-finance', 'other-installation', 'other-supply-chain', 'other-projects', 'other-quartermaster'];
+const OTHER_TOOLS_CATS = ['other-hr', 'other-marketing', 'other-sales', 'other-business-support', 'other-fabrication', 'other-finance', 'other-installation', 'other-supply-chain', 'other-projects', 'other-quartermaster', 'other-general'];
 function isOtherToolsCategory(cat){ return cat === 'other-tools' || OTHER_TOOLS_CATS.includes(cat); }
 
 const CLAUDE_SHORTCUT_CATS = ['shortcut-prompts', 'shortcut-desktop', 'shortcut-code', 'shortcut-slash'];

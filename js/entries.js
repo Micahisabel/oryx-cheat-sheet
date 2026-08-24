@@ -229,16 +229,18 @@ function renderOtherFilesSection(inOtherDept, toolCount){
 }
 
 function render(){
-  updateActivityBadge();
+  // activity.js loads after this file; an early auth-state render (admin.js) can fire before
+  // updateActivityBadge is defined, so guard the call.
+  if(typeof updateActivityBadge === "function") updateActivityBadge();
   const libraryEntries = entries.filter(e => !isShortcutCategory(e.category));
   const shortcutEntries = entries.filter(e => isShortcutCategory(e.category));
   const inOtherDept = viewMode !== 'shortcuts' && activePlatform === 'other' && OTHER_TOOLS_CATS.includes(activeCat);
 
-  if(viewMode === 'shortcuts'){
+  if(viewMode === 'shortcuts' || activePlatform === 'other'){
+    // Recently Added shows only on Claude and ChatGPT — not in AI Tools & Files.
     recentStrip.style.display = 'none';
   }else{
-    // Recently Added is per-platform: on Claude it shows recent Claude entries, on ChatGPT
-    // ChatGPT, on AI Tools & Files recent tools — so it never mixes platforms.
+    // Per-platform: Claude shows recent Claude entries, ChatGPT shows ChatGPT — never mixed.
     renderRecentStrip(libraryEntries.filter(e => (e.platform || 'claude') === activePlatform));
   }
 
