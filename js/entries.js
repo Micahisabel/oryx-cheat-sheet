@@ -327,7 +327,7 @@ function render(){
   // staff member understands it at a glance — no separate announcement needed.
   const showOtherLegend = !searchTerm && viewMode !== 'shortcuts' && activePlatform === 'other';
   const legendHtml = showOtherLegend
-    ? `<span class="cat-explainer-legend">Faded tools are ones we're still exploring — not in regular use yet. Clear tools are already in use.</span>`
+    ? `<span class="cat-explainer-legend">Faded tools are still being explored. Clear tools are in use.</span>`
     : '';
   if(explainer || legendHtml){
     // Content is developer-defined constants, but escape anyway to keep the innerHTML sink safe.
