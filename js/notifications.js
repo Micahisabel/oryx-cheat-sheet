@@ -1,4 +1,4 @@
-// ============= Notification (browser notification on every new entry, opt-in per staff member) =============
+// ============= Notification (browser notification on every new entry — always on for all staff) =============
 let subscribedCats = new Set();
 let notifSubsUnsub = null;
 
@@ -17,25 +17,27 @@ firebase.auth().onAuthStateChanged((user) => {
     (doc) => {
       const data = doc.data();
       subscribedCats = new Set((data && data.categories) || []);
+      // Notifications are always on: make sure this staff member is subscribed to every
+      // category. If the stored set is missing any, write the full set back once.
+      const missingSome = ALL_NOTIFICATION_CATEGORIES.some(cat => !subscribedCats.has(cat));
+      if(missingSome){
+        notificationSubsCollection.doc(user.uid)
+          .set({ categories: ALL_NOTIFICATION_CATEGORIES }, { merge: true })
+          .catch(() => {});
+      }
       if(notifPrefsOverlay.classList.contains('open')) renderNotifPrefsList();
     },
     () => { subscribedCats = new Set(); }
   );
 });
 
-async function setNotifyAll(enabled){
-  const signedIn = await ensureStaffSignedIn();
-  if(!signedIn) return;
-  const uid = firebase.auth().currentUser.uid;
-  try{
-    await notificationSubsCollection.doc(uid).set({
-      categories: enabled ? ALL_NOTIFICATION_CATEGORIES : []
-    }, { merge: true });
-    if(enabled && 'Notification' in window && Notification.permission === 'default'){
-      Notification.requestPermission();
-    }
-  }catch(e){
-    alert('Could not update your notification preferences. Check your connection and try again.');
+// Ask the browser for permission to show notifications. Must be called from a user gesture
+// (e.g. opening the notification panel, or tapping the Allow button) or the browser ignores it.
+function requestNotifPermission(){
+  if('Notification' in window && Notification.permission === 'default'){
+    Notification.requestPermission().then(() => {
+      if(notifPrefsOverlay.classList.contains('open')) renderNotifPrefsList();
+    });
   }
 }
 
@@ -70,20 +72,30 @@ const notifPrefsOverlay = document.getElementById('notifPrefsOverlay');
 const notifPrefsList = document.getElementById('notifPrefsList');
 
 function renderNotifPrefsList(){
-  const isOn = ALL_NOTIFICATION_CATEGORIES.every(cat => subscribedCats.has(cat));
-  notifPrefsList.innerHTML = `
-    <label class="notif-toggle-row">
-      <input type="checkbox" id="notifAllToggle" ${isOn ? 'checked' : ''}>
-      <span class="notif-toggle-track"></span>
-      <span class="notif-toggle-label">Notify me about every new entry</span>
-    </label>
-  `;
-  document.getElementById('notifAllToggle').addEventListener('change', (ev) => setNotifyAll(ev.target.checked));
+  const supported = 'Notification' in window;
+  const perm = supported ? Notification.permission : 'unsupported';
+  let statusHtml;
+  if(!supported){
+    statusHtml = `<p class="notif-status">Your browser does not support notifications, so new entries won’t pop up here.</p>`;
+  }else if(perm === 'granted'){
+    statusHtml = `<p class="notif-status notif-status-on"><span class="notif-status-dot"></span>You’ll get a notification for every new entry.</p>`;
+  }else if(perm === 'denied'){
+    statusHtml = `<p class="notif-status">Notifications are always on, but your browser is blocking them. Turn them on for this site in your browser settings to get alerts.</p>`;
+  }else{
+    statusHtml = `
+      <p class="notif-status">Notifications are always on. Allow them once and you’ll get an alert for every new entry.</p>
+      <button class="notif-allow-btn" id="notifAllowBtn">Allow notifications</button>`;
+  }
+  notifPrefsList.innerHTML = statusHtml;
+  const allowBtn = document.getElementById('notifAllowBtn');
+  if(allowBtn) allowBtn.addEventListener('click', requestNotifPermission);
 }
 
 function openNotifPrefsPanel(){
   notifPrefsOverlay.classList.add('open');
   renderNotifPrefsList();
+  // Opening the panel is a user gesture, so it's a safe moment to ask for permission.
+  requestNotifPermission();
   if(isAdmin){
     renderActivityList();
     markActivitySeen();
