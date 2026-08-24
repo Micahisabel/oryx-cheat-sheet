@@ -176,7 +176,7 @@ function renderRecentStrip(libraryEntries){
       <div class="recent-card" data-id="${e.id}">
         <span class="recent-badge">New</span>
         <p class="recent-title">${escapeHtml(e.title)}</p>
-        ${e.department ? `<p class="recent-dept">${escapeHtml(e.department)}</p>` : ''}
+        ${e.department ? `<p class="recent-dept">For ${escapeHtml(e.department)}</p>` : ''}
         <p class="recent-desc">${escapeHtml(desc || '')}</p>
         <div class="recent-footer">
           <span class="card-tag-chip recent-platform-tag">${escapeHtml(platformLabel)}</span>
