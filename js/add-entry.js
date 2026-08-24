@@ -290,6 +290,8 @@ saveAdd.addEventListener('click', async () => {
   };
   if(!isEditing){
     entryData.createdAt = Date.now();
+    // Stamp the creator so notifyIfSubscribed can suppress a self-notification for the person adding it.
+    entryData.authorEmail = (firebase.auth().currentUser && firebase.auth().currentUser.email) || '';
   }else{
     let editorName = '';
     try{ editorName = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}

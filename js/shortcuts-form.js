@@ -142,6 +142,8 @@ saveAddShortcut.addEventListener('click', async () => {
     entryData.lastEditedAt = Date.now();
   }else{
     entryData.createdAt = Date.now();
+    // Stamp the creator so notifyIfSubscribed can suppress a self-notification for the person adding it.
+    entryData.authorEmail = (firebase.auth().currentUser && firebase.auth().currentUser.email) || '';
   }
 
   try{
