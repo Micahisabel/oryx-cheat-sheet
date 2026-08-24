@@ -27,7 +27,7 @@
 
   /* ---------- Grid ---------- */
   .count-row{
-    font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--silver);
+    font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--label);
     font-family:var(--font-display);font-weight:500;margin:0 0 18px;
     padding-bottom:14px;border-bottom:1px solid var(--line);
   }
@@ -40,7 +40,7 @@
   }
   .pagination-btn:hover:not(:disabled){background:var(--panel);border-color:var(--oryx-blue);box-shadow:0 4px 12px rgba(2,42,58,0.1);transform:translateY(-1px);}
   .pagination-btn:disabled{opacity:0.4;cursor:not-allowed;}
-  .pagination-status{font-size:12.5px;color:var(--silver);font-family:var(--font-display);font-weight:500;}
+  .pagination-status{font-size:12.5px;color:var(--label);font-family:var(--font-display);font-weight:500;}
   .card{
     position:relative;background:var(--white);border:1px solid var(--line);padding:20px;
     border-radius:14px;box-shadow:0 1px 2px rgba(2,42,58,0.04);
@@ -89,7 +89,7 @@
   .link-play-icon svg{width:16px;height:16px;fill:var(--white);}
   .card-footer{
     margin-top:auto;padding-top:10px;border-top:1px solid var(--line-soft);
-    display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--silver);gap:8px;flex-wrap:wrap;
+    display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--label);gap:8px;flex-wrap:wrap;
   }
   .card-badge{
     font-family:var(--font-display);font-weight:600;font-size:10px;letter-spacing:0.05em;
@@ -168,7 +168,7 @@
   .card-fav-btn svg{width:16px;height:16px;fill:none;stroke:var(--oryx-blue);stroke-width:2;stroke-linejoin:round;}
   .card-fav-btn.active svg{fill:var(--oryx-blue);}
   .skill-fav-btn{position:static;margin-left:auto;flex-shrink:0;}
-  .empty{padding:60px 20px;text-align:center;color:var(--silver);font-size:14px;grid-column:1/-1;background:var(--panel);border-radius:16px;}
+  .empty{padding:60px 20px;text-align:center;color:var(--label);font-size:14px;grid-column:1/-1;background:var(--panel);border-radius:16px;}
 
   .add-btn{
     font-family:var(--font-display);font-weight:600;font-size:13.5px;letter-spacing:0.01em;

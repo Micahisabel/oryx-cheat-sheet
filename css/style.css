@@ -3,6 +3,7 @@
     --oryx-blue-tint:#0C4A63;
     --white:#FFFFFF;
     --silver:#A9A9A9;
+    --label:#5F7079;  /* darker, legible secondary text on white (accessibility) */
     --black:#000000;
     --panel:#F6F8F9;
     --line:rgba(2,42,58,0.14);

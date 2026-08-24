@@ -69,7 +69,7 @@
   }
   .panel h2{font-family:var(--font-display);font-size:20px;color:var(--oryx-blue);margin:0 0 4px;}
   .panel .sub{
-    font-size:12px;color:var(--silver);margin:0 0 24px;text-transform:uppercase;
+    font-size:12px;color:var(--label);margin:0 0 24px;text-transform:uppercase;
     letter-spacing:0.08em;font-family:var(--font-display);
   }
 
@@ -85,9 +85,9 @@
   .analytics-kpi-value--text{font-size:17px;}
   .analytics-section-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px;}
   .analytics-section-head h3{font-family:var(--font-display);font-size:14px;color:var(--oryx-blue);margin:0;}
-  .analytics-contrib-count{font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--silver);}
+  .analytics-contrib-count{font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--label);}
   .analytics-seg{display:flex;gap:2px;background:var(--panel);border:1px solid var(--line-soft);border-radius:999px;padding:2px;}
-  .analytics-seg-btn{appearance:none;border:none;background:none;font-family:var(--font-display);font-size:11px;font-weight:600;color:var(--silver);padding:6px 12px;border-radius:999px;cursor:pointer;}
+  .analytics-seg-btn{appearance:none;border:none;background:none;font-family:var(--font-display);font-size:11px;font-weight:600;color:var(--label);padding:6px 12px;border-radius:999px;cursor:pointer;}
   .analytics-seg-btn.active{background:var(--oryx-blue);color:var(--white);}
   .analytics-row{display:flex;align-items:center;gap:12px;cursor:pointer;}
   .analytics-row.my-component-row{flex-direction:row;align-items:center;text-align:left;background:var(--white);border-radius:12px;box-shadow:0 1px 4px rgba(2,42,58,0.06);padding:12px 14px;margin:0 0 8px;border-bottom:none;transition:box-shadow 0.15s ease, transform 0.15s ease;}
@@ -100,7 +100,7 @@
   .analytics-cat-top{display:flex;justify-content:space-between;font-size:12.5px;color:var(--black);font-family:var(--font-display);}
   .analytics-bar-track{height:8px;background:var(--panel);border-radius:999px;overflow:hidden;}
   .analytics-bar-fill{height:100%;background:linear-gradient(90deg, var(--oryx-blue), var(--oryx-blue-tint));border-radius:999px;}
-  .analytics-footnote{margin-top:24px;font-size:11px;color:var(--silver);text-align:center;}
+  .analytics-footnote{margin-top:24px;font-size:11px;color:var(--label);text-align:center;}
 
   /* ---------- Staff account / sign-in modal (sliding two-panel card) ---------- */
   .overlay-center{align-items:center;justify-content:center;}
@@ -117,7 +117,7 @@
     box-shadow:0 40px 90px -30px rgba(2,42,58,0.55), 0 0 0 1px rgba(255,255,255,0.06);
   }
   .auth-close-x{
-    position:absolute;top:16px;right:18px;z-index:3;background:var(--white);color:var(--silver);
+    position:absolute;top:16px;right:18px;z-index:3;background:var(--white);color:var(--label);
     box-shadow:0 1px 4px rgba(2,42,58,0.18);
   }
   .auth-close-x:hover{background:var(--white);color:var(--oryx-blue);}
@@ -185,7 +185,7 @@
     cursor:pointer;transition:background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;margin-top:8px;
   }
   .auth-btn-primary:hover{background:var(--oryx-blue-tint);box-shadow:0 8px 20px rgba(2,42,58,0.25);transform:translateY(-1px);}
-  .auth-domain-note{margin-top:16px;text-align:center;font-size:12px;color:var(--silver);}
+  .auth-domain-note{margin-top:16px;text-align:center;font-size:12px;color:var(--label);}
   .auth-domain-note b{color:#5b6b72;}
 
   .auth-overlay-panel{

@@ -1,7 +1,7 @@
   /* ---------- Usage analytics (in-page, admin only) ---------- */
   .analytics-page-head{margin-bottom:24px;}
   .analytics-page-head h2{font-family:var(--font-display);font-size:22px;color:var(--oryx-blue);margin:0 0 4px;}
-  .analytics-page-sub{font-size:13px;color:var(--silver);margin:0;}
+  .analytics-page-sub{font-size:13px;color:var(--label);margin:0;}
 
   /* ---------- Filter toolbar (search + department + advanced) ---------- */
   .filter-toolbar{
@@ -18,7 +18,7 @@
     width:100%;border:none;background:none;outline:none;padding:11px 0;
     font-family:var(--font-body);font-size:14px;color:var(--black);
   }
-  .filter-search input::placeholder{color:var(--silver);}
+  .filter-search input::placeholder{color:var(--label);}
   .filter-select{
     width:auto;flex-shrink:0;border:1px solid var(--line-soft);border-radius:10px;background:var(--panel);
     color:var(--black);font-family:var(--font-body);font-weight:500;font-size:14px;
@@ -39,7 +39,7 @@
     font-family:var(--font-display);font-weight:600;font-size:12px;letter-spacing:0.08em;
     text-transform:uppercase;color:var(--oryx-blue);
   }
-  .recent-strip-sub{font-family:var(--font-body);font-weight:400;font-size:12px;color:var(--silver);}
+  .recent-strip-sub{font-family:var(--font-body);font-weight:400;font-size:12px;color:var(--label);}
   .recent-row{display:flex;gap:14px;overflow-x:auto;flex-wrap:nowrap;padding:8px 2px 10px;}
   .recent-card{
     position:relative;flex:0 0 220px;background:var(--white);border:1px solid var(--line);
@@ -54,7 +54,14 @@
   }
   .recent-title{
     font-family:var(--font-display);font-weight:600;font-size:14px;color:var(--black);
-    margin:6px 0 6px;line-height:1.3;
+    margin:6px 0 2px;line-height:1.3;
+  }
+  .recent-dept{
+    display:inline-block;max-width:100%;box-sizing:border-box;
+    font-family:var(--font-body);font-weight:600;font-size:11px;color:var(--oryx-blue);
+    background:rgba(2,42,58,0.08);border-radius:999px;padding:2px 9px;
+    margin:0 0 8px;line-height:1.4;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
   .recent-desc{
     font-size:12.5px;line-height:1.5;color:#333;margin:0 0 12px;
@@ -62,4 +69,4 @@
   }
   .recent-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;}
   .recent-platform-tag{margin-top:0;}
-  .recent-date{font-size:11px;color:var(--silver);white-space:nowrap;}
+  .recent-date{font-size:11px;color:var(--label);white-space:nowrap;}
