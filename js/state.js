@@ -4,7 +4,7 @@ let entries = [];
 // here, isOtherToolUsed() falls back to the USED_OTHER_TOOLS code list in constants.js.
 let otherToolsUsage = {};
 let activeCat = 'instructions';
-let activePlatform = 'all';
+let activePlatform = 'claude';
 let searchTerm = '';
 let activeDepartment = 'all';
 let currentPage = 1;

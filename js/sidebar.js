@@ -109,10 +109,10 @@ if(chatgptShortcutsBtn){
 }
 
 document.getElementById('exitShortcuts').addEventListener('click', () => {
-  const allBtn = platformNav.querySelector('[data-platform="all"]');
+  const claudeBtn = platformNav.querySelector('[data-platform="claude"]');
   platformNav.querySelectorAll('.platform-item').forEach(t => t.classList.remove('active'));
-  if(allBtn) allBtn.classList.add('active');
-  activePlatform = 'all';
+  if(claudeBtn) claudeBtn.classList.add('active');
+  activePlatform = 'claude';
   exitShortcutsMode();
 });
 
@@ -209,7 +209,7 @@ new ResizeObserver(syncHeaderHeightVar).observe(siteHeaderEl);
 // Reuses the real click handler so state, indicator, and category selection set up exactly as a user click.
 // Deferred to 'load' so every script (e.g. exitAnalyticsMode in analytics.js) is defined first.
 window.addEventListener('load', () => {
-  const defaultPlatformBtn = platformNav.querySelector('[data-platform="all"]');
+  const defaultPlatformBtn = platformNav.querySelector('[data-platform="claude"]');
   if(defaultPlatformBtn) defaultPlatformBtn.click();
 });
 
