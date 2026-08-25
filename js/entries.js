@@ -374,9 +374,11 @@ function render(){
     let thumbInner = e.link ? linkThumbHtml(e.link) : '';
     if(!thumbInner && (isOtherToolsCategory(e.category) || e.category === 'mcps') && e.link) thumbInner = faviconBadgeHtml(e.link, e.category);
     if(!thumbInner) thumbInner = isShortcutCategory(e.category) ? shortcutBadgeHtml(e.shortcutKey) : cardPlaceholderHtml(e.category);
-    // Instructions open their detail page on click; their thumb must NOT be a direct file link
-    // (that downloads the attachment instead of opening the entry).
-    const thumbHtml = (safeLink && e.category !== 'instructions') ? `<a class="card-thumb-link" href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${thumbInner}</a>` : thumbInner;
+    // Instructions and AI Tools open their detail page on click, so their thumb must NOT be a
+    // direct link — instructions would download the file, and AI tools would skip the page
+    // (with its details and tutorial videos) and jump straight to the external site.
+    const thumbLinksOut = safeLink && e.category !== 'instructions' && !isOtherToolsCategory(e.category);
+    const thumbHtml = thumbLinksOut ? `<a class="card-thumb-link" href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${thumbInner}</a>` : thumbInner;
     const linkHtml = (safeLink && e.category !== 'instructions')
       ? (isFileLink(safeLink)
           ? `<div class="card-file"><a href="${escapeHtml(safeLink)}" target="_blank" rel="noopener" download>${FILE_ICON_SVG}<span>${escapeHtml(fileNameFromUrl(safeLink))}</span></a></div>`
