@@ -55,6 +55,11 @@ function videoEmbedHtml(url){
   if(m){
     return `<div class="video-embed"><iframe src="https://player.vimeo.com/video/${m[1]}" title="Video" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
   }
+  // TikTok clips are vertical, so they get a portrait frame.
+  m = raw.match(/tiktok\.com\/(?:@[\w.-]+\/video\/|v\/|embed\/(?:v2\/)?)(\d+)/);
+  if(m){
+    return `<div class="video-embed video-embed-portrait"><iframe src="https://www.tiktok.com/embed/v2/${m[1]}" title="Video" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>`;
+  }
   if(/\.(mp4|webm|mov|m4v)(\?|$)/i.test(raw) || isFileLink(raw)){
     return `<div class="video-embed"><video src="${escapeHtml(raw)}" controls preload="metadata"></video></div>`;
   }
@@ -103,7 +108,11 @@ function openNoteDetail(entry){
   const catLabel = CATEGORY_LABELS[entry.category] || entry.category;
   const safeLink = entry.link && isValidLink(entry.link) ? entry.link : '';
   const thumbInner = entry.link ? linkThumbHtml(entry.link) : '';
-  const thumbHtml = safeLink ? `<a class="card-thumb-link" href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${thumbInner}</a>` : '';
+  // Video Discoveries embed a real player on the page (play it here, no new tab); other
+  // categories keep the thumbnail that opens the link.
+  const thumbHtml = (entry.category === 'discoveries' && safeLink)
+    ? videoEmbedHtml(safeLink)
+    : (safeLink ? `<a class="card-thumb-link" href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${thumbInner}</a>` : '');
   const titleFaviconUrl = (isOtherToolsCategory(entry.category) || entry.category === 'mcps') && entry.link ? faviconUrlForLink(entry.link) : null;
   const titleLogoHtml = titleFaviconUrl
     ? `<img class="skill-title-logo" src="${titleFaviconUrl}" alt="" onerror="this.style.display='none';">`

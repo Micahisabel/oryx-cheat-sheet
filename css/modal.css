@@ -364,3 +364,9 @@
 .tool-about-name{font-family:var(--font-body);font-size:15px;color:var(--black);margin:0;}
 .tool-about-date{font-family:var(--font-body);font-size:13px;color:var(--label);margin:2px 0 0;}
 @media(max-width:520px){.tool-about{grid-template-columns:1fr;}}
+
+/* TikTok clips are vertical. */
+.video-embed-portrait{aspect-ratio:9/16;max-width:300px;}
+/* On a Video Discovery detail page the player is the main content, so give it more room. */
+.skill-thumb .video-embed{max-width:560px;}
+.skill-thumb .video-embed-portrait{max-width:320px;}

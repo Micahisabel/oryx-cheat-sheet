@@ -374,10 +374,10 @@ function render(){
     let thumbInner = e.link ? linkThumbHtml(e.link) : '';
     if(!thumbInner && (isOtherToolsCategory(e.category) || e.category === 'mcps') && e.link) thumbInner = faviconBadgeHtml(e.link, e.category);
     if(!thumbInner) thumbInner = isShortcutCategory(e.category) ? shortcutBadgeHtml(e.shortcutKey) : cardPlaceholderHtml(e.category);
-    // Instructions and AI Tools open their detail page on click, so their thumb must NOT be a
-    // direct link — instructions would download the file, and AI tools would skip the page
-    // (with its details and tutorial videos) and jump straight to the external site.
-    const thumbLinksOut = safeLink && e.category !== 'instructions' && !isOtherToolsCategory(e.category);
+    // Instructions, AI tools and Video Discoveries all open their detail page on click, so
+    // their thumb must NOT be a direct link — instructions would download the file, AI tools
+    // would jump to the external site, and Discoveries embed the video on the page instead.
+    const thumbLinksOut = safeLink && e.category !== 'instructions' && e.category !== 'discoveries' && !isOtherToolsCategory(e.category);
     const thumbHtml = thumbLinksOut ? `<a class="card-thumb-link" href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${thumbInner}</a>` : thumbInner;
     const linkHtml = (safeLink && e.category !== 'instructions')
       ? (isFileLink(safeLink)
