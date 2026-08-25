@@ -65,10 +65,14 @@ function videoEmbedHtml(url){
 // or a calm placeholder when one isn't yet — so the section is ready before the
 // video is.
 function videoSectionHtml(entry){
-  const inner = entry.videoUrl
-    ? videoEmbedHtml(entry.videoUrl)
+  // videoUrl holds one link per line, so a tool can carry several clips. Each becomes
+  // its own player, stacked in order; an empty field shows the placeholder.
+  const links = String(entry.videoUrl || '')
+    .split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const inner = links.length
+    ? links.map(videoEmbedHtml).join('')
     : '<p class="video-empty">A short tutorial video will be added here soon.</p>';
-  return detailSection('Video', inner);
+  return detailSection('Video', `<div class="video-list">${inner}</div>`);
 }
 
 function openNoteDetail(entry){

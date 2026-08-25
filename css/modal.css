@@ -334,6 +334,7 @@
   .copy-btn.copied{background:var(--oryx-blue);border-color:var(--oryx-blue);}
   .copy-btn.copied svg{stroke:var(--white);}
 
+.video-list{display:flex;flex-direction:column;gap:16px;}
 /* Video section on AI Tools & Files pages — an embedded tutorial, or a calm
    placeholder until one is added. */
 .video-embed{
