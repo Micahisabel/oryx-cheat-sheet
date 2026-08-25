@@ -75,6 +75,26 @@ function videoSectionHtml(entry){
   return detailSection('Video', `<div class="video-list">${inner}</div>`);
 }
 
+// A compact "About this tool" block for AI Tools & Files pages — folds Added by, Date added
+// and Last edited by into one two-column section so it takes far less vertical space.
+function aboutToolSectionHtml(entry, addedDateStr){
+  const edited = !!entry.lastEditedBy;
+  const editedDate = edited
+    ? new Date(entry.lastEditedAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'})
+    : '';
+  let cols = `<div class="tool-about-item">`
+    + `<p class="tool-about-label">Added by</p>`
+    + `<p class="tool-about-name">${escapeHtml(entry.author || 'Anonymous')}</p>`
+    + `<p class="tool-about-date">${escapeHtml(addedDateStr)}</p></div>`;
+  if(edited){
+    cols += `<div class="tool-about-item">`
+      + `<p class="tool-about-label">Last edited by</p>`
+      + `<p class="tool-about-name">${escapeHtml(entry.lastEditedBy)}</p>`
+      + `<p class="tool-about-date">${escapeHtml(editedDate)}</p></div>`;
+  }
+  return detailSection('About this tool', `<div class="tool-about">${cols}</div>`);
+}
+
 function openNoteDetail(entry){
   incrementViewCount(entry.id);
   const inner = document.getElementById('skillPageInner');
@@ -168,14 +188,16 @@ function openNoteDetail(entry){
     : '';
 
   html += ((entry.link && !isInstruction) ? detailBlockHtml('Link', linkHtml) : '')
-    + optionalBlock('Suggested by', entry.suggestedBy)
-    + detailBlock('Added by', entry.author || 'Anonymous')
-    + detailBlock('Date added', dateStr)
-    + optionalBlock('Last edited by', lastEditedStr);
+    + optionalBlock('Suggested by', entry.suggestedBy);
 
-  // AI Tools & Files pages carry a Video section at the very bottom for a how-to clip.
   if(isOtherToolsCategory(entry.category)){
-    html += videoSectionHtml(entry);
+    // AI Tools & Files pages: the how-to videos, then a compact About block at the very bottom.
+    html += videoSectionHtml(entry)
+      + aboutToolSectionHtml(entry, dateStr);
+  }else{
+    html += detailBlock('Added by', entry.author || 'Anonymous')
+      + detailBlock('Date added', dateStr)
+      + optionalBlock('Last edited by', lastEditedStr);
   }
 
   if(!isLinkResource){
