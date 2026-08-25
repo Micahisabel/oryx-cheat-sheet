@@ -37,6 +37,40 @@ function instructionHowToHtml(hasFile, platform){
     + '<div class="howto-card"><h4><span class="howto-dot" style="background:' + dot + '"></span>Add it to ' + toolName + '</h4>' + instructionStepsList(steps) + '</div>';
 }
 
+
+// ---- Video section (AI Tools & Files) ----------------------------------------
+// Turns a pasted video link into an embedded player. Handles YouTube and Vimeo
+// (the two most staff will paste) and any direct video file (.mp4/.webm/.mov,
+// including files uploaded to our own storage). Anything else falls back to a
+// plain "Watch the video" button so a working link is never lost.
+function videoEmbedHtml(url){
+  const raw = String(url || '').trim();
+  if(!raw) return '';
+  let id = null;
+  let m = raw.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  if(m){ id = m[1];
+    return `<div class="video-embed"><iframe src="https://www.youtube.com/embed/${id}" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+  }
+  m = raw.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  if(m){
+    return `<div class="video-embed"><iframe src="https://player.vimeo.com/video/${m[1]}" title="Video" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
+  }
+  if(/\.(mp4|webm|mov|m4v)(\?|$)/i.test(raw) || isFileLink(raw)){
+    return `<div class="video-embed"><video src="${escapeHtml(raw)}" controls preload="metadata"></video></div>`;
+  }
+  return `<a class="video-link-btn" href="${escapeHtml(raw)}" target="_blank" rel="noopener">Watch the video</a>`;
+}
+
+// The Video section for an AI-tool page. Shows the player when a link is saved,
+// or a calm placeholder when one isn't yet — so the section is ready before the
+// video is.
+function videoSectionHtml(entry){
+  const inner = entry.videoUrl
+    ? videoEmbedHtml(entry.videoUrl)
+    : '<p class="video-empty">A short tutorial video will be added here soon.</p>';
+  return detailSection('Video', inner);
+}
+
 function openNoteDetail(entry){
   incrementViewCount(entry.id);
   const inner = document.getElementById('skillPageInner');
@@ -134,6 +168,11 @@ function openNoteDetail(entry){
     + detailBlock('Added by', entry.author || 'Anonymous')
     + detailBlock('Date added', dateStr)
     + optionalBlock('Last edited by', lastEditedStr);
+
+  // AI Tools & Files pages carry a Video section at the very bottom for a how-to clip.
+  if(isOtherToolsCategory(entry.category)){
+    html += videoSectionHtml(entry);
+  }
 
   if(!isLinkResource){
     const isSkillFile = isRichCategory(entry.category) && entry.category !== 'mcps';

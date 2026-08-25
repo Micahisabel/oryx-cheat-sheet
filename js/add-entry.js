@@ -41,6 +41,9 @@ function toggleEntryFields(){
   const isRich = isRichCategory(fCategory.value);
   simpleFields.style.display = isRich ? 'none' : '';
   skillFields.style.display = isRich ? '' : 'none';
+  // The Video link field only applies to AI Tools & Files pages, which carry a Video section.
+  const videoField = document.getElementById('fVideoField');
+  if(videoField) videoField.style.display = isOtherToolsCategory(fCategory.value) ? '' : 'none';
 }
 fCategory.addEventListener('change', toggleEntryFields);
 
@@ -199,6 +202,7 @@ function openEditEntry(entry){
   document.getElementById('fBody').value = entry.body || '';
   document.getElementById('fTag').value = entry.tag || '';
   document.getElementById('fLink').value = entry.link || '';
+  document.getElementById('fVideoUrl').value = entry.videoUrl || '';
   document.getElementById('fAuthor').value = entry.author || '';
 
   SKILL_FIELD_IDS.forEach(id => { document.getElementById(id).value = entry[SKILL_FIELD_KEYS[id]] || ''; });
@@ -274,6 +278,8 @@ saveAdd.addEventListener('click', async () => {
 
   const entryData = {
     category, title, link,
+    // Only AI Tools & Files pages show a Video section; other categories keep it blank.
+    videoUrl: isOtherToolsCategory(category) ? document.getElementById('fVideoUrl').value.trim() : '',
     tag: document.getElementById('fTag').value,
     platform: document.getElementById('fPlatform').value,
     author: author || 'Anonymous',

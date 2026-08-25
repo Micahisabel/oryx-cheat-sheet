@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.79";</script>
+<script>window.APP_VERSION = "2026-08-16.80";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="css/sidebar.css?v=14">
 <link rel="stylesheet" href="css/dashboard.css?v=8">
 <link rel="stylesheet" href="css/cards.css?v=17">
-<link rel="stylesheet" href="css/modal.css?v=25">
+<link rel="stylesheet" href="css/modal.css?v=26">
 <link rel="stylesheet" href="css/forms.css?v=20">
 <link rel="stylesheet" href="css/dept-files.css?v=6">
 <link rel="stylesheet" href="css/responsive.css?v=2">
@@ -359,6 +359,12 @@
 
     <label for="fLink">Link <span class="optional-tag">(optional)</span></label>
     <input type="text" id="fLink" placeholder="https://…">
+
+    <div id="fVideoField" style="display:none;">
+      <label for="fVideoUrl">Video link <span class="optional-tag">(optional)</span></label>
+      <input type="text" id="fVideoUrl" placeholder="YouTube, Vimeo, or a video file link">
+      <p class="df-file-hint">Shows a tutorial video at the bottom of this tool's page. Leave blank for now — you can add it later.</p>
+    </div>
 
     <label for="fAuthor">Your name</label>
     <input type="text" id="fAuthor" placeholder="e.g. Sara">
@@ -723,8 +729,8 @@
 <script src="js/state.js?v=20"></script>
 <script src="js/sidebar.js?v=29"></script>
 <script src="js/entries.js?v=50"></script>
-<script src="js/skill-detail.js?v=34"></script>
-<script src="js/add-entry.js?v=23"></script>
+<script src="js/skill-detail.js?v=35"></script>
+<script src="js/add-entry.js?v=24"></script>
 <script src="js/shortcuts-form.js?v=19"></script>
 <script src="js/admin.js?v=22"></script>
 <script src="js/suggest.js?v=44"></script>
