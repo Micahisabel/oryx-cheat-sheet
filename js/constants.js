@@ -77,7 +77,7 @@ const CATEGORY_EXPLAINERS = {
   claude: {
     skills: 'A Claude Skill is like a helper that already knows how to do a specific job. You give it the instructions once, and Claude can use them whenever you need that job done.',
     agents: 'A Claude AI Agent is like a worker that can handle a task for you. You give it a goal, and it can work through the steps needed to complete it.',
-    mcps: 'A Claude MCP is like a bridge that connects Claude to other tools or systems. It allows Claude to access information or use tools outside of the chat.',
+    mcps: 'A Claude Connector is like a bridge that connects Claude to other tools or systems. It allows Claude to access information or use tools outside of the chat.',
     plugins: 'A Claude Plugin is like an extra tool for Claude. It adds new abilities or makes it easier to connect Claude with other tools and services.',
     instructions: 'Ready-made instructions you can give Claude so it works the way you need. Open one, copy the text (or its file), and paste it into the Claude instructions box.',
     discoveries: 'Short and useful videos that help the team learn new Claude features, tips, shortcuts, and ways to use Claude at work.'
@@ -85,7 +85,7 @@ const CATEGORY_EXPLAINERS = {
   chatgpt: {
     skills: 'A ChatGPT Skill is like a helper that knows how to handle a specific type of task. It gives ChatGPT instructions or knowledge that helps it perform that task more effectively.',
     agents: 'A ChatGPT AI Agent is like a worker that can handle a task for you. You give it a goal, and it can take several steps to work toward completing it.',
-    mcps: 'A ChatGPT MCP is like a bridge that connects ChatGPT to other tools or systems. It allows ChatGPT to work with information and services outside of the chat.',
+    mcps: 'A ChatGPT Connector is like a bridge that connects ChatGPT to other tools or systems. It allows ChatGPT to work with information and services outside of the chat.',
     plugins: 'A ChatGPT Plugin is like an extra tool that gives ChatGPT additional abilities or connects it to other services.',
     instructions: 'Ready-made instructions you can give ChatGPT so it works the way you need. Open one, copy the text (or its file), and paste it into the ChatGPT instructions box.',
     discoveries: 'Short and useful videos that help the team learn new ChatGPT features, tips, shortcuts, and ways to use ChatGPT at work.'
@@ -123,11 +123,11 @@ const CATEGORY_EXPLAINER_LINKS = {
   claude: {
     skills: { url: 'https://youtu.be/kS1MJFZWMq4?si=qSlIawPKHZP0YnqF', label: 'Click here to learn how to create a Skill in Claude' },
     agents: { url: 'https://youtu.be/I4mVeNKPqPc?si=jJYlzvK1bheDJ6OM', label: 'Click here to learn how to create an AI Agent in Claude' },
-    mcps: { url: 'https://youtu.be/kkBFmwkDzdo?si=eSmnE2Wvy81WxDIi', label: 'Click here to learn how to set up an MCP in Claude' }
+    mcps: { url: 'https://youtu.be/kkBFmwkDzdo?si=eSmnE2Wvy81WxDIi', label: 'Click here to learn how to set up a Connector in Claude' }
   },
   chatgpt: {
     skills: { url: 'https://youtu.be/qh93rLRPw80?si=jribn9jMDYo9KZOe', label: 'Click here to learn how to create a Skill in ChatGPT' },
-    mcps: { url: 'https://youtu.be/G_AqysfbikA?si=izGMGdGKDeH_TcZn', label: 'Click here to learn how to set up an MCP in ChatGPT' }
+    mcps: { url: 'https://youtu.be/G_AqysfbikA?si=izGMGdGKDeH_TcZn', label: 'Click here to learn how to set up a Connector in ChatGPT' }
   }
 };
 
