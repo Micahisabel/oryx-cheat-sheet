@@ -82,7 +82,7 @@ function videoSectionHtml(entry){
 
 // A compact "About this tool" block for AI Tools & Files pages — folds Added by, Date added
 // and Last edited by into one two-column section so it takes far less vertical space.
-function aboutToolSectionHtml(entry, addedDateStr){
+function aboutToolSectionHtml(entry, addedDateStr, heading){
   const edited = !!entry.lastEditedBy;
   const editedDate = edited
     ? new Date(entry.lastEditedAt).toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'})
@@ -97,7 +97,7 @@ function aboutToolSectionHtml(entry, addedDateStr){
       + `<p class="tool-about-name">${escapeHtml(entry.lastEditedBy)}</p>`
       + `<p class="tool-about-date">${escapeHtml(editedDate)}</p></div>`;
   }
-  return detailSection('About this tool', `<div class="tool-about">${cols}</div>`);
+  return detailSection(heading || 'About this tool', `<div class="tool-about">${cols}</div>`);
 }
 
 function openNoteDetail(entry){
@@ -203,6 +203,9 @@ function openNoteDetail(entry){
     // AI Tools & Files pages: the how-to videos, then a compact About block at the very bottom.
     html += videoSectionHtml(entry)
       + aboutToolSectionHtml(entry, dateStr);
+  }else if(isInstruction){
+    // Instructions get the same compact About block as AI Tools & Files pages — no video section.
+    html += aboutToolSectionHtml(entry, dateStr, 'About this instruction');
   }else{
     html += detailBlock('Added by', entry.author || 'Anonymous')
       + detailBlock('Date added', dateStr)
