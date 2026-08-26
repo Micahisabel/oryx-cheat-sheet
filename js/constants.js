@@ -187,10 +187,12 @@ function shortcutBadgeHtml(key){
 // card as "not used yet" per entry via the toggle (stored in adminState/otherToolsUsage).
 const USED_OTHER_TOOLS = {};
 function normalizeToolName(s){ return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+// Other AI Tools and Connectors (MCPs) can both be flagged "still exploring" this way —
+// everything else (Skills, Commands, Instructions, etc.) is always "used" (unaffected).
+function usesUsageStatus(category){ return isOtherToolsCategory(category) || category === 'mcps'; }
 // Returns true when a card should render normally; false when it needs the glass effect.
-// Only Other AI Tools cards are governed — everything else is always "used" (unaffected).
 function isOtherToolUsed(entry){
-  if(!entry || !isOtherToolsCategory(entry.category)) return true;
+  if(!entry || !usesUsageStatus(entry.category)) return true;
   // An admin toggle (stored in adminState/otherToolsUsage) always wins.
   if(typeof otherToolsUsage !== 'undefined' && typeof otherToolsUsage[entry.id] === 'boolean'){
     return otherToolsUsage[entry.id];

@@ -381,10 +381,11 @@ function render(){
     let thumbInner = e.link ? linkThumbHtml(e.link) : '';
     if(!thumbInner && (isOtherToolsCategory(e.category) || e.category === 'mcps') && e.link) thumbInner = faviconBadgeHtml(e.link, e.category);
     if(!thumbInner) thumbInner = isShortcutCategory(e.category) ? shortcutBadgeHtml(e.shortcutKey) : cardPlaceholderHtml(e.category);
-    // Instructions, AI tools and Video Discoveries all open their detail page on click, so
-    // their thumb must NOT be a direct link — instructions would download the file, AI tools
-    // would jump to the external site, and Discoveries embed the video on the page instead.
-    const thumbLinksOut = safeLink && e.category !== 'instructions' && e.category !== 'discoveries' && !isOtherToolsCategory(e.category);
+    // Instructions, AI tools, Connectors and Video Discoveries all open their detail page on
+    // click, so their thumb must NOT be a direct link — instructions would download the file,
+    // AI tools/Connectors would jump to the external site, and Discoveries embed the video
+    // on the page instead.
+    const thumbLinksOut = safeLink && e.category !== 'instructions' && e.category !== 'discoveries' && e.category !== 'mcps' && !isOtherToolsCategory(e.category);
     const thumbHtml = thumbLinksOut ? `<a class="card-thumb-link" href="${escapeHtml(safeLink)}" target="_blank" rel="noopener">${thumbInner}</a>` : thumbInner;
     const linkHtml = (safeLink && e.category !== 'instructions')
       ? (isFileLink(safeLink)
@@ -405,11 +406,11 @@ function render(){
     const platformBadgeHtml = showPlatformBadge
       ? `<span class="card-platform-badge"><span class="platform-dot" style="background:${pmBadge.color}"></span>${escapeHtml(pmBadge.label)}</span>`
       : '';
-    // Other AI Tools the team hasn't used yet get a subtle frosted/glass look.
-    const isUnusedTool = isOtherToolsCategory(e.category) && !isOtherToolUsed(e);
+    // Other AI Tools and Connectors the team hasn't used yet get a subtle frosted/glass look.
+    const isUnusedTool = usesUsageStatus(e.category) && !isOtherToolUsed(e);
     const unusedBadgeHtml = isUnusedTool ? `<span class="card-unused-badge">Not used yet</span>` : '';
-    // Admin-only control to mark an Other AI Tools card used / not used.
-    const usedToggleHtml = (isAdmin && isOtherToolsCategory(e.category))
+    // Admin-only control to mark an Other AI Tools / Connector card used / not used.
+    const usedToggleHtml = (isAdmin && usesUsageStatus(e.category))
       ? `<button class="card-used-toggle${isUnusedTool ? '' : ' is-used'}" data-id="${e.id}">${isUnusedTool ? 'Mark used' : 'Mark unused'}</button>`
       : '';
     return `
