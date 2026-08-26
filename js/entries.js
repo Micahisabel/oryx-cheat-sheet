@@ -330,9 +330,10 @@ function render(){
       }
     }
   }
-  // In the Other AI Tools view, explain what the faded/glass cards mean so every
-  // staff member understands it at a glance — no separate announcement needed.
-  const showOtherLegend = !searchTerm && viewMode !== 'shortcuts' && activePlatform === 'other';
+  // In the Other AI Tools view (and Connectors, which shares the same fade/badge/toggle),
+  // explain what the faded/glass cards mean so every staff member understands it at a glance
+  // — no separate announcement needed.
+  const showOtherLegend = !searchTerm && viewMode !== 'shortcuts' && (activePlatform === 'other' || activeCat === 'mcps');
   const legendHtml = showOtherLegend
     ? `<span class="cat-explainer-legend">Faded tools are still being explored. Clear tools are in use.</span>`
     : '';
