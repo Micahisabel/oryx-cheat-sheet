@@ -200,6 +200,13 @@ function favThenRecent(a, b){
   return fb - fa || ((b.createdAt || 0) - (a.createdAt || 0));
 }
 
+// Other AI Tools department views list tools A-Z (by title) instead of newest-first, so a
+// department with many tools stays easy to scan. Favourites still float to the top.
+function favThenAlpha(a, b){
+  const fa = favoriteIds.has(a.id) ? 1 : 0, fb = favoriteIds.has(b.id) ? 1 : 0;
+  return fb - fa || String(a.title || '').localeCompare(String(b.title || ''), undefined, {sensitivity: 'base'});
+}
+
 // Within an Other AI Tools department view, show that department's uploaded files below its
 // tools (Department Files is merged into Other AI Tools). Elsewhere this section stays hidden.
 function renderOtherFilesSection(inOtherDept, toolCount){
@@ -295,7 +302,7 @@ function render(){
       const haystack = [e.title, e.body, e.purpose, e.bestFor, e.notes, e.department, e.samplePrompt, e.exampleOutput, e.oryxTip, e.howToAccess]
         .filter(Boolean).join(' ').toLowerCase();
       return haystack.includes(searchTerm);
-    }).sort(favThenRecent);
+    }).sort(inOtherDept ? favThenAlpha : favThenRecent);
 
     const platformFilteredEntries = activePlatform === 'all' ? libraryEntries : libraryEntries.filter(e => (e.platform || 'claude') === activePlatform);
     const counts = { all: platformFilteredEntries.length, instructions: 0, skills: 0, commands: 0, agents: 0, mcps: 0, plugins: 0, discoveries: 0, 'other-tools': 0 };
