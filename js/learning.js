@@ -122,12 +122,38 @@ function applyNewBadges(){
 // ---------------------------------------------------------------------------
 // Entry / exit
 // ---------------------------------------------------------------------------
+// Resolves once the Hub's entries have loaded (needed for recommendations),
+// or after a short timeout so a genuinely empty/slow Hub never blocks entry.
+function waitForEntries(maxWaitMs = 4000){
+  return new Promise((resolve) => {
+    const start = (typeof performance !== 'undefined' ? performance.now() : 0);
+    (function check(){
+      const elapsed = (typeof performance !== 'undefined' ? performance.now() : 0) - start;
+      if((typeof entries !== 'undefined' && entries.length > 0) || elapsed > maxWaitMs) return resolve();
+      setTimeout(check, 150);
+    })();
+  });
+}
+
+function renderLearningLoading(){
+  learningRoot.innerHTML = `
+    <div class="lrn-screen lrn-loading">
+      <div class="lrn-loading-badge"><img src="assets/images/mascot/cat-sleepy.png" alt="Ginger sleeping"></div>
+      <div class="lrn-loading-text">Just a moment — getting things ready…</div>
+    </div>`;
+}
+
 async function enterLearning(){
   const signedIn = await ensureStaffSignedIn();
   if(!signedIn) return;
   if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
   viewNotes.classList.remove('active');
   viewLearning.classList.add('active');
+
+  if(typeof entries === 'undefined' || entries.length === 0){
+    renderLearningLoading();
+    await waitForEntries();
+  }
 
   ensureProgressForCurrentUser();
   bumpStreak();

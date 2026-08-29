@@ -22,6 +22,27 @@
 
 .lrn-screen{ display:flex; flex-direction:column; gap:24px; animation:lrnFadeUp .38s var(--lrn-ease) both; }
 
+/* ---------- Loading ---------- */
+.lrn-screen.lrn-loading{
+  align-items:center; justify-content:center; text-align:center; gap:18px;
+  min-height:55vh;
+}
+.lrn-loading-badge{
+  width:110px; height:110px; border-radius:50%;
+  background:radial-gradient(circle at 32% 28%, rgba(255,255,255,.9), var(--panel) 60%);
+  border:1px solid var(--line); box-shadow:var(--lrn-shadow);
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+  animation:lrnFloat 3.2s ease-in-out infinite;
+}
+.lrn-loading-badge img{ width:82%; height:82%; object-fit:contain; }
+.lrn-loading-text{
+  font-family:var(--font-display); font-weight:600; font-size:14px; color:var(--label);
+  animation:lrnLoadingPulse 1.6s ease-in-out infinite;
+}
+@keyframes lrnLoadingPulse{
+  0%,100%{ opacity:1; } 50%{ opacity:.5; }
+}
+
 @keyframes lrnFadeUp{
   from{ opacity:0; transform:translateY(10px); }
   to{ opacity:1; transform:translateY(0); }
