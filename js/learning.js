@@ -660,7 +660,7 @@ function renderAchievementsTab(){
 // 7. Lesson runner — Learn -> Practice -> Quiz -> Complete
 // ---------------------------------------------------------------------------
 function openLesson(levelKey, lessonId){
-  activeLesson = { levelKey, lessonId, step: 'learn', wrongAttempt: false };
+  activeLesson = { levelKey, lessonId, step: 'learn', wrongAttempt: false, practiceAttempt: '', practiceRevealed: false };
   learningScreen = 'lesson';
   renderLearning();
 }
@@ -683,13 +683,23 @@ function renderLesson(){
       </div>
       <button class="lrn-btn-primary" id="lrnNextStep">Continue</button>`;
   }else if(step === 'practice'){
+    const hasExample = !!lesson.practiceExample;
+    const canContinue = !hasExample || activeLesson.practiceRevealed;
     body = `
       <div class="lrn-lesson-section">
         <h3>Practice</h3>
         <p>${escapeHtml(lesson.practice)}</p>
-        <p class="lrn-practice-hint">Try it now in Claude or ChatGPT, then come back and continue.</p>
+        <textarea class="lrn-practice-input" id="lrnPracticeInput" placeholder="Type your attempt here — a prompt, a note, whatever fits this task…">${escapeHtml(activeLesson.practiceAttempt || '')}</textarea>
+        ${hasExample ? `
+          <button class="lrn-btn-text lrn-reveal-btn" id="lrnRevealExample" ${(activeLesson.practiceAttempt || '').trim().length < 3 ? 'disabled' : ''}>Show me a strong example</button>
+          ${activeLesson.practiceRevealed ? `
+            <div class="lrn-practice-example">
+              <div class="lrn-practice-example-label">Here's a strong example</div>
+              <p>${escapeHtml(lesson.practiceExample)}</p>
+            </div>` : ''}
+        ` : `<p class="lrn-practice-hint">Try it now in Claude or ChatGPT, then come back and continue.</p>`}
       </div>
-      <button class="lrn-btn-primary" id="lrnNextStep">I tried it — continue</button>`;
+      <button class="lrn-btn-primary" id="lrnNextStep" ${canContinue ? '' : 'disabled'}>${hasExample ? 'Continue' : 'I tried it — continue'}</button>`;
   }else if(step === 'quiz'){
     body = `
       <div class="lrn-lesson-section">
@@ -732,6 +742,24 @@ function renderLesson(){
 
   const nextBtn = document.getElementById('lrnNextStep');
   if(nextBtn) nextBtn.addEventListener('click', advanceLessonStep);
+
+  if(step === 'practice'){
+    const practiceInput = document.getElementById('lrnPracticeInput');
+    const revealBtn = document.getElementById('lrnRevealExample');
+    if(practiceInput){
+      practiceInput.addEventListener('input', () => {
+        activeLesson.practiceAttempt = practiceInput.value;
+        if(revealBtn) revealBtn.disabled = practiceInput.value.trim().length < 3;
+      });
+    }
+    if(revealBtn){
+      revealBtn.addEventListener('click', () => {
+        activeLesson.practiceAttempt = practiceInput ? practiceInput.value : activeLesson.practiceAttempt;
+        activeLesson.practiceRevealed = true;
+        renderLesson();
+      });
+    }
+  }
 
   if(step === 'quiz'){
     learningRoot.querySelectorAll('.lrn-option-btn').forEach(btn => {
