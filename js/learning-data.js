@@ -11,10 +11,10 @@
 const LEARNING_LEVEL_ORDER = ['beginner', 'intermediate', 'advanced', 'expert'];
 
 const LEVEL_META = {
-  beginner:     { label: 'Beginner',     emoji: '🌱', color: '#3FA34D', blurb: "You're ready to start with the AI fundamentals!" },
-  intermediate: { label: 'Intermediate', emoji: '🔵', color: '#1C7ED6', blurb: 'You already have a good understanding of AI. Let\'s build on what you know.' },
-  advanced:     { label: 'Advanced',     emoji: '🟣', color: '#7048E8', blurb: "You're comfortable with AI — let's get into workflows and automation." },
-  expert:       { label: 'Expert',       emoji: '🟠', color: '#E8590C', blurb: "You know your way around AI — let's build real AI systems." }
+  beginner:     { label: 'Beginner',     emoji: '🌱', color: '#3FA34D', desc: 'Little or no understanding of AI', blurb: "You're just starting to explore AI. Let's build your understanding from the basics." },
+  intermediate: { label: 'Intermediate', emoji: '🔵', color: '#1C7ED6', desc: 'Understands the basic concepts of AI and prompting', blurb: "You understand the basics of AI and how AI tools work. You're ready to learn more advanced AI concepts." },
+  advanced:     { label: 'Advanced',     emoji: '🟣', color: '#7048E8', desc: 'Understands AI concepts, models, agents, and advanced features', blurb: 'You understand AI concepts, models, and agents well. Time to sharpen your skills even further.' },
+  expert:       { label: 'Expert',       emoji: '🟠', color: '#E8590C', desc: 'Has a strong understanding of advanced AI concepts, systems, automation, APIs, agents, and related technologies', blurb: 'You have a strong understanding of advanced AI concepts, systems, and automation.' }
 };
 
 // Score thresholds (0-100, weighted — see scoreAssessment() in learning.js).
@@ -32,167 +32,198 @@ function levelFromScore(score){
 }
 
 // ---- Adaptive assessment question bank --------------------------------------
-// tier 1 = basic, 2 = prompting/practical, 3 = workflows/tools, 4 = advanced
-// (automation/agents/integrations). `weight` is how much this tier counts
-// toward the final score — advanced tiers count for more, per the brief.
-// Each option carries a 0-3 quality score (not just right/wrong), so partial
-// credit reflects real answer quality on judgment-call questions.
+// Pure AI-knowledge check — no job/department/workplace framing. Questions
+// only test how much the person actually knows about AI itself, and get
+// gradually harder: tier 1 = beginner, 2 = intermediate, 3 = advanced,
+// 4 = expert. `weight` is how much each tier counts toward the final score.
+// Each option carries a 0-3 quality score (not just right/wrong), so a
+// half-right answer still earns partial credit.
 const TIER_WEIGHT = { 1: 1, 2: 2, 3: 3, 4: 4 };
 const ASSESSMENT_LENGTH = 9; // how many questions a single assessment run asks
 
 const ASSESSMENT_QUESTIONS = [
-  // ---- Tier 1: basic ----
-  {
-    id: 'q-usage-frequency', tier: 1, topic: 'Basic AI understanding',
-    prompt: 'How often do you use AI tools (like ChatGPT or Claude)?',
-    options: [
-      { text: "I'm completely new to AI", score: 0 },
-      { text: "I've tried AI a few times", score: 1 },
-      { text: 'I use AI regularly', score: 2 },
-      { text: 'I use AI almost every day', score: 3 }
-    ]
-  },
+  // ---- Tier 1: beginner ----
   {
     id: 'q-what-is-ai', tier: 1, topic: 'Basic AI understanding',
-    prompt: 'In your own words, what best describes what tools like ChatGPT or Claude actually do?',
+    prompt: 'What is AI, in simple terms?',
     options: [
-      { text: "I'm not really sure", score: 0 },
-      { text: 'They search the internet and copy an answer for you', score: 1 },
-      { text: 'They predict and generate a helpful reply based on your message', score: 3 },
-      { text: 'They follow a fixed script of pre-written answers', score: 1 }
+      { text: 'A computer program that can understand language and respond, kind of like a smart assistant', score: 3 },
+      { text: 'A robot that looks and moves like a human', score: 1 },
+      { text: 'A website that stores files', score: 0 },
+      { text: "I'm not sure", score: 0 }
     ]
   },
   {
-    id: 'q-claude-vs-chatgpt', tier: 1, topic: 'Experience with AI assistants',
-    prompt: 'Have you used Claude or ChatGPT for work before?',
+    id: 'q-what-can-ai-do', tier: 1, topic: 'Basic AI understanding',
+    prompt: 'What can AI tools like ChatGPT or Claude help you do?',
     options: [
-      { text: 'No, never', score: 0 },
-      { text: 'A little, just to try it out', score: 1 },
-      { text: 'Yes, for simple tasks like emails or summaries', score: 2 },
-      { text: 'Yes, regularly for several types of tasks', score: 3 }
+      { text: 'Only play simple games', score: 0 },
+      { text: 'Write, summarise, answer questions, and help with everyday tasks', score: 3 },
+      { text: 'Only translate one language into another', score: 1 },
+      { text: 'Fix problems with your computer hardware', score: 0 }
     ]
   },
-  // ---- Tier 2: prompting / practical ----
   {
-    id: 'q-better-prompt', tier: 2, topic: 'Writing prompts',
-    prompt: 'Which of these prompts is more likely to get you a useful answer?',
+    id: 'q-ai-chatbot', tier: 1, topic: 'Basic AI understanding',
+    prompt: 'What is an AI chatbot?',
+    options: [
+      { text: 'A program you can chat with in everyday language to get answers or help', score: 3 },
+      { text: 'A robot that moves around an office', score: 0 },
+      { text: 'A type of computer virus', score: 0 },
+      { text: 'A website with only buttons, no typing', score: 1 }
+    ]
+  },
+  {
+    id: 'q-chatgpt-claude', tier: 1, topic: 'Basic AI understanding',
+    prompt: 'What are ChatGPT and Claude?',
+    options: [
+      { text: 'Two examples of AI assistants you can chat with', score: 3 },
+      { text: 'Two social media apps', score: 0 },
+      { text: 'Types of computer hardware', score: 0 },
+      { text: 'Search engines, nothing more', score: 1 }
+    ]
+  },
+  // ---- Tier 2: intermediate ----
+  {
+    id: 'q-what-is-prompt', tier: 2, topic: 'Prompting and how AI works',
+    prompt: "What is a 'prompt' when using AI?",
+    options: [
+      { text: 'The message or instruction you type to tell the AI what you want', score: 3 },
+      { text: 'A type of error message', score: 0 },
+      { text: "The AI's reply to you", score: 1 },
+      { text: 'A setting inside your computer', score: 0 }
+    ]
+  },
+  {
+    id: 'q-better-prompt', tier: 2, topic: 'Prompting and how AI works',
+    prompt: 'Which prompt is more likely to get a useful answer from AI?',
     options: [
       { text: '"Write an email."', score: 0 },
-      { text: '"Write something for a customer."', score: 1 },
       { text: '"Write a short, professional email telling a customer their order will be delayed by two days."', score: 3 },
-      { text: '"Email."', score: 0 }
+      { text: '"Email."', score: 0 },
+      { text: '"Something for a customer."', score: 1 }
     ]
   },
   {
-    id: 'q-too-formal', tier: 2, topic: 'Improving AI responses',
-    prompt: 'You ask AI to write an email, but the reply is too formal. What would you do?',
+    id: 'q-ai-wrong-answers', tier: 2, topic: 'Prompting and how AI works',
+    prompt: 'Why can AI sometimes give a wrong or made-up answer?',
     options: [
-      { text: 'Give up and write it myself from scratch', score: 0 },
-      { text: 'Ask again with the exact same prompt and hope for a better result', score: 0 },
-      { text: 'Tell it: "Make this more casual and friendly" and let it revise', score: 3 },
-      { text: 'Copy the reply anyway and send it as-is', score: 1 }
+      { text: "Because it's broken and needs to be repaired", score: 0 },
+      { text: 'Because it predicts a likely-sounding answer based on patterns, and isn\'t always checking facts', score: 3 },
+      { text: 'AI never gives a wrong answer', score: 0 },
+      { text: 'Because the internet connection is slow', score: 0 }
     ]
   },
   {
-    id: 'q-ai-for-work', tier: 2, topic: 'Using AI for work',
-    prompt: 'Which is a good everyday use of AI at Oryx?',
+    id: 'q-generate-vs-search', tier: 2, topic: 'Prompting and how AI works',
+    prompt: "What's the difference between AI generating an answer and a search engine searching the internet?",
     options: [
-      { text: 'Summarising a long supplier email into three key points', score: 3 },
-      { text: 'Letting AI make a final decision on a customer complaint with no review', score: 0 },
-      { text: 'Only using it for spelling checks', score: 1 },
-      { text: "Nothing — it's not useful for daily work", score: 0 }
+      { text: 'There is no real difference between them', score: 0 },
+      { text: 'A search engine finds existing web pages; AI generates a new answer based on what it learned', score: 3 },
+      { text: 'AI only shows a list of links, like a search engine', score: 0 },
+      { text: 'Search engines are simply a type of AI', score: 1 }
+    ]
+  },
+  // ---- Tier 3: advanced ----
+  {
+    id: 'q-ai-model', tier: 3, topic: 'AI concepts',
+    prompt: "What is an 'AI model'?",
+    options: [
+      { text: 'A physical robot', score: 0 },
+      { text: 'The underlying system that has been trained to understand and generate language or other content', score: 3 },
+      { text: 'A type of keyboard shortcut', score: 0 },
+      { text: "A screen that shows the AI's mood", score: 0 }
     ]
   },
   {
-    id: 'q-documents', tier: 2, topic: 'Working with documents and files',
-    prompt: "You need to pull the key terms out of a 10-page supplier contract. What's the best approach?",
+    id: 'q-context', tier: 3, topic: 'AI concepts',
+    prompt: "What does 'context' mean when talking to an AI?",
     options: [
-      { text: 'Read the whole thing manually — AI can\'t help with documents', score: 0 },
-      { text: 'Upload or paste it and ask AI to summarise the key terms and flag anything unusual', score: 3 },
-      { text: 'Ask AI to guess what the contract probably says without giving it the file', score: 0 },
-      { text: 'Paste in a random paragraph and ask what it means', score: 1 }
-    ]
-  },
-  // ---- Tier 3: workflows / tools ----
-  {
-    id: 'q-ai-tools-awareness', tier: 3, topic: 'AI tools',
-    prompt: 'You need to turn messy meeting notes into a clean action list every week. What\'s the best habit to build?',
-    options: [
-      { text: 'Do it manually each time — it only takes a few minutes', score: 1 },
-      { text: 'Save a reusable prompt/template that formats notes into action items consistently', score: 3 },
-      { text: 'Ask a different tool each time and compare styles', score: 1 },
-      { text: 'Skip the notes and rely on memory', score: 0 }
+      { text: 'The colour scheme of the chat window', score: 0 },
+      { text: 'The background information the AI is given so it can respond more accurately', score: 3 },
+      { text: 'How fast the AI replies', score: 0 },
+      { text: 'A type of file format', score: 1 }
     ]
   },
   {
-    id: 'q-context-instructions', tier: 3, topic: 'AI workflows',
-    prompt: 'Why do custom instructions or "context" (like a company style guide) make AI responses better?',
+    id: 'q-hallucinations', tier: 3, topic: 'AI concepts',
+    prompt: "What is an 'AI hallucination'?",
     options: [
-      { text: "They don't — every prompt is judged the same either way", score: 0 },
-      { text: 'They give the AI standing background so it doesn\'t need to be repeated every time', score: 3 },
-      { text: 'They make responses shorter, nothing else', score: 1 },
-      { text: 'They\'re only useful for developers', score: 0 }
+      { text: 'When AI shows a picture instead of text', score: 0 },
+      { text: 'When AI confidently states something that is actually false or made up', score: 3 },
+      { text: 'When AI stops working completely', score: 0 },
+      { text: 'A special feature you can choose to turn on', score: 0 }
     ]
   },
   {
-    id: 'q-double-check', tier: 3, topic: 'Responsible AI use',
-    prompt: 'AI gives you a confident-sounding fact you\'re not sure is correct. What should you do?',
+    id: 'q-multimodal', tier: 3, topic: 'AI concepts',
+    prompt: "What does 'multimodal AI' mean?",
     options: [
-      { text: 'Trust it completely — AI is always accurate', score: 0 },
-      { text: 'Verify it against a reliable source before relying on it', score: 3 },
-      { text: 'Ignore AI entirely from now on', score: 1 },
-      { text: 'Pass it on to a colleague without checking', score: 0 }
+      { text: 'AI that only works on mobile phones', score: 0 },
+      { text: 'AI that can understand more than one type of input, like text, images, or audio', score: 3 },
+      { text: 'AI protected by multiple passwords', score: 0 },
+      { text: 'AI that speaks multiple human languages only', score: 1 }
     ]
   },
   {
-    id: 'q-connectors-awareness', tier: 3, topic: 'AI tools',
-    prompt: 'What is a "Connector" (also called an MCP) in tools like Claude?',
+    id: 'q-ai-agent-adv', tier: 3, topic: 'AI concepts',
+    prompt: "What is an 'AI agent'?",
     options: [
-      { text: 'A cable used to charge your laptop', score: 0 },
-      { text: 'A bridge that lets the AI access another app or system, like Zoho or Google Drive', score: 3 },
-      { text: 'A type of prompt template', score: 1 },
-      { text: 'Not sure what this is', score: 0 }
+      { text: 'Just another name for a chatbot — no real difference', score: 1 },
+      { text: 'AI that can take several steps and use tools on its own to complete a goal', score: 3 },
+      { text: 'A person who sells AI software', score: 0 },
+      { text: 'A type of computer virus', score: 0 }
     ]
   },
-  // ---- Tier 4: advanced — automation / agents / integrations ----
+  // ---- Tier 4: expert ----
   {
-    id: 'q-automation', tier: 4, topic: 'AI automation',
-    prompt: 'What best describes "AI automation" in a business setting?',
+    id: 'q-apis', tier: 4, topic: 'AI systems and automation',
+    prompt: 'What is an API?',
     options: [
-      { text: 'Typing faster while using AI', score: 0 },
-      { text: 'Setting up AI to handle a repeatable multi-step task automatically, with little manual input', score: 3 },
-      { text: 'Using AI only once per project', score: 0 },
-      { text: 'Turning off AI features to save time', score: 0 }
-    ]
-  },
-  {
-    id: 'q-ai-agents', tier: 4, topic: 'AI agents',
-    prompt: 'How is an "AI agent" different from a normal chat with AI?',
-    options: [
-      { text: 'There is no real difference', score: 0 },
-      { text: 'An agent can take multiple steps and use tools on its own to reach a goal, not just reply once', score: 3 },
-      { text: 'An agent is just a chat with a different name', score: 1 },
-      { text: 'An agent only works with images', score: 0 }
+      { text: 'A type of computer virus', score: 0 },
+      { text: 'A way for different software systems to talk to each other and share data or actions', score: 3 },
+      { text: 'A password manager', score: 0 },
+      { text: 'A type of file extension', score: 1 }
     ]
   },
   {
-    id: 'q-integrations', tier: 4, topic: 'AI tool integrations',
-    prompt: 'Your team wants AI to automatically log new customer enquiries into Zoho CRM. What\'s the right way to think about this?',
+    id: 'q-ai-workflow-expert', tier: 4, topic: 'AI systems and automation',
+    prompt: "What is an 'AI workflow'?",
     options: [
-      { text: 'It can\'t be done — AI can\'t connect to business systems', score: 0 },
-      { text: 'Connect AI to Zoho CRM through an integration/connector, then design a workflow that triggers on new enquiries', score: 3 },
-      { text: 'Manually retype every enquiry after asking AI to format it', score: 1 },
-      { text: 'Ask AI to remember the enquiries in the chat forever', score: 0 }
+      { text: 'A single one-off question you ask AI', score: 1 },
+      { text: 'A series of connected steps where AI helps complete a task from start to finish', score: 3 },
+      { text: 'A type of AI-generated image', score: 0 },
+      { text: 'A setting that turns AI off', score: 0 }
     ]
   },
   {
-    id: 'q-advanced-workflow', tier: 4, topic: 'Advanced AI workflows',
-    prompt: 'You want to design a multi-step AI workflow: pull data, analyse it, then draft a report. What\'s the best approach?',
+    id: 'q-automation-expert', tier: 4, topic: 'AI systems and automation',
+    prompt: "What does 'automation with AI' mean?",
     options: [
-      { text: 'Ask for everything in one giant prompt and hope it works', score: 1 },
-      { text: 'Break it into clear steps, check the output at each stage, and chain them together', score: 3 },
-      { text: 'Do each step manually since AI can\'t chain tasks', score: 0 },
-      { text: 'Only do the last step (the report) and skip the rest', score: 0 }
+      { text: 'Typing prompts faster', score: 0 },
+      { text: 'Setting up AI to handle a repeatable task on its own, with little manual effort', score: 3 },
+      { text: 'Turning off notifications', score: 0 },
+      { text: 'Using AI only once for a single project', score: 0 }
+    ]
+  },
+  {
+    id: 'q-mcps-expert', tier: 4, topic: 'AI systems and automation',
+    prompt: 'What is an MCP (also called a Connector)?',
+    options: [
+      { text: 'A type of file format', score: 0 },
+      { text: 'A way for AI to securely connect to and use another app or system, like a CRM or file storage', score: 3 },
+      { text: 'A pricing plan for AI tools', score: 0 },
+      { text: 'A keyboard shortcut', score: 0 }
+    ]
+  },
+  {
+    id: 'q-agents-tools-models', tier: 4, topic: 'AI systems and automation',
+    prompt: 'How do AI agents, tools, and models typically work together?',
+    options: [
+      { text: 'They are all exactly the same thing', score: 0 },
+      { text: 'The model provides the "thinking", tools let it take real actions, and an agent coordinates the steps toward a goal', score: 3 },
+      { text: 'Only the model matters — tools and agents are just decoration', score: 0 },
+      { text: 'Tools replace the need for a model entirely', score: 0 }
     ]
   }
 ];
