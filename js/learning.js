@@ -6,7 +6,11 @@
 // config lives in js/learning-data.js — this file is rendering + flow only.
 // ============================================================================
 
-const LEARNING_STORAGE_KEY = 'oryx-ai-learning-progress';
+// Pre-multi-account fix, progress was saved under this one shared key for
+// every signed-in user on the browser — migrated into the uid-scoped key
+// below the first time any account loads with nothing under its own key yet.
+const LEARNING_LEGACY_STORAGE_KEY = 'oryx-ai-learning-progress';
+const LEARNING_STORAGE_PREFIX = 'oryx-ai-learning-progress:';
 const learningRoot = document.getElementById('learningRoot');
 const viewLearning = document.getElementById('view-learning');
 const viewNotes = document.getElementById('view-notes');
@@ -15,6 +19,7 @@ const openLearningBtn = document.getElementById('openLearning');
 let learningScreen = 'onboarding'; // onboarding | assessment | results | dashboard | lesson
 let progress = null;              // the learner's saved progress object
 let learningUnsub = null;         // Firestore snapshot unsubscribe
+let learningLastUid = null;       // uid the in-memory `progress` currently belongs to
 
 // ---- Assessment run state (not persisted — only the final result is saved) ----
 let assessment = null; // { tier, askedIds:[], answers:[] }
@@ -44,22 +49,54 @@ function defaultProgress(){
   };
 }
 
+// Every signed-in user gets their own localStorage key (oryx-ai-learning-progress:{uid})
+// so two accounts signed into the same browser never see each other's assessment
+// result, XP, or lessons — only Firestore (per-uid by design) is shared infrastructure.
+function learningStorageKey(uid){
+  return uid ? (LEARNING_STORAGE_PREFIX + uid) : null;
+}
+
 function loadLocalProgress(){
+  const user = firebase.auth().currentUser;
+  const key = learningStorageKey(user && user.uid);
+  if(!key) return defaultProgress();
   try{
-    const raw = localStorage.getItem(LEARNING_STORAGE_KEY);
+    let raw = localStorage.getItem(key);
+    if(!raw){
+      // One-time migration: adopt whatever was under the old shared key, then
+      // clear it so no other account can inherit it after this.
+      const legacy = localStorage.getItem(LEARNING_LEGACY_STORAGE_KEY);
+      if(legacy){
+        localStorage.setItem(key, legacy);
+        localStorage.removeItem(LEARNING_LEGACY_STORAGE_KEY);
+        raw = legacy;
+      }
+    }
     if(!raw) return defaultProgress();
     return Object.assign(defaultProgress(), JSON.parse(raw));
   }catch(e){ return defaultProgress(); }
 }
 
 function saveProgress(){
-  try{ localStorage.setItem(LEARNING_STORAGE_KEY, JSON.stringify(progress)); }catch(e){}
   const user = firebase.auth().currentUser;
+  const key = learningStorageKey(user && user.uid);
+  if(key){ try{ localStorage.setItem(key, JSON.stringify(progress)); }catch(e){} }
   if(user && typeof learningCollection !== 'undefined'){
     learningCollection.doc(user.uid).set(progress, { merge: false }).catch(() => {
       // Likely no Firestore rule yet for learningProgress/{uid} — localStorage still works.
     });
   }
+}
+
+// Makes sure the in-memory `progress` object actually belongs to whoever is
+// currently signed in — reloads it whenever the signed-in account changes.
+function ensureProgressForCurrentUser(){
+  const user = firebase.auth().currentUser;
+  if(!user){ learningLastUid = null; progress = null; return; }
+  if(progress && learningLastUid === user.uid) return;
+  learningLastUid = user.uid;
+  progress = loadLocalProgress();
+  subscribeLearningProgress();
 }
 
 function bumpStreak(){
@@ -92,10 +129,7 @@ async function enterLearning(){
   viewNotes.classList.remove('active');
   viewLearning.classList.add('active');
 
-  if(!progress){
-    progress = loadLocalProgress();
-    subscribeLearningProgress();
-  }
+  ensureProgressForCurrentUser();
   bumpStreak();
   applyNewBadges();
   saveProgress();
@@ -117,7 +151,8 @@ function subscribeLearningProgress(){
       // Firestore is the cross-device source of truth once the rule allows it;
       // merge onto defaults so a partially-shaped remote doc never breaks the UI.
       progress = Object.assign(defaultProgress(), doc.data());
-      try{ localStorage.setItem(LEARNING_STORAGE_KEY, JSON.stringify(progress)); }catch(e){}
+      const key = learningStorageKey(user.uid);
+      if(key){ try{ localStorage.setItem(key, JSON.stringify(progress)); }catch(e){} }
       if(learningScreen !== 'assessment') renderLearning();
     }
   }, () => { /* no rule yet, or offline — keep using localStorage silently */ });
@@ -664,7 +699,7 @@ function renderMyAiProgressPanel(){
   if(typeof closeAccountMenu === 'function') closeAccountMenu();
   const user = firebase.auth().currentUser;
   if(!user) return;
-  if(!progress) progress = loadLocalProgress();
+  ensureProgressForCurrentUser();
 
   if(!progress.assessmentResult){
     myAiProgressBody.innerHTML = `
@@ -730,21 +765,23 @@ myAiProgressOverlay.addEventListener('click', (ev) => { if(ev.target === myAiPro
 // "AI Learning" button. Skipped if another panel is already open (e.g. they
 // signed in specifically to submit a resource) so it never hijacks a
 // different in-flight task.
+//
+// Keyed off the actual signed-in uid (not a one-shot flag) so switching
+// accounts on the same browser — including creating a new account while
+// already signed in, which swaps the Firebase user with no intermediate
+// signed-out state — always reloads that account's own progress instead of
+// silently keeping the previous user's in memory.
 // ---------------------------------------------------------------------------
-let learningAutoCheckDone = false;
-
 firebase.auth().onAuthStateChanged((user) => {
   if(!user){
-    learningAutoCheckDone = false;
+    learningLastUid = null;
     if(learningUnsub){ learningUnsub(); learningUnsub = null; }
     progress = null;
     return;
   }
-  if(learningAutoCheckDone) return;
-  learningAutoCheckDone = true;
+  if(user.uid === learningLastUid) return; // same account re-firing (e.g. token refresh)
 
-  progress = loadLocalProgress();
-  subscribeLearningProgress();
+  ensureProgressForCurrentUser();
   if(progress.assessmentResult) return; // already assessed — never force it again
 
   setTimeout(() => {
