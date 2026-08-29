@@ -214,6 +214,24 @@
 }
 .lrn-lesson-complete .lrn-btn-primary{ max-width:260px; }
 
+/* ---------- Recommended Hub resources ---------- */
+.lrn-reco{ display:flex; flex-direction:column; gap:10px; }
+.lrn-reco-heading{ font-family:var(--font-display); font-weight:700; font-size:13.5px; color:var(--oryx-blue); }
+.lrn-reco-list{ display:flex; flex-direction:column; gap:8px; }
+.lrn-reco-item{
+  text-align:left; display:flex; flex-direction:column; gap:3px; width:100%;
+  background:var(--white); border:1px solid var(--line); border-radius:12px; padding:12px 14px;
+  cursor:pointer; transition:border-color .15s;
+}
+.lrn-reco-item:hover{ border-color:var(--oryx-blue); }
+.lrn-reco-cat{
+  align-self:flex-start; font-family:var(--font-display); font-weight:600; font-size:10.5px;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--oryx-blue); background:var(--panel);
+  border-radius:999px; padding:2px 9px;
+}
+.lrn-reco-title{ font-family:var(--font-display); font-weight:700; font-size:14px; color:var(--black); }
+.lrn-reco-desc{ font-size:12.5px; color:var(--label); line-height:1.4; }
+
 /* ---------- My AI Progress (profile panel) ---------- */
 .lrn-profile-level{
   --lrn-accent:var(--oryx-blue);

@@ -304,13 +304,71 @@ function renderResults(){
         <div class="lrn-recommend-label">Recommended next step</div>
         <div class="lrn-recommend-lesson">Start with <strong>${escapeHtml(firstLessonTitle)}</strong></div>
       </div>
+      ${renderRecommendationsHtml(r.level)}
       <button class="lrn-btn-primary" id="lrnStartLearning">Start My Learning Journey</button>
     </div>`;
   bindTopbar();
+  bindRecommendations(learningRoot);
   document.getElementById('lrnStartLearning').addEventListener('click', () => {
     learningScreen = 'dashboard';
     dashboardTab = 'overview';
     renderLearning();
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Recommended Hub resources — real Instructions/Video/Assistants/Connectors/
+// etc. entries (not the built-in lessons), matched to the learner's level via
+// LEVEL_RECOMMENDED_CATEGORIES in learning-data.js. Clicking one opens the
+// same entry detail page as the rest of the Knowledge Hub.
+// ---------------------------------------------------------------------------
+function getRecommendedEntries(level){
+  const cats = LEVEL_RECOMMENDED_CATEGORIES[level] || [];
+  const pool = (typeof entries !== 'undefined' ? entries : []).filter(e => cats.includes(e.category));
+  // Round-robin across categories so one category can't crowd out the others.
+  const byCategory = cats.map(cat => pool.filter(e => e.category === cat).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)));
+  const picked = [];
+  for(let round = 0; picked.length < RECOMMENDATIONS_COUNT; round++){
+    let addedThisRound = false;
+    for(const list of byCategory){
+      if(list[round]){ picked.push(list[round]); addedThisRound = true; }
+      if(picked.length >= RECOMMENDATIONS_COUNT) break;
+    }
+    if(!addedThisRound) break;
+  }
+  return picked;
+}
+
+function recommendationSnippet(e){
+  const raw = (isRichCategory(e.category) ? (e.purpose || e.body) : e.body) || '';
+  const clean = String(raw).replace(/\s+/g, ' ').trim();
+  return clean.length > 90 ? clean.slice(0, 90) + '…' : clean;
+}
+
+function renderRecommendationsHtml(level){
+  const items = getRecommendedEntries(level);
+  if(!items.length) return '';
+  return `
+    <div class="lrn-reco">
+      <div class="lrn-reco-heading">Recommended for you</div>
+      <div class="lrn-reco-list">
+        ${items.map(e => `
+          <button class="lrn-reco-item" data-id="${e.id}">
+            <span class="lrn-reco-cat">${escapeHtml(CATEGORY_LABELS[e.category] || e.category)}</span>
+            <span class="lrn-reco-title">${escapeHtml(e.title || 'Untitled')}</span>
+            ${recommendationSnippet(e) ? `<span class="lrn-reco-desc">${escapeHtml(recommendationSnippet(e))}</span>` : ''}
+          </button>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function bindRecommendations(container){
+  container.querySelectorAll('.lrn-reco-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const entry = entries.find(e => e.id === btn.dataset.id);
+      if(entry) openNoteDetail(entry);
+    });
   });
 }
 
@@ -368,6 +426,7 @@ function renderDashboard(){
     const contBtn = document.getElementById('lrnContinueBtn');
     if(contBtn) contBtn.addEventListener('click', () => openLesson(level, nextId));
     bindOverviewLevelUp();
+    bindRecommendations(body);
   }else if(dashboardTab === 'path'){
     if(!reviewLevel) reviewLevel = level;
     body.innerHTML = renderPathTab();
@@ -398,7 +457,8 @@ function renderOverviewTab(level, meta, done, total, nextId, xpInfo){
         <div class="lrn-level-sub">${done}/${total} lessons complete · ${progress.xp || 0} XP total (${xpInfo.into}/${xpInfo.needed} to next learner level)</div>
       </div>
       ${nextLessonHtml}
-    </div>`;
+    </div>
+    ${renderRecommendationsHtml(level)}`;
 }
 
 function bindOverviewLevelUp(){
