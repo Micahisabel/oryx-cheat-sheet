@@ -234,13 +234,14 @@ const ASSESSMENT_QUESTIONS = [
 // level. Beginners get simple, foundational formats (Instructions, Video);
 // advanced/expert users get pointed at the more technical categories they
 // may not have explored yet (Assistants/agents, Connectors/MCPs, Plugins,
-// Commands). 'skills' is deliberately excluded — that category is admin-only
+// Commands), plus Video since a good video can teach a new concept fast at
+// any level. 'skills' is deliberately excluded — that category is admin-only
 // and not meant for staff. Edit this list to change what gets recommended.
 const LEVEL_RECOMMENDED_CATEGORIES = {
   beginner: ['instructions', 'discoveries'],
   intermediate: ['instructions', 'discoveries', 'commands'],
-  advanced: ['commands', 'agents', 'mcps'],
-  expert: ['agents', 'mcps', 'plugins']
+  advanced: ['commands', 'agents', 'mcps', 'discoveries'],
+  expert: ['agents', 'mcps', 'plugins', 'discoveries']
 };
 const RECOMMENDATIONS_COUNT = 4; // how many entries to show at once
 
