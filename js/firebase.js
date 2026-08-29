@@ -14,6 +14,7 @@ const suggestionsCollection = db.collection('suggestions');
 const favoritesCollection = db.collection('favorites');
 const notificationSubsCollection = db.collection('notificationSubs');
 const adminStateCollection = db.collection('adminState');
+const learningCollection = db.collection('learningProgress');
 
 // --- Supabase (Department Files) -------------------------------------------------
 // Department Files are stored entirely in Supabase (a Postgres table + a public Storage
