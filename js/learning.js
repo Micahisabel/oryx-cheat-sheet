@@ -22,7 +22,7 @@ let learningUnsub = null;         // Firestore snapshot unsubscribe
 let learningLastUid = null;       // uid the in-memory `progress` currently belongs to
 
 // ---- Assessment run state (not persisted — only the final result is saved) ----
-let assessment = null; // { tier, askedIds:[], answers:[] }
+let assessment = null; // { index, answers:[], selected:[] } — selected is the in-progress multi-select state
 
 // ---- Dashboard sub-navigation ----
 let dashboardTab = 'overview'; // overview | path | achievements
@@ -197,6 +197,7 @@ function renderOnboarding(){
     <div class="lrn-screen lrn-onboarding">
       ${topbar({ showBackToApp: true })}
       <div class="lrn-hero">
+        <div class="lrn-greeting-bubble">Hi there! 👋</div>
         <div class="lrn-hero-badge">🚀</div>
         <h2>Let's find your AI level</h2>
         <p class="lrn-hero-sub">Answer a few quick questions to discover where you are on your AI learning journey. Don't worry — there are no wrong answers.</p>
@@ -208,10 +209,13 @@ function renderOnboarding(){
 }
 
 // ---------------------------------------------------------------------------
-// 2. Adaptive assessment
+// 2. Assessment — fixed 5 questions (2 of them multi-select), not adaptive.
+// Level is never decided by question 1 alone: every question is weighted
+// (see ASSESSMENT_QUESTIONS[].weight in learning-data.js) and combined into
+// one 0-100 score, with "what can you actually do" counting for the most.
 // ---------------------------------------------------------------------------
 function startAssessment(){
-  assessment = { tier: 2, askedIds: [], answers: [] };
+  assessment = { index: 0, answers: [], selected: [] };
   learningScreen = 'assessment';
   renderLearning();
 }
@@ -225,76 +229,122 @@ function retakeAssessment(){
   startAssessment();
 }
 
-function pickNextQuestion(tier){
-  const pool = (t) => ASSESSMENT_QUESTIONS.filter(q => q.tier === t && !assessment.askedIds.includes(q.id));
-  for(const t of [tier, tier - 1, tier + 1, tier - 2, tier + 2]){
-    if(t < 1 || t > 4) continue;
-    const candidates = pool(t);
-    if(candidates.length) return candidates[Math.floor(Math.random() * candidates.length)];
-  }
-  const anyLeft = ASSESSMENT_QUESTIONS.filter(q => !assessment.askedIds.includes(q.id));
-  return anyLeft.length ? anyLeft[0] : null;
-}
-
 function renderAssessment(){
-  const qNum = assessment.answers.length + 1;
-  if(qNum > ASSESSMENT_LENGTH){ return finishAssessment(); }
-  const question = pickNextQuestion(assessment.tier);
-  if(!question){ return finishAssessment(); }
-  assessment.currentQuestion = question;
+  const total = ASSESSMENT_QUESTIONS.length;
+  if(assessment.index >= total){ return finishAssessment(); }
+  const question = ASSESSMENT_QUESTIONS[assessment.index];
+  assessment.selected = []; // reset per-question selection state
 
   learningRoot.innerHTML = `
     <div class="lrn-screen lrn-assessment">
-      ${topbar({ showProgress: Math.round(((qNum - 1) / ASSESSMENT_LENGTH) * 100) })}
-      <div class="lrn-q-meta">Question ${qNum} of ${ASSESSMENT_LENGTH}</div>
+      ${topbar({ showProgress: Math.round((assessment.index / total) * 100) })}
+      <div class="lrn-q-meta">Question ${assessment.index + 1} of ${total}</div>
       <div class="lrn-q-card">
         <div class="lrn-q-mascot">🤖</div>
-        <div class="lrn-q-bubble">${escapeHtml(question.prompt)}</div>
+        <div class="lrn-q-bubble">
+          ${escapeHtml(question.prompt)}
+          ${question.helper ? `<div class="lrn-q-helper">${escapeHtml(question.helper)}</div>` : ''}
+        </div>
       </div>
-      <div class="lrn-options">
+      <div class="lrn-options ${question.multi ? 'lrn-options-multi' : ''}">
         ${question.options.map((opt, i) => `
           <button class="lrn-option-btn" data-i="${i}">${escapeHtml(opt.text)}</button>
         `).join('')}
       </div>
+      ${question.multi ? `<button class="lrn-btn-primary" id="lrnMultiContinue" disabled>Continue</button>` : ''}
     </div>`;
   bindTopbar();
-  learningRoot.querySelectorAll('.lrn-option-btn').forEach(btn => {
-    btn.addEventListener('click', () => answerAssessmentQuestion(question, Number(btn.dataset.i)));
-  });
+
+  if(question.multi){
+    const continueBtn = document.getElementById('lrnMultiContinue');
+    learningRoot.querySelectorAll('.lrn-option-btn').forEach(btn => {
+      btn.addEventListener('click', () => toggleMultiOption(question, Number(btn.dataset.i), btn, continueBtn));
+    });
+    continueBtn.addEventListener('click', () => answerAssessmentQuestion(question, assessment.selected));
+  }else{
+    learningRoot.querySelectorAll('.lrn-option-btn').forEach(btn => {
+      btn.addEventListener('click', () => answerAssessmentQuestion(question, [Number(btn.dataset.i)]));
+    });
+  }
 }
 
-function answerAssessmentQuestion(question, optionIndex){
-  const opt = question.options[optionIndex];
-  assessment.askedIds.push(question.id);
-  assessment.answers.push({ questionId: question.id, tier: question.tier, topic: question.topic, score: opt.score });
-  const ratio = opt.score / 3;
-  if(ratio >= 0.66) assessment.tier = Math.min(4, assessment.tier + 1);
-  else if(ratio <= 0.33) assessment.tier = Math.max(1, assessment.tier - 1);
+function toggleMultiOption(question, i, btn, continueBtn){
+  const opt = question.options[i];
+  const isSelected = assessment.selected.includes(i);
+
+  if(opt.exclusive){
+    // Selecting an exclusive option (e.g. "None" / "I'm not sure yet") clears everything else.
+    assessment.selected = isSelected ? [] : [i];
+  }else{
+    assessment.selected = assessment.selected.filter(idx => !question.options[idx].exclusive);
+    if(isSelected) assessment.selected = assessment.selected.filter(idx => idx !== i);
+    else assessment.selected.push(i);
+  }
+
+  learningRoot.querySelectorAll('.lrn-option-btn').forEach((b, idx) => {
+    b.classList.toggle('selected', assessment.selected.includes(idx));
+  });
+  continueBtn.disabled = assessment.selected.length === 0;
+}
+
+function answerAssessmentQuestion(question, optionIndexes){
+  assessment.answers.push({ questionId: question.id, kind: question.kind || 'single', optionIndexes });
+  assessment.index += 1;
   renderLearning();
 }
 
+// Combines every answer into a single 0-100 score, then works out what the
+// person already demonstrated ("known") vs. what's a step above that they
+// haven't claimed yet ("gaps") — driven entirely by the `capabilities`
+// question, since that's the clearest signal of real demonstrated ability.
 function finishAssessment(){
-  const answers = assessment.answers;
-  const weightedSum = answers.reduce((sum, a) => sum + (a.score / 3) * TIER_WEIGHT[a.tier], 0);
-  const weightTotal = answers.reduce((sum, a) => sum + TIER_WEIGHT[a.tier], 0);
-  const score = Math.round((weightedSum / weightTotal) * 100);
-  const level = levelFromScore(score);
+  const byId = {};
+  assessment.answers.forEach(a => { byId[a.questionId] = a; });
 
-  // Strengths / areas to improve — averaged per topic actually asked this run.
-  const byTopic = {};
-  answers.forEach(a => {
-    if(!byTopic[a.topic]) byTopic[a.topic] = { total: 0, count: 0 };
-    byTopic[a.topic].total += a.score / 3;
-    byTopic[a.topic].count += 1;
+  let weightedSum = 0, weightTotal = 0;
+  ASSESSMENT_QUESTIONS.forEach(q => {
+    const answer = byId[q.id];
+    if(!answer) return;
+    let questionScore = 0;
+    if(q.id === 'tools-used'){
+      const realTools = answer.optionIndexes.filter(i => q.options[i].isTool);
+      questionScore = Math.min(100, realTools.length * 25);
+    }else if(q.kind === 'capabilities'){
+      const levelIndexes = answer.optionIndexes.map(i => q.options[i].levelIndex).filter(li => li >= 0);
+      questionScore = levelIndexes.length ? Math.max(...levelIndexes) * 25 : 0;
+    }else{
+      questionScore = q.options[answer.optionIndexes[0]].points;
+    }
+    weightedSum += questionScore * q.weight;
+    weightTotal += q.weight;
   });
-  const topicAverages = Object.keys(byTopic).map(topic => ({ topic, avg: byTopic[topic].total / byTopic[topic].count }));
-  const strengths = topicAverages.filter(t => t.avg >= 0.66).sort((a, b) => b.avg - a.avg).slice(0, 3).map(t => t.topic);
-  const improve = topicAverages.filter(t => t.avg <= 0.4).sort((a, b) => a.avg - b.avg).slice(0, 3).map(t => t.topic);
+  const score = Math.round(weightedSum / weightTotal);
+  const level = levelFromScore(score);
+  const levelIndex = LEARNING_LEVEL_ORDER.indexOf(level);
+
+  // "What you already know" / "What you can learn next" — from the
+  // capabilities question. Known = selected (real) capabilities. Gaps =
+  // capabilities not selected, closest to (at-or-above) their own level first.
+  const capQuestion = ASSESSMENT_QUESTIONS.find(q => q.kind === 'capabilities');
+  const capAnswer = byId[capQuestion.id];
+  const selectedCapIds = capAnswer ? capAnswer.optionIndexes.map(i => capQuestion.options[i].id) : [];
+  const known = capQuestion.options
+    .filter(o => selectedCapIds.includes(o.id) && !o.exclusive)
+    .map(o => o.text);
+  const gapOptions = capQuestion.options
+    .filter(o => !selectedCapIds.includes(o.id) && !o.exclusive)
+    .sort((a, b) => {
+      const da = Math.abs(a.levelIndex - levelIndex), db = Math.abs(b.levelIndex - levelIndex);
+      if(da !== db) return da - db;
+      // Tie-break: prefer the next step forward over one that's actually behind them.
+      return (a.levelIndex >= levelIndex ? 0 : 1) - (b.levelIndex >= levelIndex ? 0 : 1);
+    });
 
   progress.assessmentResult = {
     level, score,
-    strengths: strengths.length ? strengths : ['Getting started with AI'],
-    improve: improve.length ? improve : ['Keep practicing — you\'re off to a solid start']
+    known: known.length ? known : ['Just getting started — no worries, that\'s what this path is for'],
+    gaps: gapOptions.slice(0, 3).map(o => o.gapLabel),
+    gapCategories: gapOptions.slice(0, 3).map(o => o.gapCategory).filter(Boolean)
   };
   progress.currentLevel = level;
   progress.assessmentDate = new Date().toISOString();
@@ -327,19 +377,19 @@ function renderResults(){
       </div>
       <div class="lrn-results-grid">
         <div class="lrn-results-col">
-          <h3>Your strengths</h3>
-          <ul>${r.strengths.map(s => `<li>✅ ${escapeHtml(s)}</li>`).join('')}</ul>
+          <h3>What you already know</h3>
+          <ul>${r.known.map(s => `<li>✅ ${escapeHtml(s)}</li>`).join('')}</ul>
         </div>
         <div class="lrn-results-col">
-          <h3>Areas to improve</h3>
-          <ul>${r.improve.map(s => `<li>🎯 ${escapeHtml(s)}</li>`).join('')}</ul>
+          <h3>What you can learn next</h3>
+          <ul>${(r.gaps && r.gaps.length ? r.gaps : ['You\'re covering a lot already — keep practicing to go deeper']).map(s => `<li>🎯 ${escapeHtml(s)}</li>`).join('')}</ul>
         </div>
       </div>
       <div class="lrn-recommend">
         <div class="lrn-recommend-label">Recommended next step</div>
         <div class="lrn-recommend-lesson">Start with <strong>${escapeHtml(firstLessonTitle)}</strong></div>
       </div>
-      ${renderRecommendationsHtml(r.level)}
+      ${renderRecommendationsHtml(r.level, r.gapCategories)}
       <button class="lrn-btn-primary" id="lrnStartLearning">Start My Learning Journey</button>
     </div>`;
   bindTopbar();
@@ -357,18 +407,44 @@ function renderResults(){
 // LEVEL_RECOMMENDED_CATEGORIES in learning-data.js. Clicking one opens the
 // same entry detail page as the rest of the Knowledge Hub.
 // ---------------------------------------------------------------------------
-function getRecommendedEntries(level){
+// Picks one real Hub entry per knowledge gap (see finishAssessment) so the
+// recommendations don't just repeat the same level-wide list for everyone —
+// they specifically try to fill in what THIS person hasn't shown yet.
+function getGapEntries(gapCategories){
+  const seenCats = new Set();
+  const picks = [];
+  (gapCategories || []).forEach(cat => {
+    if(!cat || seenCats.has(cat)) return;
+    seenCats.add(cat);
+    const pool = (typeof entries !== 'undefined' ? entries : [])
+      .filter(e => e.category === cat)
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    if(pool[0]) picks.push(Object.assign({}, pool[0], { isGapPick: true }));
+  });
+  return picks;
+}
+
+function getRecommendedEntries(level, gapCategories){
+  const gapPicks = getGapEntries(gapCategories).slice(0, RECOMMENDATIONS_COUNT);
+  const pickedIds = new Set(gapPicks.map(e => e.id));
+  const picked = gapPicks.slice();
+
   const cats = LEVEL_RECOMMENDED_CATEGORIES[level] || [];
   const pool = (typeof entries !== 'undefined' ? entries : []).filter(e => cats.includes(e.category));
   // Round-robin across categories so one category can't crowd out the others.
   const byCategory = cats.map(cat => pool.filter(e => e.category === cat).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)));
-  const picked = [];
-  for(let round = 0; picked.length < RECOMMENDATIONS_COUNT; round++){
+
+  let round = 0;
+  while(picked.length < RECOMMENDATIONS_COUNT){
     let addedThisRound = false;
     for(const list of byCategory){
-      if(list[round]){ picked.push(list[round]); addedThisRound = true; }
       if(picked.length >= RECOMMENDATIONS_COUNT) break;
+      const candidate = list[round];
+      if(candidate && !pickedIds.has(candidate.id)){
+        picked.push(candidate); pickedIds.add(candidate.id); addedThisRound = true;
+      }
     }
+    round++;
     if(!addedThisRound) break;
   }
   return picked;
@@ -380,8 +456,8 @@ function recommendationSnippet(e){
   return clean.length > 90 ? clean.slice(0, 90) + '…' : clean;
 }
 
-function renderRecommendationsHtml(level){
-  const items = getRecommendedEntries(level);
+function renderRecommendationsHtml(level, gapCategories){
+  const items = getRecommendedEntries(level, gapCategories);
   if(!items.length) return '';
   return `
     <div class="lrn-reco">
@@ -389,7 +465,10 @@ function renderRecommendationsHtml(level){
       <div class="lrn-reco-list">
         ${items.map(e => `
           <button class="lrn-reco-item" data-id="${e.id}">
-            <span class="lrn-reco-cat">${escapeHtml(CATEGORY_LABELS[e.category] || e.category)}</span>
+            <span class="lrn-reco-tags">
+              <span class="lrn-reco-cat">${escapeHtml(CATEGORY_LABELS[e.category] || e.category)}</span>
+              ${e.isGapPick ? `<span class="lrn-reco-gap-tag">Fills a gap</span>` : ''}
+            </span>
             <span class="lrn-reco-title">${escapeHtml(e.title || 'Untitled')}</span>
             ${recommendationSnippet(e) ? `<span class="lrn-reco-desc">${escapeHtml(recommendationSnippet(e))}</span>` : ''}
           </button>
@@ -493,7 +572,7 @@ function renderOverviewTab(level, meta, done, total, nextId, xpInfo){
       </div>
       ${nextLessonHtml}
     </div>
-    ${renderRecommendationsHtml(level)}`;
+    ${renderRecommendationsHtml(level, progress.assessmentResult && progress.assessmentResult.gapCategories)}`;
 }
 
 function bindOverviewLevelUp(){

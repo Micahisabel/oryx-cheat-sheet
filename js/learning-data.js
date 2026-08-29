@@ -8,22 +8,24 @@
 // ============================================================================
 
 // ---- Levels -----------------------------------------------------------------
-const LEARNING_LEVEL_ORDER = ['beginner', 'intermediate', 'advanced', 'expert'];
+const LEARNING_LEVEL_ORDER = ['beginner', 'basic', 'intermediate', 'advanced', 'expert'];
 
 const LEVEL_META = {
-  beginner:     { label: 'Beginner',     emoji: '🌱', color: '#3FA34D', desc: 'Little or no understanding of AI', blurb: "You're just starting to explore AI. Let's build your understanding from the basics." },
-  intermediate: { label: 'Intermediate', emoji: '🔵', color: '#1C7ED6', desc: 'Understands the basic concepts of AI and prompting', blurb: "You understand the basics of AI and how AI tools work. You're ready to learn more advanced AI concepts." },
-  advanced:     { label: 'Advanced',     emoji: '🟣', color: '#7048E8', desc: 'Understands AI concepts, models, agents, and advanced features', blurb: 'You understand AI concepts, models, and agents well. Time to sharpen your skills even further.' },
-  expert:       { label: 'Expert',       emoji: '🟠', color: '#E8590C', desc: 'Has a strong understanding of advanced AI concepts, systems, automation, APIs, agents, and related technologies', blurb: 'You have a strong understanding of advanced AI concepts, systems, and automation.' }
+  beginner:     { label: 'Beginner',     emoji: '🟢', color: '#3FA34D', desc: 'Little or no understanding of AI', blurb: "You're new to AI — this path builds your understanding from the ground up." },
+  basic:        { label: 'Basic',        emoji: '🔵', color: '#1C7ED6', desc: 'Knows some things about AI and has used AI tools', blurb: 'You know some AI basics and have tried a few tools. Time to strengthen that and get practical.' },
+  intermediate: { label: 'Intermediate', emoji: '🟡', color: '#8A5A00', desc: 'Understands AI and uses it regularly', blurb: 'You understand AI and use it regularly. Let\'s sharpen your prompting and workflow skills.' },
+  advanced:     { label: 'Advanced',     emoji: '🟠', color: '#E8590C', desc: 'Understands AI well and uses it for different tasks', blurb: 'You know AI well and use it for different tasks. Time for techniques and tools you may not know yet.' },
+  expert:       { label: 'Expert',       emoji: '🔴', color: '#C92A2A', desc: 'Deep AI knowledge and understanding of advanced AI concepts', blurb: 'You have deep AI knowledge. Let\'s explore specialized and emerging AI topics.' }
 };
 
-// Score thresholds (0-100, weighted — see scoreAssessment() in learning.js).
+// Score thresholds (0-100, weighted — see finishAssessment() in learning.js).
 // Edit min/max here to rebalance level placement without touching any logic.
 const LEVEL_THRESHOLDS = [
-  { level: 'beginner',     min: 0,  max: 25 },
-  { level: 'intermediate', min: 26, max: 50 },
-  { level: 'advanced',     min: 51, max: 75 },
-  { level: 'expert',       min: 76, max: 100 }
+  { level: 'beginner',     min: 0,  max: 20 },
+  { level: 'basic',        min: 21, max: 40 },
+  { level: 'intermediate', min: 41, max: 60 },
+  { level: 'advanced',     min: 61, max: 80 },
+  { level: 'expert',       min: 81, max: 100 }
 ];
 
 function levelFromScore(score){
@@ -31,199 +33,78 @@ function levelFromScore(score){
   return (hit || LEVEL_THRESHOLDS[0]).level;
 }
 
-// ---- Adaptive assessment question bank --------------------------------------
-// Pure AI-knowledge check — no job/department/workplace framing. Questions
-// only test how much the person actually knows about AI itself, and get
-// gradually harder: tier 1 = beginner, 2 = intermediate, 3 = advanced,
-// 4 = expert. `weight` is how much each tier counts toward the final score.
-// Each option carries a 0-3 quality score (not just right/wrong), so a
-// half-right answer still earns partial credit.
-const TIER_WEIGHT = { 1: 1, 2: 2, 3: 3, 4: 4 };
-const ASSESSMENT_LENGTH = 9; // how many questions a single assessment run asks
-
+// ---- Assessment ---------------------------------------------------------------
+// A short, fixed 5-question knowledge + habit check — not adaptive, and never
+// decided by a single question. Each question has a `weight` (how much it
+// counts toward the final 0-100 score); the last question (what you can
+// actually DO with AI) counts for the most, since demonstrated capability is
+// a stronger signal than self-rating alone. Single-select questions carry a
+// `points` value per option (0/25/50/75/100). The two multi-select questions
+// carry richer option metadata used for scoring, "what you know", and
+// knowledge-gap recommendations — see scoreAssessment() in learning.js.
 const ASSESSMENT_QUESTIONS = [
-  // ---- Tier 1: beginner ----
   {
-    id: 'q-what-is-ai', tier: 1, topic: 'Basic AI understanding',
-    prompt: 'What is AI, in simple terms?',
+    id: 'self-level', weight: 0.15,
+    prompt: 'How would you describe your current AI knowledge?',
     options: [
-      { text: 'A computer program that can understand language and respond, kind of like a smart assistant', score: 3 },
-      { text: 'A robot that looks and moves like a human', score: 1 },
-      { text: 'A website that stores files', score: 0 },
-      { text: "I'm not sure", score: 0 }
+      { text: "Beginner — I'm new to AI.", points: 0 },
+      { text: 'Basic — I know some things about AI and have used AI tools.', points: 25 },
+      { text: 'Intermediate — I understand AI and use it regularly.', points: 50 },
+      { text: 'Advanced — I understand AI well and know how to use it for different tasks.', points: 75 },
+      { text: 'Expert — I have strong knowledge of AI and understand advanced AI concepts.', points: 100 }
     ]
   },
   {
-    id: 'q-what-can-ai-do', tier: 1, topic: 'Basic AI understanding',
-    prompt: 'What can AI tools like ChatGPT or Claude help you do?',
+    id: 'usage-frequency', weight: 0.15,
+    prompt: 'How often do you use AI tools?',
     options: [
-      { text: 'Only play simple games', score: 0 },
-      { text: 'Write, summarise, answer questions, and help with everyday tasks', score: 3 },
-      { text: 'Only translate one language into another', score: 1 },
-      { text: 'Fix problems with your computer hardware', score: 0 }
+      { text: 'Never', points: 0 },
+      { text: 'Rarely', points: 25 },
+      { text: 'Sometimes', points: 50 },
+      { text: 'Often', points: 75 },
+      { text: 'Every day', points: 100 }
     ]
   },
   {
-    id: 'q-ai-chatbot', tier: 1, topic: 'Basic AI understanding',
-    prompt: 'What is an AI chatbot?',
+    id: 'tools-used', weight: 0.15, multi: true, kind: 'tools',
+    prompt: 'Which AI tools have you used before?',
+    helper: 'Select all that apply.',
     options: [
-      { text: 'A program you can chat with in everyday language to get answers or help', score: 3 },
-      { text: 'A robot that moves around an office', score: 0 },
-      { text: 'A type of computer virus', score: 0 },
-      { text: 'A website with only buttons, no typing', score: 1 }
+      { id: 'chatgpt', text: 'ChatGPT', isTool: true },
+      { id: 'claude', text: 'Claude', isTool: true },
+      { id: 'copilot', text: 'Microsoft Copilot', isTool: true },
+      { id: 'gemini', text: 'Gemini', isTool: true },
+      { id: 'other-tool', text: 'Other', isTool: true },
+      { id: 'none', text: 'None', isTool: false, exclusive: true }
     ]
   },
   {
-    id: 'q-chatgpt-claude', tier: 1, topic: 'Basic AI understanding',
-    prompt: 'What are ChatGPT and Claude?',
+    id: 'confidence', weight: 0.15,
+    prompt: 'How confident are you when using AI?',
     options: [
-      { text: 'Two examples of AI assistants you can chat with', score: 3 },
-      { text: 'Two social media apps', score: 0 },
-      { text: 'Types of computer hardware', score: 0 },
-      { text: 'Search engines, nothing more', score: 1 }
-    ]
-  },
-  // ---- Tier 2: intermediate ----
-  {
-    id: 'q-what-is-prompt', tier: 2, topic: 'Prompting and how AI works',
-    prompt: "What is a 'prompt' when using AI?",
-    options: [
-      { text: 'The message or instruction you type to tell the AI what you want', score: 3 },
-      { text: 'A type of error message', score: 0 },
-      { text: "The AI's reply to you", score: 1 },
-      { text: 'A setting inside your computer', score: 0 }
+      { text: 'Not confident', points: 0 },
+      { text: 'Slightly confident', points: 25 },
+      { text: 'Somewhat confident', points: 50 },
+      { text: 'Very confident', points: 75 },
+      { text: 'Extremely confident', points: 100 }
     ]
   },
   {
-    id: 'q-better-prompt', tier: 2, topic: 'Prompting and how AI works',
-    prompt: 'Which prompt is more likely to get a useful answer from AI?',
+    id: 'capabilities', weight: 0.40, multi: true, kind: 'capabilities',
+    prompt: 'What can you currently do with AI?',
+    helper: 'Select all that apply.',
+    // levelIndex (0=beginner..4=expert) drives both scoring and gap-finding;
+    // gapCategory/gapLabel are used when this capability ISN'T selected, to
+    // recommend a real Hub resource that fills that specific gap.
     options: [
-      { text: '"Write an email."', score: 0 },
-      { text: '"Write a short, professional email telling a customer their order will be delayed by two days."', score: 3 },
-      { text: '"Email."', score: 0 },
-      { text: '"Something for a customer."', score: 1 }
-    ]
-  },
-  {
-    id: 'q-ai-wrong-answers', tier: 2, topic: 'Prompting and how AI works',
-    prompt: 'Why can AI sometimes give a wrong or made-up answer?',
-    options: [
-      { text: "Because it's broken and needs to be repaired", score: 0 },
-      { text: 'Because it predicts a likely-sounding answer based on patterns, and isn\'t always checking facts', score: 3 },
-      { text: 'AI never gives a wrong answer', score: 0 },
-      { text: 'Because the internet connection is slow', score: 0 }
-    ]
-  },
-  {
-    id: 'q-generate-vs-search', tier: 2, topic: 'Prompting and how AI works',
-    prompt: "What's the difference between AI generating an answer and a search engine searching the internet?",
-    options: [
-      { text: 'There is no real difference between them', score: 0 },
-      { text: 'A search engine finds existing web pages; AI generates a new answer based on what it learned', score: 3 },
-      { text: 'AI only shows a list of links, like a search engine', score: 0 },
-      { text: 'Search engines are simply a type of AI', score: 1 }
-    ]
-  },
-  // ---- Tier 3: advanced ----
-  {
-    id: 'q-ai-model', tier: 3, topic: 'AI concepts',
-    prompt: "What is an 'AI model'?",
-    options: [
-      { text: 'A physical robot', score: 0 },
-      { text: 'The underlying system that has been trained to understand and generate language or other content', score: 3 },
-      { text: 'A type of keyboard shortcut', score: 0 },
-      { text: "A screen that shows the AI's mood", score: 0 }
-    ]
-  },
-  {
-    id: 'q-context', tier: 3, topic: 'AI concepts',
-    prompt: "What does 'context' mean when talking to an AI?",
-    options: [
-      { text: 'The colour scheme of the chat window', score: 0 },
-      { text: 'The background information the AI is given so it can respond more accurately', score: 3 },
-      { text: 'How fast the AI replies', score: 0 },
-      { text: 'A type of file format', score: 1 }
-    ]
-  },
-  {
-    id: 'q-hallucinations', tier: 3, topic: 'AI concepts',
-    prompt: "What is an 'AI hallucination'?",
-    options: [
-      { text: 'When AI shows a picture instead of text', score: 0 },
-      { text: 'When AI confidently states something that is actually false or made up', score: 3 },
-      { text: 'When AI stops working completely', score: 0 },
-      { text: 'A special feature you can choose to turn on', score: 0 }
-    ]
-  },
-  {
-    id: 'q-multimodal', tier: 3, topic: 'AI concepts',
-    prompt: "What does 'multimodal AI' mean?",
-    options: [
-      { text: 'AI that only works on mobile phones', score: 0 },
-      { text: 'AI that can understand more than one type of input, like text, images, or audio', score: 3 },
-      { text: 'AI protected by multiple passwords', score: 0 },
-      { text: 'AI that speaks multiple human languages only', score: 1 }
-    ]
-  },
-  {
-    id: 'q-ai-agent-adv', tier: 3, topic: 'AI concepts',
-    prompt: "What is an 'AI agent'?",
-    options: [
-      { text: 'Just another name for a chatbot — no real difference', score: 1 },
-      { text: 'AI that can take several steps and use tools on its own to complete a goal', score: 3 },
-      { text: 'A person who sells AI software', score: 0 },
-      { text: 'A type of computer virus', score: 0 }
-    ]
-  },
-  // ---- Tier 4: expert ----
-  {
-    id: 'q-apis', tier: 4, topic: 'AI systems and automation',
-    prompt: 'What is an API?',
-    options: [
-      { text: 'A type of computer virus', score: 0 },
-      { text: 'A way for different software systems to talk to each other and share data or actions', score: 3 },
-      { text: 'A password manager', score: 0 },
-      { text: 'A type of file extension', score: 1 }
-    ]
-  },
-  {
-    id: 'q-ai-workflow-expert', tier: 4, topic: 'AI systems and automation',
-    prompt: "What is an 'AI workflow'?",
-    options: [
-      { text: 'A single one-off question you ask AI', score: 1 },
-      { text: 'A series of connected steps where AI helps complete a task from start to finish', score: 3 },
-      { text: 'A type of AI-generated image', score: 0 },
-      { text: 'A setting that turns AI off', score: 0 }
-    ]
-  },
-  {
-    id: 'q-automation-expert', tier: 4, topic: 'AI systems and automation',
-    prompt: "What does 'automation with AI' mean?",
-    options: [
-      { text: 'Typing prompts faster', score: 0 },
-      { text: 'Setting up AI to handle a repeatable task on its own, with little manual effort', score: 3 },
-      { text: 'Turning off notifications', score: 0 },
-      { text: 'Using AI only once for a single project', score: 0 }
-    ]
-  },
-  {
-    id: 'q-mcps-expert', tier: 4, topic: 'AI systems and automation',
-    prompt: 'What is an MCP (also called a Connector)?',
-    options: [
-      { text: 'A type of file format', score: 0 },
-      { text: 'A way for AI to securely connect to and use another app or system, like a CRM or file storage', score: 3 },
-      { text: 'A pricing plan for AI tools', score: 0 },
-      { text: 'A keyboard shortcut', score: 0 }
-    ]
-  },
-  {
-    id: 'q-agents-tools-models', tier: 4, topic: 'AI systems and automation',
-    prompt: 'How do AI agents, tools, and models typically work together?',
-    options: [
-      { text: 'They are all exactly the same thing', score: 0 },
-      { text: 'The model provides the "thinking", tools let it take real actions, and an agent coordinates the steps toward a goal', score: 3 },
-      { text: 'Only the model matters — tools and agents are just decoration', score: 0 },
-      { text: 'Tools replace the need for a model entirely', score: 0 }
+      { id: 'ask-questions', text: 'Ask AI simple questions', levelIndex: 0, gapCategory: 'instructions', gapLabel: 'asking AI clear, useful questions' },
+      { id: 'write-text', text: 'Write or improve text', levelIndex: 1, gapCategory: 'instructions', gapLabel: 'writing and improving text with AI' },
+      { id: 'summarize-docs', text: 'Summarize documents', levelIndex: 1, gapCategory: 'instructions', gapLabel: 'summarizing documents with AI' },
+      { id: 'analyze-info', text: 'Analyze information', levelIndex: 2, gapCategory: 'commands', gapLabel: 'analyzing information with AI' },
+      { id: 'create-content', text: 'Create images or other content', levelIndex: 2, gapCategory: 'commands', gapLabel: 'creating images or content with AI' },
+      { id: 'automate-tasks', text: 'Automate tasks', levelIndex: 3, gapCategory: 'mcps', gapLabel: 'automating tasks with AI' },
+      { id: 'build-agents', text: 'Build AI workflows or agents', levelIndex: 4, gapCategory: 'agents', gapLabel: 'building AI workflows or agents' },
+      { id: 'not-sure', text: "I'm not sure yet", levelIndex: -1, exclusive: true }
     ]
   }
 ];
@@ -231,14 +112,17 @@ const ASSESSMENT_QUESTIONS = [
 // ---- Recommended Hub resources, by level ------------------------------------
 // After the assessment (and on the dashboard), we point people at real
 // Knowledge Hub entries — not just the built-in lessons — matched to their
-// level. Beginners get simple, foundational formats (Instructions, Video);
-// advanced/expert users get pointed at the more technical categories they
-// may not have explored yet (Assistants/agents, Connectors/MCPs, Plugins,
-// Commands), plus Video since a good video can teach a new concept fast at
-// any level. 'skills' is deliberately excluded — that category is admin-only
-// and not meant for staff. Edit this list to change what gets recommended.
+// level. Beginners/Basic get simple, foundational formats (Instructions,
+// Video); Intermediate adds Commands; Advanced/Expert skip basic content for
+// the more technical categories they may not have explored yet (Assistants/
+// agents, Connectors/MCPs, Plugins), plus Video since a good video can teach
+// a new concept fast at any level. 'skills' is deliberately excluded — that
+// category is admin-only and not meant for staff. Edit this list to change
+// what gets recommended. Knowledge-gap recommendations (see learning.js)
+// layer on top of this general pool, not instead of it.
 const LEVEL_RECOMMENDED_CATEGORIES = {
   beginner: ['instructions', 'discoveries'],
+  basic: ['instructions', 'discoveries', 'commands'],
   intermediate: ['instructions', 'discoveries', 'commands'],
   advanced: ['commands', 'agents', 'mcps', 'discoveries'],
   expert: ['agents', 'mcps', 'plugins', 'discoveries']
@@ -252,6 +136,10 @@ const LEARNING_PATHS = {
   beginner: [
     'what-is-ai', 'how-assistants-work', 'intro-chatgpt-claude', 'basic-prompt',
     'ask-better-questions', 'ai-everyday-work', 'working-with-documents', 'ai-safety'
+  ],
+  basic: [
+    'ai-strengths-weaknesses', 'everyday-prompting', 'comparing-ai-assistants', 'refining-ai-answers',
+    'ai-for-quick-tasks', 'intro-file-work', 'spotting-ai-mistakes', 'from-basic-to-practical'
   ],
   intermediate: [
     'better-prompting', 'prompt-structure', 'context-and-instructions', 'documents-intermediate',
@@ -382,6 +270,120 @@ const LESSON_LIBRARY = {
         { text: 'Confidential customer or financial information, unless approved', correct: true },
         { text: 'Any text at all — AI tools should never be used', correct: false },
         { text: 'Nothing — everything is safe to share', correct: false }
+      ]
+    }
+  },
+
+  // ================= BASIC =================
+  'ai-strengths-weaknesses': {
+    title: "What AI Is Good At (and Not)",
+    learn: 'AI is great at drafting, summarising, brainstorming, and answering general questions. It\'s weaker at precise maths, today\'s exact news, or live company data it isn\'t connected to. Knowing this helps you pick the right task for AI.',
+    example: { label: 'Good fit vs. weak fit', good: 'Drafting a first version of an email is a good fit. Asking for exact live stock levels it has no access to is a weak fit.' },
+    practice: 'List two tasks you\'d trust AI with, and one you wouldn\'t — and why.',
+    quiz: {
+      question: 'Which task is AI naturally weaker at?',
+      options: [
+        { text: 'Giving today\'s exact live stock count from a system it isn\'t connected to', correct: true },
+        { text: 'Drafting a first version of an email', correct: false },
+        { text: 'Brainstorming ideas for a project name', correct: false }
+      ]
+    }
+  },
+  'everyday-prompting': {
+    title: 'Everyday Prompting Habits',
+    learn: 'A few small habits make prompts far more useful day to day: say the goal first, mention who it\'s for, and ask for a specific format — bullets, a table, or a short paragraph.',
+    example: { label: 'Everyday prompt', good: '"Turn these notes into 3 bullet points for my manager."' },
+    practice: 'Take one task you do this week and write a one-line prompt with goal + audience + format.',
+    quiz: {
+      question: 'What\'s a good everyday prompting habit?',
+      options: [
+        { text: 'Say the goal, audience, and format you want', correct: true },
+        { text: 'Keep every prompt exactly the same, regardless of the task', correct: false },
+        { text: 'Never mention who the output is for', correct: false }
+      ]
+    }
+  },
+  'comparing-ai-assistants': {
+    title: 'Comparing AI Assistants',
+    learn: 'Claude, ChatGPT, Copilot, and Gemini all work in a similar way — you chat, they generate a reply — but each has its own strengths and fits into different tools (Copilot, for example, works inside Microsoft apps). Trying more than one helps you see what fits your workflow best.',
+    example: { label: 'Why it helps', good: 'Copilot can work directly inside Word or Outlook, while Claude or ChatGPT are often used in a separate chat window.' },
+    practice: 'If you\'ve only used one AI tool, try asking the same question to a second one and compare the replies.',
+    quiz: {
+      question: 'Why might it help to try more than one AI assistant?',
+      options: [
+        { text: 'Each has its own strengths and fits differently into your workflow', correct: true },
+        { text: 'They are all identical with no real differences', correct: false },
+        { text: 'Only one AI assistant is allowed to exist', correct: false }
+      ]
+    }
+  },
+  'refining-ai-answers': {
+    title: 'Refining AI Answers',
+    learn: 'Your first reply from AI doesn\'t have to be your last. If it\'s too long, too formal, missing something, or off-target, just say so in plain words and ask it to adjust — that\'s normal and expected, not a failure.',
+    example: { label: 'Refining', good: '"Shorter please, and make it sound friendlier."' },
+    practice: 'Ask AI for something, then give it one round of feedback to improve the reply.',
+    quiz: {
+      question: 'What should you do if an AI reply isn\'t quite right?',
+      options: [
+        { text: 'Tell it what to change and ask again', correct: true },
+        { text: 'Assume it can\'t be fixed', correct: false },
+        { text: 'Never use AI for that task again', correct: false }
+      ]
+    }
+  },
+  'ai-for-quick-tasks': {
+    title: 'AI for Quick, Everyday Tasks',
+    learn: 'Small, quick wins build the habit: turning a messy note into a clean message, checking spelling and tone, or listing pros and cons before a decision. These take seconds and build confidence for bigger tasks later.',
+    example: { label: 'Quick win', good: '"Clean up this message and make the tone more polite."' },
+    practice: 'Use AI for one quick task today — a message, a list, or a tone check.',
+    quiz: {
+      question: 'What\'s a good "quick win" use of AI?',
+      options: [
+        { text: 'Cleaning up a message or checking its tone', correct: true },
+        { text: 'Something that requires a whole day of setup first', correct: false },
+        { text: 'Nothing — quick tasks aren\'t worth using AI for', correct: false }
+      ]
+    }
+  },
+  'intro-file-work': {
+    title: 'Getting Started with Files and Documents',
+    learn: 'You can share a document or a block of text with AI and ask simple questions about it — like "what are the main points?" This is one of the most useful basic skills once you\'re comfortable chatting with AI.',
+    example: { label: 'Try this', good: '"Here\'s an email — what are the 3 key points?"' },
+    practice: 'Paste a short document or email into AI and ask for the 3 main points.',
+    quiz: {
+      question: 'What\'s a simple way to start working with documents in AI?',
+      options: [
+        { text: 'Paste or share the text and ask a simple question about it', correct: true },
+        { text: 'Only ever describe the document from memory', correct: false },
+        { text: 'Documents can\'t be used with AI at all', correct: false }
+      ]
+    }
+  },
+  'spotting-ai-mistakes': {
+    title: 'Spotting AI Mistakes',
+    learn: 'AI can sound confident even when it\'s wrong — sometimes called a "hallucination." A good habit is to double-check any fact, number, or name that really matters before you rely on it.',
+    example: { label: 'Good habit', good: 'Quickly checking a name, date, or number AI gives you against a real source before using it.' },
+    practice: 'Next time AI gives you a specific fact or number, take 10 seconds to verify it.',
+    quiz: {
+      question: 'What should you do with an important fact or number AI gives you?',
+      options: [
+        { text: 'Quickly double-check it before relying on it', correct: true },
+        { text: 'Always trust it completely, no matter what', correct: false },
+        { text: 'Ignore anything AI ever says', correct: false }
+      ]
+    }
+  },
+  'from-basic-to-practical': {
+    title: 'From Basic to Practical AI Use',
+    learn: 'You\'ve got the fundamentals — now it\'s about making AI a regular habit: for messages, summaries, quick research, and decisions. The next step is structure — building prompts and simple workflows that get consistently good results.',
+    example: { label: 'Next step', good: 'Instead of one-off prompts, start thinking about a repeatable structure you can reuse.' },
+    practice: 'Pick one task you now do with AI regularly, and write down the prompt you use so you can reuse it.',
+    quiz: {
+      question: 'What\'s the natural next step after building basic AI habits?',
+      options: [
+        { text: 'Learning more structure, like reusable prompts and simple workflows', correct: true },
+        { text: 'Stopping using AI altogether', correct: false },
+        { text: 'Only ever using AI for one single task forever', correct: false }
       ]
     }
   },
@@ -751,10 +753,11 @@ const BADGE_LIBRARY = [
   { id: 'first-steps', label: 'First Steps', emoji: '🥾', desc: 'Complete your first lesson', check: p => (p.completedLessons || []).length >= 1 },
   { id: 'quiz-whiz', label: 'Quiz Whiz', emoji: '🧠', desc: 'Pass a quiz on your first try', check: p => p.perfectQuizzes > 0 },
   { id: 'five-lessons', label: 'Building Momentum', emoji: '⚡', desc: 'Complete 5 lessons', check: p => (p.completedLessons || []).length >= 5 },
-  { id: 'path-complete-beginner', label: 'Fundamentals Graduate', emoji: '🌱', desc: 'Finish the Beginner path', check: p => p.pathCompleted && p.pathCompleted.beginner },
-  { id: 'path-complete-intermediate', label: 'Skilled Up', emoji: '🔵', desc: 'Finish the Intermediate path', check: p => p.pathCompleted && p.pathCompleted.intermediate },
-  { id: 'path-complete-advanced', label: 'Workflow Master', emoji: '🟣', desc: 'Finish the Advanced path', check: p => p.pathCompleted && p.pathCompleted.advanced },
-  { id: 'path-complete-expert', label: 'AI Systems Architect', emoji: '🟠', desc: 'Finish the Expert path', check: p => p.pathCompleted && p.pathCompleted.expert },
+  { id: 'path-complete-beginner', label: 'Fundamentals Graduate', emoji: '🟢', desc: 'Finish the Beginner path', check: p => p.pathCompleted && p.pathCompleted.beginner },
+  { id: 'path-complete-basic', label: 'Practical Starter', emoji: '🔵', desc: 'Finish the Basic path', check: p => p.pathCompleted && p.pathCompleted.basic },
+  { id: 'path-complete-intermediate', label: 'Skilled Up', emoji: '🟡', desc: 'Finish the Intermediate path', check: p => p.pathCompleted && p.pathCompleted.intermediate },
+  { id: 'path-complete-advanced', label: 'Workflow Master', emoji: '🟠', desc: 'Finish the Advanced path', check: p => p.pathCompleted && p.pathCompleted.advanced },
+  { id: 'path-complete-expert', label: 'AI Systems Architect', emoji: '🔴', desc: 'Finish the Expert path', check: p => p.pathCompleted && p.pathCompleted.expert },
   { id: 'streak-3', label: '3-Day Streak', emoji: '🔥', desc: 'Learn 3 days in a row', check: p => (p.streak || 0) >= 3 },
   { id: 'streak-7', label: '7-Day Streak', emoji: '🔥', desc: 'Learn 7 days in a row', check: p => (p.streak || 0) >= 7 },
   { id: 'assessment-done', label: 'Know Thyself', emoji: '🎯', desc: 'Complete the AI skill assessment', check: p => !!p.assessmentResult }
