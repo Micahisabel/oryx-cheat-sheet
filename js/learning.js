@@ -197,8 +197,8 @@ function renderOnboarding(){
     <div class="lrn-screen lrn-onboarding">
       ${topbar({ showBackToApp: true })}
       <div class="lrn-hero">
-        <div class="lrn-greeting-bubble">Hi there! 👋</div>
-        <div class="lrn-hero-badge">🚀</div>
+        <div class="lrn-greeting-bubble">Hi there! I'm Ginger 👋</div>
+        <div class="lrn-hero-badge"><img src="assets/images/mascot/cat-sunglasses.png" alt="Ginger the cat"></div>
         <h2>Let's find your AI level</h2>
         <p class="lrn-hero-sub">Answer a few quick questions to discover where you are on your AI learning journey. Don't worry — there are no wrong answers.</p>
         <button class="lrn-btn-primary" id="lrnStartAssessment">Start Assessment</button>
@@ -240,7 +240,7 @@ function renderAssessment(){
       ${topbar({ showProgress: Math.round((assessment.index / total) * 100) })}
       <div class="lrn-q-meta">Question ${assessment.index + 1} of ${total}</div>
       <div class="lrn-q-card">
-        <div class="lrn-q-mascot">🤖</div>
+        <div class="lrn-q-mascot"><img src="assets/images/mascot/cat-sunglasses.png" alt="Ginger the cat"></div>
         <div class="lrn-q-bubble">
           ${escapeHtml(question.prompt)}
           ${question.helper ? `<div class="lrn-q-helper">${escapeHtml(question.helper)}</div>` : ''}
@@ -667,7 +667,7 @@ function renderLesson(){
   }else if(step === 'quiz'){
     body = `
       <div class="lrn-lesson-section">
-        ${activeLesson.wrongAttempt ? `<div class="lrn-quiz-retry">Not quite — take another look at the Learn section above, then try again.</div>` : ''}
+        ${activeLesson.wrongAttempt ? `<div class="lrn-quiz-retry"><img src="assets/images/mascot/cat-confused.png" alt="Ginger looking confused">Not quite — take another look at the Learn section above, then try again.</div>` : ''}
         <h3>Quick check</h3>
         <p>${escapeHtml(lesson.quiz.question)}</p>
         <div class="lrn-options">
@@ -677,7 +677,7 @@ function renderLesson(){
   }else if(step === 'done'){
     body = `
       <div class="lrn-lesson-complete">
-        <div class="lrn-complete-emoji">🎉</div>
+        <div class="lrn-complete-emoji"><img src="assets/images/mascot/cat-yawn.png" alt="Ginger celebrating"> 🎉</div>
         <h2>Lesson Complete!</h2>
         <p>+${XP_PER_LESSON + (activeLesson.wrongAttempt ? 0 : XP_PER_QUIZ_CORRECT)} XP</p>
         ${activeLesson.newBadges && activeLesson.newBadges.length ? `
