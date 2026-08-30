@@ -463,9 +463,19 @@ function getRecommendedEntries(level, gapCategories){
   const picked = gapPicks.slice();
 
   const cats = LEVEL_RECOMMENDED_CATEGORIES[level] || [];
-  const pool = (typeof entries !== 'undefined' ? entries : []).filter(e => cats.includes(e.category));
+  // Blank difficulty always matches (most of the existing 72 entries have none set) —
+  // a resource tagged for a DIFFERENT level is the only thing excluded here.
+  const pool = (typeof entries !== 'undefined' ? entries : [])
+    .filter(e => cats.includes(e.category) && (!e.difficulty || e.difficulty === level));
   // Round-robin across categories so one category can't crowd out the others.
-  const byCategory = cats.map(cat => pool.filter(e => e.category === cat).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)));
+  // Within a category, entries tagged for this exact level get a slight edge over
+  // untagged ones, then both fall back to recency.
+  const byCategory = cats.map(cat => pool.filter(e => e.category === cat).sort((a, b) => {
+    const aMatch = a.difficulty === level ? 1 : 0;
+    const bMatch = b.difficulty === level ? 1 : 0;
+    if(aMatch !== bMatch) return bMatch - aMatch;
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  }));
 
   let round = 0;
   while(picked.length < RECOMMENDATIONS_COUNT){
