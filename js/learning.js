@@ -416,7 +416,7 @@ function renderResults(){
         <div class="lrn-recommend-label">Recommended next step</div>
         <div class="lrn-recommend-lesson">Start with <strong>${escapeHtml(firstLessonTitle)}</strong></div>
       </div>
-      ${renderRecommendationsHtml(r.level, r.gapCategories)}
+      ${renderRecommendationsHtml(r.level, r.gapCategories, r.gaps)}
       <button class="lrn-btn-primary" id="lrnStartLearning">Start My Learning Journey</button>
     </div>`;
   bindTopbar();
@@ -483,12 +483,14 @@ function recommendationSnippet(e){
   return clean.length > 90 ? clean.slice(0, 90) + '…' : clean;
 }
 
-function renderRecommendationsHtml(level, gapCategories){
+function renderRecommendationsHtml(level, gapCategories, gapLabels){
   const items = getRecommendedEntries(level, gapCategories);
   if(!items.length) return '';
+  const topGap = (items.some(e => e.isGapPick) && gapLabels && gapLabels[0]) ? gapLabels[0] : '';
   return `
     <div class="lrn-reco">
       <div class="lrn-reco-heading">Recommended for you</div>
+      ${topGap ? `<div class="lrn-reco-gap-note">Because you're working on: <strong>${escapeHtml(topGap)}</strong></div>` : ''}
       <div class="lrn-reco-list">
         ${items.map(e => `
           <button class="lrn-reco-item" data-id="${e.id}">
@@ -565,7 +567,7 @@ function renderLearningSnapshot(){
       </div>
       <div class="snap-actions"><button class="lrn-btn-primary" id="snapContinueBtn">Continue Learning</button></div>
     </div>
-    ${renderRecommendationsHtml(level, progress.assessmentResult && progress.assessmentResult.gapCategories)}`;
+    ${renderRecommendationsHtml(level, progress.assessmentResult && progress.assessmentResult.gapCategories, progress.assessmentResult && progress.assessmentResult.gaps)}`;
 
   const contBtn = document.getElementById('snapContinueBtn');
   if(contBtn) contBtn.addEventListener('click', enterLearning);
@@ -658,7 +660,7 @@ function renderOverviewTab(level, meta, done, total, nextId, xpInfo){
       </div>
       ${nextLessonHtml}
     </div>
-    ${renderRecommendationsHtml(level, progress.assessmentResult && progress.assessmentResult.gapCategories)}`;
+    ${renderRecommendationsHtml(level, progress.assessmentResult && progress.assessmentResult.gapCategories, progress.assessmentResult && progress.assessmentResult.gaps)}`;
 }
 
 function bindOverviewLevelUp(){
@@ -923,9 +925,9 @@ function renderMyAiProgressPanel(){
       <div class="lrn-profile-stat"><span>Assessment score</span><strong>${progress.assessmentResult.score}%</strong></div>
       <div class="lrn-profile-stat"><span>Assessment date</span><strong>${formatAssessmentDate(progress.assessmentDate)}</strong></div>
       <div class="lrn-profile-stat"><span>Overall progress</span><strong>${pct}%</strong></div>
-      <div class="lrn-profile-stat" title="Points you earn by finishing lessons."><span>Points earned</span><strong>${progress.xp || 0}</strong></div>
+      <div class="lrn-profile-stat" title="Points you earn by finishing lessons."><span>Points earned</span><strong class="lrn-profile-stat-accent">${progress.xp || 0}</strong></div>
       <div class="lrn-profile-stat"><span>Lessons completed</span><strong>${(progress.completedLessons || []).length}</strong></div>
-      <div class="lrn-profile-stat" title="Little awards you unlock for reaching a milestone, like a learning streak."><span>Badges (awards)</span><strong>${(progress.badges || []).length}</strong></div>
+      <div class="lrn-profile-stat" title="Little awards you unlock for reaching a milestone, like a learning streak."><span>Badges (awards)</span><strong class="lrn-profile-stat-accent">${(progress.badges || []).length}</strong></div>
     </div>
     <div class="lrn-profile-course">
       <span>Current course</span>
