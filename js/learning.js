@@ -1134,6 +1134,39 @@ function latestChallengeAttempt(levelKey){
   return state.attempts[state.attempts.length - 1];
 }
 
+// Plain-English, step-by-step walkthrough shown on every active challenge —
+// written for someone who has never used this kind of system before (not
+// everyone at Oryx is technical). Purely explanatory: adds no new state and
+// changes nothing about how evidence/explanation/submission actually work.
+const CHALLENGE_HOWTO_STEPS = [
+  { icon: '📖', title: '1. Read', text: 'Read the challenge above and make sure you understand what you need to do.' },
+  { icon: '🤖', title: '2. Use AI', text: 'Open Claude, ChatGPT, or the AI tool mentioned in the challenge and complete the task.' },
+  { icon: '📸', title: '3. Show your work', text: 'Take a screenshot or save the file you created — you\'ll need it in the next step.' },
+  { icon: '✍️', title: '4. Explain', text: 'Write a short explanation of what you did and how you used AI.' },
+  { icon: '✅', title: '5. Submit', text: 'Upload your evidence, add your explanation, then click "Submit challenge."' }
+];
+
+function challengeHowToHtml(){
+  return `
+    <div class="lrn-challenge-card lrn-howto">
+      <h3>How to complete this challenge</h3>
+      <div class="lrn-howto-steps">
+        ${CHALLENGE_HOWTO_STEPS.map(s => `
+          <div class="lrn-howto-step">
+            <span class="lrn-howto-icon">${s.icon}</span>
+            <div>
+              <div class="lrn-howto-title">${escapeHtml(s.title)}</div>
+              <div class="lrn-howto-text">${escapeHtml(s.text)}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <p class="lrn-practice-hint"><strong>Important:</strong> you must provide evidence and a short explanation before you can submit.</p>
+      <div class="lrn-howto-help">
+        <strong>Need help?</strong> Not sure what to do? Read the steps above first. If you're still unsure, ask your manager or the AI Knowledge Hub administrator for help.
+      </div>
+    </div>`;
+}
+
 function renderChallenge(){
   const { levelKey } = activeChallenge;
   const meta = LEVEL_META[levelKey];
@@ -1208,6 +1241,8 @@ function renderChallenge(){
           ${needsImprovementNote.reviewNote ? `<p class="lrn-practice-hint"><strong>Reviewer note:</strong> ${escapeHtml(needsImprovementNote.reviewNote)}</p>` : ''}
         ` : ''}
       </div>
+
+      ${challengeHowToHtml()}
 
       <div class="lrn-challenge-card">
         <h3>Your submission</h3>
