@@ -398,6 +398,9 @@ function render(){
     const tagChipHtml = e.tag ? `<span class="card-tag-chip">${escapeHtml(e.tag)}</span>` : '';
     const platformTagLabel = e.platform === 'other' ? 'Other AI Tools' : platformMeta(e.platform).label;
     const cardTagLabel = isRichCategory(e.category) && e.department ? e.department : (e.category === 'discoveries' ? platformTagLabel : (CATEGORY_LABELS[e.category] || e.category));
+    // Shortcuts keep their type as the card tag (e.g. "Claude Prompt"), so a chosen department
+    // gets its own small pill instead of replacing it (unlike rich categories above).
+    const shortcutDeptHtml = (isShortcutCategory(e.category) && e.department) ? `<p class="card-dept">For ${escapeHtml(e.department)}</p>` : '';
     const isFav = favoriteIds.has(e.id);
     // In the mixed "All Platforms" view, show a Claude/ChatGPT badge so users can tell them apart.
     // (Skipped in single-platform views where it would be redundant, and for Other AI Tools /
@@ -422,6 +425,7 @@ function render(){
         ${thumbHtml}
         <span class="card-tag">${escapeHtml(cardTagLabel)}</span>
         <p class="card-title">${escapeHtml(e.title)}</p>
+        ${shortcutDeptHtml}
         <p class="card-body">${escapeHtml(preview)}</p>
         ${tagChipHtml}
         ${linkHtml}

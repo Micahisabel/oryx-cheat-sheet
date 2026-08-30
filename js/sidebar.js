@@ -71,9 +71,11 @@ function exitShortcutsMode(){
   render();
 }
 
+// Any signed-in team member can add Prompts/Desktop/Quick Commands shortcuts — only the
+// Code categories stay admin-only (see the dropdown filtering in shortcuts-form.js).
 function updateAddShortcutVisibility(){
   const btn = document.getElementById('openAddShortcut');
-  if(btn) btn.style.display = (isAdmin && viewMode === 'shortcuts') ? '' : 'none';
+  if(btn) btn.style.display = (viewMode === 'shortcuts') ? '' : 'none';
 }
 
 document.querySelectorAll('.platform-expand-btn').forEach(btn => {

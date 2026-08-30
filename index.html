@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-30.106";</script>
+<script>window.APP_VERSION = "2026-08-30.107";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="css/layout.css?v=7">
 <link rel="stylesheet" href="css/sidebar.css?v=14">
 <link rel="stylesheet" href="css/dashboard.css?v=8">
-<link rel="stylesheet" href="css/cards.css?v=17">
+<link rel="stylesheet" href="css/cards.css?v=18">
 <link rel="stylesheet" href="css/modal.css?v=32">
 <link rel="stylesheet" href="css/forms.css?v=20">
 <link rel="stylesheet" href="css/dept-files.css?v=6">
@@ -397,7 +397,7 @@
   </div>
 </div>
 
-<!-- Add a Claude shortcut (admin, from within the Claude Shortcuts view) -->
+<!-- Add a Claude/ChatGPT shortcut (any team member, from within the Shortcuts view) -->
 <div class="overlay" id="shortcutOverlay">
   <div class="panel">
     <button class="close-x" id="closeShortcutPanel">&times;</button>
@@ -442,6 +442,11 @@
     <div id="scNotesGroup">
       <label for="scNotes">Notes <span class="optional-tag">(optional)</span></label>
       <textarea id="scNotes" placeholder="Gotchas, aliases, limitations"></textarea>
+    </div>
+
+    <div id="scDeptPickerField">
+      <label>Which teams is this for? <span class="optional-tag">(pick any — or skip)</span></label>
+      <div class="dept-picker" id="scDepartments"></div>
     </div>
 
     <label for="scAuthor">Your name</label>
@@ -749,11 +754,11 @@
 <script src="js/constants.js?v=46"></script>
 <script src="js/learning-data.js?v=8"></script>
 <script src="js/state.js?v=20"></script>
-<script src="js/sidebar.js?v=29"></script>
-<script src="js/entries.js?v=55"></script>
+<script src="js/sidebar.js?v=30"></script>
+<script src="js/entries.js?v=56"></script>
 <script src="js/skill-detail.js?v=39"></script>
 <script src="js/add-entry.js?v=24"></script>
-<script src="js/shortcuts-form.js?v=19"></script>
+<script src="js/shortcuts-form.js?v=20"></script>
 <script src="js/admin.js?v=22"></script>
 <script src="js/suggest.js?v=44"></script>
 <script src="js/favorites.js?v=4"></script>

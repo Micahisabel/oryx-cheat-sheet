@@ -17,26 +17,35 @@ function applyShortcutFormMode(cat){
   document.getElementById('scTitleLabel').textContent = isPrompt ? 'Name' : 'Label';
 }
 
+// Code categories are developer-oriented and stay admin-only (matches the tab hiding in
+// admin.js) — everyone else can only pick Prompts / Desktop / Quick Commands.
+function shortcutCatsFor(group){
+  const all = group === 'chatgpt' ? CHATGPT_SHORTCUT_CATS : CLAUDE_SHORTCUT_CATS;
+  const codeCat = group === 'chatgpt' ? 'chatgpt-shortcut-code' : 'shortcut-code';
+  return isAdmin ? all : all.filter(c => c !== codeCat);
+}
+
 function openShortcutOverlay(){
   shortcutOverlay.classList.add('open');
   editingShortcutId = null;
-  const cats = shortcutGroup === 'chatgpt' ? CHATGPT_SHORTCUT_CATS : CLAUDE_SHORTCUT_CATS;
+  const cats = shortcutCatsFor(shortcutGroup);
   const scCategory = document.getElementById('scCategory');
   scCategory.innerHTML = cats.map(c => `<option value="${c}">${CATEGORY_LABELS[c]}</option>`).join('');
-  scCategory.value = activeCat;
+  scCategory.value = cats.includes(activeCat) ? activeCat : cats[0];
   applyShortcutFormMode(scCategory.value);
   document.getElementById('shortcutPanelTitle').textContent = shortcutGroup === 'chatgpt' ? 'Add a ChatGPT shortcut' : 'Add a Claude shortcut';
   saveAddShortcut.textContent = 'Save shortcut';
   let savedAuthor = '';
   try{ savedAuthor = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
   document.getElementById('scAuthor').value = savedAuthor;
+  setScDepartments('');
 }
 
 function openEditShortcut(entry){
   shortcutOverlay.classList.add('open');
   editingShortcutId = entry.id;
   const isChatgpt = CHATGPT_SHORTCUT_CATS.includes(entry.category);
-  const cats = isChatgpt ? CHATGPT_SHORTCUT_CATS : CLAUDE_SHORTCUT_CATS;
+  const cats = shortcutCatsFor(isChatgpt ? 'chatgpt' : 'claude');
   const scCategory = document.getElementById('scCategory');
   scCategory.innerHTML = cats.map(c => `<option value="${c}">${CATEGORY_LABELS[c]}</option>`).join('');
   scCategory.value = entry.category;
@@ -51,6 +60,7 @@ function openEditShortcut(entry){
   document.getElementById('scExample').value = entry.example || '';
   document.getElementById('scNotes').value = entry.notes || '';
   document.getElementById('scAuthor').value = entry.author || '';
+  setScDepartments(entry.department || '');
 }
 
 function closeShortcutOverlay(){
@@ -67,6 +77,28 @@ function closeShortcutOverlay(){
   document.getElementById('errScKey').style.display = 'none';
   document.getElementById('errScPurpose').style.display = 'none';
   document.getElementById('errScSamplePrompt').style.display = 'none';
+  setScDepartments('');
+}
+
+// Departments chip picker for the shortcut form (mirrors the Suggest form's dDepartments).
+const scDeptPickerEl = document.getElementById('scDepartments');
+if(scDeptPickerEl){
+  scDeptPickerEl.innerHTML = LIBRARY_DEPARTMENTS.map(d =>
+    `<button type="button" class="dept-chip" data-dept="${escapeHtml(d)}">${escapeHtml(d)}</button>`
+  ).join('');
+  scDeptPickerEl.querySelectorAll('.dept-chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('selected'));
+  });
+}
+function getScDepartments(){
+  return scDeptPickerEl ? [...scDeptPickerEl.querySelectorAll('.dept-chip.selected')].map(c => c.dataset.dept) : [];
+}
+function setScDepartments(deptStr){
+  if(!scDeptPickerEl) return;
+  const selected = (deptStr || '').split(',').map(s => s.trim()).filter(Boolean);
+  scDeptPickerEl.querySelectorAll('.dept-chip').forEach(chip => {
+    chip.classList.toggle('selected', selected.includes(chip.dataset.dept));
+  });
 }
 
 openAddShortcutBtn.addEventListener('click', openShortcutOverlay);
@@ -130,7 +162,7 @@ saveAddShortcut.addEventListener('click', async () => {
     howToUse: document.getElementById('scHowToUse').value.trim(),
     example: isPrompt ? '' : document.getElementById('scExample').value.trim(),
     notes: isPrompt ? '' : document.getElementById('scNotes').value.trim(),
-    link: '', tag: '', body: '', department: '',
+    link: '', tag: '', body: '', department: getScDepartments().join(', '),
     platform: shortcutGroup === 'chatgpt' ? 'chatgpt' : 'claude',
     author: author || 'Anonymous',
     suggestedBy: existing ? (existing.suggestedBy || '') : ''
