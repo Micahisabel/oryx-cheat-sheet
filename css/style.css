@@ -10,6 +10,49 @@
     --line-soft:rgba(2,42,58,0.08);
     --font-display:'Archivo',sans-serif;
     --font-body:'Inter',sans-serif;
+    --font-mono:'Courier New',monospace;
+
+    /* Muted text (previously hardcoded ad hoc across cards.css/modal.css/dashboard.css) */
+    --text-muted:#5b6b72;
+    --text-muted-light:#8a97a0;
+
+    /* Accent — gold, used sparingly for AI-feature/new/highlight moments, never a repaint */
+    --accent:#F5C451;
+    --accent-hover:#e9b53c;
+    --accent-deep:#8a5a34;
+
+    /* Semantic */
+    --danger:#8a2b2b;
+    --danger-bg:#fbeceb;
+    --danger-bg-hover:#f5d9d7;
+    --alert:#c15656;
+    --neutral-hover:#e9eef0;
+
+    /* Radii, by frequency of use */
+    --r-pill:999px;
+    --r-lg:14px;
+    --r-md:12px;
+    --r-sm:10px;
+    --r-xs:8px;
+
+    /* Shadows — always tinted brand blue, never plain black */
+    --sh-subtle:0 1px 4px rgba(2,42,58,0.06);
+    --sh-card:0 2px 10px rgba(2,42,58,0.08);
+    --sh-header:0 4px 20px rgba(2,42,58,0.18);
+    --sh-raised:0 8px 24px rgba(2,42,58,0.18);
+    --sh-hover:0 8px 20px rgba(2,42,58,0.25);
+    --sh-modal:0 40px 90px -30px rgba(2,42,58,0.55), 0 0 0 1px rgba(255,255,255,0.06);
+    --sh-focus:0 0 0 3px rgba(2,42,58,0.08);
+
+    /* Spacing scale — formalizes the ad-hoc 6/8/10/12/14/18/22/28/32px values already in use */
+    --sp-1:4px;
+    --sp-2:8px;
+    --sp-3:12px;
+    --sp-4:16px;
+    --sp-5:20px;
+    --sp-6:24px;
+    --sp-7:32px;
+    --sp-8:48px;
   }
   *{box-sizing:border-box;}
   body{
