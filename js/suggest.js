@@ -373,6 +373,12 @@ staffAuthSaveName.addEventListener('click', async () => {
     staffAuthSaveName.disabled = false; staffAuthSaveName.textContent = 'Create account';
     refreshSignInPill();
     closeStaffAuth(true);
+    // A brand-new account's very first screen is the AI assessment, not the
+    // main library — no delay, no chance to glimpse the library first.
+    if(typeof ensureProgressForCurrentUser === 'function') ensureProgressForCurrentUser();
+    if(typeof progress !== 'undefined' && progress && !progress.assessmentResult && typeof enterLearningAsEntrance === 'function'){
+      enterLearningAsEntrance();
+    }
   }catch(e){
     staffAuthSaveName.disabled = false; staffAuthSaveName.textContent = 'Create account';
     if(e.code === 'auth/email-already-in-use'){

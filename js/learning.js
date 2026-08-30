@@ -1297,6 +1297,22 @@ myAiProgressOverlay.addEventListener('click', (ev) => { if(ev.target === myAiPro
 // signed-out state — always reloads that account's own progress instead of
 // silently keeping the previous user's in memory.
 // ---------------------------------------------------------------------------
+// Swaps straight into the assessment's welcome screen — the "entrance" a
+// brand-new account lands on instead of ever seeing the main library page.
+// Shared by the account-creation success handler (suggest.js, immediate, no
+// delay) and the sign-in auto-prompt below (delayed, skippable) so both
+// paths land on the exact same screen the exact same way.
+function enterLearningAsEntrance(){
+  if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
+  if(typeof exitLearningAdminMode === 'function') exitLearningAdminMode();
+  viewNotes.classList.remove('active');
+  viewLearning.classList.add('active');
+  bumpStreak();
+  saveProgress();
+  learningScreen = 'onboarding';
+  renderLearning();
+}
+
 firebase.auth().onAuthStateChanged((user) => {
   if(!user){
     learningLastUid = null;
@@ -1312,14 +1328,10 @@ firebase.auth().onAuthStateChanged((user) => {
   setTimeout(() => {
     const otherOverlayOpen = Array.from(document.querySelectorAll('.overlay.open'))
       .some(el => el.id !== 'staffAuthOverlay');
+    // Also backs off if the entrance already ran synchronously for this same
+    // sign-in (see enterLearningAsEntrance() called directly on account
+    // creation) — viewLearning will already be active by the time this fires.
     if(otherOverlayOpen || viewLearning.classList.contains('active')) return;
-    if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
-  if(typeof exitLearningAdminMode === 'function') exitLearningAdminMode();
-    viewNotes.classList.remove('active');
-    viewLearning.classList.add('active');
-    bumpStreak();
-    saveProgress();
-    learningScreen = 'onboarding';
-    renderLearning();
+    enterLearningAsEntrance();
   }, 300); // let any in-flight UI (e.g. the sign-in modal closing) settle first
 });
