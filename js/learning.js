@@ -36,8 +36,9 @@ let activeLesson = null; // { levelKey, lessonId, step: 'learn'|'practice'|'quiz
 // ---------------------------------------------------------------------------
 function defaultProgress(){
   return {
-    assessmentResult: null,       // { level, score, strengths:[], improve:[] }
+    assessmentResult: null,       // { level, score, known:[], gaps:[], gapCategories:[] }
     assessmentDate: null,         // ISO date string of the most recent assessment
+    assessmentHistory: [],        // [{ level, score, date, gaps, gapCategories }] — appended, never overwritten
     currentLevel: null,
     xp: 0,
     completedLessons: [],
@@ -45,7 +46,11 @@ function defaultProgress(){
     badges: [],
     perfectQuizzes: 0,
     streak: 0,
-    lastActiveDate: null
+    lastActiveDate: null,
+    resourceProgress: {},         // { [entryId]: { status:'in-progress'|'completed', startedAt, completedAt, quizPassed } }
+    lastHomepageVisit: null,      // ISO string — powers the homepage's "New For You" section
+    department: null,             // one of LIBRARY_DEPARTMENTS, or null until self-selected
+    userEmail: null               // mirrored from firebase.auth() so the admin dashboard can label rows
   };
 }
 
@@ -79,11 +84,13 @@ function loadLocalProgress(){
 
 function saveProgress(){
   const user = firebase.auth().currentUser;
+  if(user && progress) progress.userEmail = user.email || null;
   const key = learningStorageKey(user && user.uid);
   if(key){ try{ localStorage.setItem(key, JSON.stringify(progress)); }catch(e){} }
   if(user && typeof learningCollection !== 'undefined'){
     learningCollection.doc(user.uid).set(progress, { merge: false }).catch(() => {
-      // Likely no Firestore rule yet for learningProgress/{uid} — localStorage still works.
+      // Best-effort — if the learningProgress/{uid} Firestore rule isn't published yet,
+      // localStorage still works as the fallback source of truth for this browser.
     });
   }
 }
