@@ -505,4 +505,8 @@ function render(){
 
   // Keep the department "More" overflow menu (and its badge counts) in sync after a re-render.
   if(typeof layoutOtherToolsOverflow === 'function') layoutOtherToolsOverflow();
+
+  // Keeps the homepage "Your AI Learning" snapshot fresh on load, entries updates,
+  // and sign-in/out (render() already runs on all of these).
+  if(typeof renderLearningSnapshot === 'function') renderLearningSnapshot();
 }
