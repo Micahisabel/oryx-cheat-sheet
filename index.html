@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-16.105";</script>
+<script>window.APP_VERSION = "2026-08-30.106";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -185,10 +185,10 @@
       </nav>
       <nav class="cat-tabbar" id="chatgptShortcutNav" style="display:none;">
         <div class="cat-tab-indicator"></div>
-        <button class="cat-tab active" data-cat="chatgpt-shortcut-desktop">ChatGPT Desktop<span class="cat-badge" data-count-for="chatgpt-shortcut-desktop">0</span></button>
+        <button class="cat-tab active" data-cat="chatgpt-shortcut-prompts">ChatGPT Prompts<span class="cat-badge" data-count-for="chatgpt-shortcut-prompts">0</span></button>
+        <button class="cat-tab" data-cat="chatgpt-shortcut-desktop">ChatGPT Desktop<span class="cat-badge" data-count-for="chatgpt-shortcut-desktop">0</span></button>
         <button class="cat-tab" data-cat="chatgpt-shortcut-code">ChatGPT Code<span class="cat-badge" data-count-for="chatgpt-shortcut-code">0</span></button>
         <button class="cat-tab" data-cat="chatgpt-shortcut-slash">Quick Commands<span class="cat-tab-tag">Slash</span><span class="cat-badge" data-count-for="chatgpt-shortcut-slash">0</span></button>
-        <button class="cat-tab" data-cat="chatgpt-shortcut-prompts">ChatGPT Prompts<span class="cat-badge" data-count-for="chatgpt-shortcut-prompts">0</span></button>
       </nav>
       <nav class="cat-tabbar" id="sideNav">
         <div class="cat-tab-indicator"></div>
@@ -746,7 +746,7 @@
 
 <script src="js/firebase.js?v=21"></script>
 <script src="js/utils.js?v=25"></script>
-<script src="js/constants.js?v=45"></script>
+<script src="js/constants.js?v=46"></script>
 <script src="js/learning-data.js?v=8"></script>
 <script src="js/state.js?v=20"></script>
 <script src="js/sidebar.js?v=29"></script>

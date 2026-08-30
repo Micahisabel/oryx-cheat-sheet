@@ -166,7 +166,7 @@ const OTHER_TOOLS_CATS = ['other-hr', 'other-marketing', 'other-sales', 'other-b
 function isOtherToolsCategory(cat){ return cat === 'other-tools' || OTHER_TOOLS_CATS.includes(cat); }
 
 const CLAUDE_SHORTCUT_CATS = ['shortcut-prompts', 'shortcut-desktop', 'shortcut-code', 'shortcut-slash'];
-const CHATGPT_SHORTCUT_CATS = ['chatgpt-shortcut-desktop', 'chatgpt-shortcut-code', 'chatgpt-shortcut-slash', 'chatgpt-shortcut-prompts'];
+const CHATGPT_SHORTCUT_CATS = ['chatgpt-shortcut-prompts', 'chatgpt-shortcut-desktop', 'chatgpt-shortcut-code', 'chatgpt-shortcut-slash'];
 const SHORTCUT_CATEGORIES = [...CLAUDE_SHORTCUT_CATS, ...CHATGPT_SHORTCUT_CATS];
 function isShortcutCategory(cat){ return SHORTCUT_CATEGORIES.includes(cat); }
 const PROMPT_SHORTCUT_CATS = ['shortcut-prompts', 'chatgpt-shortcut-prompts'];
