@@ -1,3 +1,27 @@
+  /* ---------- Responsive layer ---------- */
+  /* Sidebar drawer toggle/scrim markup lives in index.html (Phase 3 scaffold) and is
+     display:none by default in layout.css — only shown/activated at the breakpoints below. */
+
+  /* Laptop: narrow the sidebar to give content more room. */
+  @media(max-width:1024px){
+    .platform-sidebar{ width:210px; }
+  }
+
+  /* Tablet: the sidebar becomes an off-canvas drawer instead of a fixed column. */
+  @media(max-width:900px){
+    .sidebar-drawer-toggle{ display:flex; }
+    .hub-body{ position:relative; }
+    .platform-sidebar{
+      position:fixed; top:0; left:-280px; z-index:50;
+      width:260px; height:100vh;
+      transition:left 0.25s ease;
+      box-shadow:var(--sh-modal);
+    }
+    body.drawer-open .platform-sidebar{ left:0; }
+    body.drawer-open .sidebar-drawer-scrim{ display:block; }
+  }
+
+  /* Phone / narrow tablet */
   @media(max-width:640px){
     header{padding-left:20px;padding-right:20px;}
     .hub-main{padding-left:20px;padding-right:20px;}
@@ -5,4 +29,17 @@
     .skill-hero{padding:22px 22px 36px;}
     .skill-hero h1{font-size:25px;}
     .skill-wrap{padding:30px 22px 48px;}
+
+    .grid{grid-template-columns:1fr;}
+    .filter-toolbar{flex-direction:column;align-items:stretch;}
+    .filter-search{min-width:0;}
+    .filter-select{width:100%;}
+
+    .snap-card{padding:var(--sp-5);}
+    .snap-heading{font-size:20px;}
+    .snap-top{flex-direction:column;align-items:flex-start;}
+
+    .recent-row, #learningSnapshot .lrn-reco-list{ -webkit-overflow-scrolling:touch; }
+
+    .lrn-results-grid{grid-template-columns:1fr;}
   }

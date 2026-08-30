@@ -216,3 +216,24 @@ window.addEventListener('load', () => {
 });
 
 repositionAllTabIndicators();
+
+// ---------- Mobile sidebar drawer (tablet/phone widths only — see responsive.css) ----------
+// The toggle button and scrim are inert on desktop (display:none there), so this wiring
+// never fires outside the breakpoints where the drawer is actually shown.
+const sidebarDrawerToggle = document.getElementById('sidebarDrawerToggle');
+const sidebarDrawerScrim = document.getElementById('sidebarDrawerScrim');
+function closeSidebarDrawer(){ document.body.classList.remove('drawer-open'); }
+if(sidebarDrawerToggle){
+  sidebarDrawerToggle.addEventListener('click', () => document.body.classList.toggle('drawer-open'));
+}
+if(sidebarDrawerScrim){
+  sidebarDrawerScrim.addEventListener('click', closeSidebarDrawer);
+}
+// Close the drawer after an actual navigation action, not after just expanding a submenu
+// (which the user still needs the drawer open to see/click into).
+const drawerSidebarEl = document.querySelector('.platform-sidebar');
+if(drawerSidebarEl){
+  drawerSidebarEl.addEventListener('click', (ev) => {
+    if(ev.target.closest('.platform-item, .platform-submenu-item, .sidebar-analytics-item')) closeSidebarDrawer();
+  });
+}
