@@ -775,6 +775,7 @@ const LESSON_LIBRARY = {
 const XP_PER_LESSON = 40;
 const XP_PER_QUIZ_CORRECT = 10; // quiz here is a single check, so this is a pass/fail bonus
 const XP_PER_PATH_COMPLETE = 100; // bonus for finishing all 8 lessons in a level's path
+const XP_PER_RESOURCE = 20; // completing a real Hub resource (with or without a knowledge check)
 const XP_PER_LEARNER_LEVEL = 200; // XP needed per "AI LEVEL" (gamification level, distinct from skill level)
 
 function learnerLevelFromXp(xp){

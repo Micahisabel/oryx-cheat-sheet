@@ -833,6 +833,107 @@ function completeLesson(){
 }
 
 // ---------------------------------------------------------------------------
+// Real Hub resource completion — a parallel, additive system to the built-in
+// lesson mechanic above. Tracks progress on actual entries/{id} documents
+// (progress.resourceProgress), never touching completedLessons. If the entry
+// has a knowledgeCheck, a short quiz gates completion (wrong answers just
+// retry the same question in place — no "back to learn" penalty, since this
+// is meant to feel light, not exam-like). If it has none, a single button
+// marks it complete — so the whole existing library works today with zero
+// seeded quiz content.
+// ---------------------------------------------------------------------------
+function markResourceInProgress(entryId){
+  const user = firebase.auth().currentUser;
+  if(!user) return;
+  ensureProgressForCurrentUser();
+  if(!progress) return;
+  progress.resourceProgress = progress.resourceProgress || {};
+  if(progress.resourceProgress[entryId]) return; // already started or completed
+  progress.resourceProgress[entryId] = { status: 'in-progress', startedAt: new Date().toISOString(), completedAt: null, quizPassed: null };
+  saveProgress();
+}
+
+function completeResource(entryId, quizPassed){
+  if(!progress) return;
+  progress.resourceProgress = progress.resourceProgress || {};
+  const existing = progress.resourceProgress[entryId];
+  if(existing && existing.status === 'completed') return; // no double-award
+  progress.resourceProgress[entryId] = {
+    status: 'completed',
+    startedAt: (existing && existing.startedAt) || new Date().toISOString(),
+    completedAt: new Date().toISOString(),
+    quizPassed: quizPassed == null ? null : quizPassed
+  };
+  awardXp(XP_PER_RESOURCE);
+  applyNewBadges();
+  saveProgress();
+}
+
+// Renders the completion control for an entry detail page: the knowledge-check
+// quiz (if the entry has one) or a plain "Mark as complete" button (if not).
+// Signed-out visitors see nothing here — there's no progress to track for them.
+function resourceProgressSectionHtml(entry){
+  if(!firebase.auth().currentUser) return '';
+  const state = (progress && progress.resourceProgress && progress.resourceProgress[entry.id]) || null;
+  const isDone = state && state.status === 'completed';
+  if(isDone){
+    return `<div class="res-progress res-progress-done"><span class="res-progress-check">✓</span> Marked complete${state.quizPassed ? ' — knowledge check passed' : ''}</div>`;
+  }
+  const quiz = entry.knowledgeCheck || [];
+  if(quiz.length){
+    return `<div class="res-progress res-quiz" id="resQuiz" data-entry-id="${entry.id}" data-qi="0"></div>`;
+  }
+  return `<div class="res-progress"><button class="lrn-btn-primary" id="resMarkComplete" data-entry-id="${entry.id}">Mark as complete</button></div>`;
+}
+
+function renderResourceQuizQuestion(entry, qIndex){
+  const container = document.getElementById('resQuiz');
+  if(!container) return;
+  const quiz = entry.knowledgeCheck || [];
+  const q = quiz[qIndex];
+  container.dataset.qi = qIndex;
+  container.innerHTML = `
+    <div class="res-quiz-meta">Quick knowledge check — question ${qIndex + 1} of ${quiz.length}</div>
+    <div class="res-quiz-question">${escapeHtml(q.question)}</div>
+    <div class="res-quiz-options">
+      ${q.options.map((opt, i) => `<button class="lrn-option-btn" data-oi="${i}">${escapeHtml(opt.text)}</button>`).join('')}
+    </div>
+    <div class="res-quiz-feedback" id="resQuizFeedback"></div>`;
+  container.querySelectorAll('.res-quiz-options .lrn-option-btn').forEach(btn => {
+    btn.addEventListener('click', () => answerResourceQuiz(entry, qIndex, Number(btn.dataset.oi)));
+  });
+}
+
+function answerResourceQuiz(entry, qIndex, optIndex){
+  const quiz = entry.knowledgeCheck || [];
+  const q = quiz[qIndex];
+  const correct = !!(q.options[optIndex] && q.options[optIndex].correct);
+  const feedback = document.getElementById('resQuizFeedback');
+  if(!correct){
+    // Retry the SAME question in place — no penalty, no sending the user away.
+    if(feedback) feedback.textContent = 'Not quite — give it another go.';
+    return;
+  }
+  if(qIndex + 1 < quiz.length){
+    renderResourceQuizQuestion(entry, qIndex + 1);
+  }else{
+    completeResource(entry.id, true);
+    const container = document.getElementById('resQuiz');
+    if(container) container.outerHTML = `<div class="res-progress res-progress-done"><span class="res-progress-check">✓</span> Marked complete — knowledge check passed</div>`;
+  }
+}
+
+function bindResourceProgressSection(container, entry){
+  const quizEl = container.querySelector('#resQuiz');
+  if(quizEl) renderResourceQuizQuestion(entry, 0);
+  const btn = container.querySelector('#resMarkComplete');
+  if(btn) btn.addEventListener('click', () => {
+    completeResource(entry.id, null);
+    btn.closest('.res-progress').outerHTML = `<div class="res-progress res-progress-done"><span class="res-progress-check">✓</span> Marked complete</div>`;
+  });
+}
+
+// ---------------------------------------------------------------------------
 // My AI Progress — the learner's saved record, opened from the account menu
 // (the app's existing "Profile" surface — see My Components / My Favorites).
 // Always reflects the same `progress` object the Learning view itself uses.

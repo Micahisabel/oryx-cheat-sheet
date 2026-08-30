@@ -212,6 +212,10 @@ function openNoteDetail(entry){
       + optionalBlock('Last edited by', lastEditedStr);
   }
 
+  if(typeof resourceProgressSectionHtml === 'function'){
+    html += resourceProgressSectionHtml(entry);
+  }
+
   if(!isLinkResource){
     const isSkillFile = isRichCategory(entry.category) && entry.category !== 'mcps';
     html += `
@@ -237,6 +241,8 @@ function openNoteDetail(entry){
   document.getElementById('skillBack').addEventListener('click', closeDetail);
   const downloadBtn = document.getElementById('downloadSkill');
   if(downloadBtn) downloadBtn.addEventListener('click', () => downloadSkillMd(entry));
+  if(typeof markResourceInProgress === 'function') markResourceInProgress(entry.id);
+  if(typeof bindResourceProgressSection === 'function') bindResourceProgressSection(inner, entry);
   const favBtn = document.getElementById('skillFavBtn');
   if(favBtn) favBtn.addEventListener('click', async () => {
     // Wait for the toggle to actually resolve (it may no-op if sign-in is cancelled or the
