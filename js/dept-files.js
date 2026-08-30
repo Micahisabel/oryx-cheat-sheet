@@ -311,6 +311,22 @@ async function uploadAttachmentFile(file){
   return pub.publicUrl;
 }
 
+// Upload level-up challenge evidence (screenshot/file). Same bucket, own path
+// prefix keyed by uid — no department_files row (evidence isn't a shared
+// department resource), just a raw upload returning a public URL for
+// levelChallenges in learning.js.
+async function uploadChallengeEvidence(file, uid){
+  if(!sbClient) throw new Error('file-service-unavailable');
+  if(file.size > DEPT_FILE_MAX_BYTES) throw new Error('file-too-large');
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const path = `challenge-evidence/${uid}/${Date.now()}_${safeName}`;
+  const up = await sbClient.storage.from(DEPT_FILES_BUCKET)
+    .upload(path, file, { contentType: file.type || 'application/octet-stream', upsert: false });
+  if(up.error) throw up.error;
+  const { data: pub } = sbClient.storage.from(DEPT_FILES_BUCKET).getPublicUrl(path);
+  return pub.publicUrl;
+}
+
 // Upload a file to a department (used by the Share a Resource form). Resolves true on success.
 async function uploadDepartmentFile({ title, description, department, file }){
   if(!sbClient) throw new Error('file-service-unavailable');

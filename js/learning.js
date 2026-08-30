@@ -31,6 +31,9 @@ let reviewLevel = null;        // level being viewed in the Learning Path tab
 // ---- Active lesson session ----
 let activeLesson = null; // { levelKey, lessonId, step: 'learn'|'practice'|'quiz'|'done', wrongAttempt:false }
 
+// ---- Active level-up challenge session (transient — only the submitted attempt is persisted) ----
+let activeChallenge = null; // { levelKey, evidenceType:'file'|'link'|'none', file:null, link:'', explanation:'' }
+
 // ---------------------------------------------------------------------------
 // Progress persistence (localStorage always; Firestore best-effort per user)
 // ---------------------------------------------------------------------------
@@ -50,7 +53,8 @@ function defaultProgress(){
     resourceProgress: {},         // { [entryId]: { status:'in-progress'|'completed', startedAt, completedAt, quizPassed } }
     lastHomepageVisit: null,      // ISO string — powers the homepage's "New For You" section
     department: null,             // one of LIBRARY_DEPARTMENTS, or null until self-selected
-    userEmail: null               // mirrored from firebase.auth() so the admin dashboard can label rows
+    userEmail: null,              // mirrored from firebase.auth() so the admin dashboard can label rows
+    levelChallenges: {}           // { [levelKey]: { status:'submitted'|'passed'|'needs_improvement', attempts:[{submittedAt,evidenceType,evidenceUrl,evidenceFileName,explanation,reviewedAt,reviewedBy,reviewStatus,reviewNote}] } } — see CHALLENGE_LIBRARY in learning-data.js
   };
 }
 
@@ -205,6 +209,7 @@ function renderLearning(){
   if(learningScreen === 'results') return renderResults();
   if(learningScreen === 'dashboard') return renderDashboard();
   if(learningScreen === 'lesson') return renderLesson();
+  if(learningScreen === 'challenge') return renderChallenge();
 }
 
 function topbar({ showProgress = null, showBackToApp = true } = {}){
@@ -865,7 +870,16 @@ function renderOverviewTab(level, meta, done, total, nextId, xpInfo){
     : `<div class="lrn-next-lesson lrn-path-done">
          <div class="lrn-next-label">🎉 Path complete!</div>
          <div class="lrn-next-title">You've finished the ${escapeHtml(meta.label)} path.</div>
-         ${level !== 'expert' ? `<button class="lrn-btn-primary" id="lrnLevelUpBtn">Try ${escapeHtml(LEVEL_META[LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(level) + 1]].label)} &rarr;</button>` : ''}
+         ${level !== 'expert' ? (() => {
+           const state = progress.levelChallenges && progress.levelChallenges[level];
+           const nextLabel = escapeHtml(LEVEL_META[LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(level) + 1]].label);
+           let label = `Practical Challenge: ${nextLabel}`;
+           let statusPill = '';
+           if(state && state.status === 'submitted'){ label = 'View Submission'; statusPill = '<span class="lrn-challenge-status pending">Submitted — awaiting review</span>'; }
+           else if(state && state.status === 'needs_improvement'){ label = 'Resubmit Challenge'; statusPill = '<span class="lrn-challenge-status needs-improvement">Needs Improvement</span>'; }
+           else if(state && state.status === 'passed'){ label = `Continue to ${nextLabel}`; statusPill = '<span class="lrn-challenge-status passed">Passed</span>'; }
+           return `${statusPill}<button class="lrn-btn-primary" id="lrnLevelUpBtn">${label}</button>`;
+         })() : ''}
        </div>`;
 
   return `
@@ -880,14 +894,24 @@ function renderOverviewTab(level, meta, done, total, nextId, xpInfo){
     ${(() => { const cg = currentGaps(); return renderRecommendationsHtml(level, cg.gapCategories, cg.gapLabels); })()}`;
 }
 
+// Advancing a level now requires a passed practical challenge, not just
+// finishing the lessons — see CHALLENGE_LIBRARY/levelChallenges. A level's
+// challenge state gates here: no attempt yet, or 'needs_improvement', opens
+// the challenge screen; 'submitted' opens it read-only pending review;
+// 'passed' is the only case that still advances immediately, exactly as before.
 function bindOverviewLevelUp(){
   const btn = document.getElementById('lrnLevelUpBtn');
   if(btn) btn.addEventListener('click', () => {
     const level = progress.currentLevel;
-    const nextLevel = LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(level) + 1];
-    progress.currentLevel = nextLevel;
-    saveProgress();
-    renderDashboard();
+    const state = progress.levelChallenges && progress.levelChallenges[level];
+    if(state && state.status === 'passed'){
+      const nextLevel = LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(level) + 1];
+      progress.currentLevel = nextLevel;
+      saveProgress();
+      renderDashboard();
+      return;
+    }
+    openChallenge(level);
   });
 }
 
@@ -1090,6 +1114,219 @@ function completeLesson(){
   activeLesson.step = 'done';
   saveProgress();
   renderLearning();
+}
+
+// ---------------------------------------------------------------------------
+// 8. Level-up challenge — practical demonstration + evidence, required before
+// advancing past a level. See CHALLENGE_LIBRARY/challengeFor() in
+// learning-data.js and bindOverviewLevelUp() above, which routes here instead
+// of advancing the level directly once all of a level's lessons are done.
+// ---------------------------------------------------------------------------
+function openChallenge(levelKey){
+  activeChallenge = { levelKey, evidenceType: 'file', file: null, link: '', explanation: '' };
+  learningScreen = 'challenge';
+  renderLearning();
+}
+
+function latestChallengeAttempt(levelKey){
+  const state = progress.levelChallenges && progress.levelChallenges[levelKey];
+  if(!state || !state.attempts || !state.attempts.length) return null;
+  return state.attempts[state.attempts.length - 1];
+}
+
+function renderChallenge(){
+  const { levelKey } = activeChallenge;
+  const meta = LEVEL_META[levelKey];
+  const challenge = challengeFor(levelKey, progress.department);
+  const state = progress.levelChallenges && progress.levelChallenges[levelKey];
+  const pastAttempts = (state && state.attempts) || [];
+  const isPending = state && state.status === 'submitted';
+
+  if(!challenge){
+    learningRoot.innerHTML = `
+      <div class="lrn-screen lrn-challenge">
+        ${topbar({ showBackToApp: true })}
+        <div class="lrn-challenge-card">
+          <div class="lrn-level-title">${meta.emoji} ${escapeHtml(meta.label)} — Practical Challenge</div>
+          <p>Set your department in <strong>My AI Progress</strong> to see this level's challenge.</p>
+        </div>
+        <button class="lrn-btn-primary" id="lrnChallengeBack">Back to dashboard</button>
+      </div>`;
+    bindTopbar();
+    document.getElementById('lrnChallengeBack').addEventListener('click', () => {
+      learningScreen = 'dashboard'; renderLearning();
+    });
+    return;
+  }
+
+  const historyHtml = pastAttempts.length > 1 ? `
+    <div class="lrn-challenge-history">
+      <div class="lrn-challenge-history-label">Previous attempts</div>
+      ${pastAttempts.slice(0, -1).map(a => `
+        <div class="lrn-challenge-history-row">
+          <span>${escapeHtml(new Date(a.submittedAt).toLocaleDateString())}</span>
+          <span class="lrn-challenge-status ${a.reviewStatus === 'passed' ? 'passed' : 'needs-improvement'}">${a.reviewStatus === 'passed' ? 'Passed' : 'Needs Improvement'}</span>
+        </div>`).join('')}
+    </div>` : '';
+
+  if(isPending){
+    const attempt = latestChallengeAttempt(levelKey);
+    learningRoot.innerHTML = `
+      <div class="lrn-screen lrn-challenge">
+        ${topbar({ showBackToApp: true })}
+        <div class="lrn-challenge-card">
+          <div class="lrn-level-title">${meta.emoji} ${escapeHtml(meta.label)} — Practical Challenge</div>
+          <p>${escapeHtml(challenge.prompt)}</p>
+          <span class="lrn-challenge-status pending">Submitted — waiting on review</span>
+          <div class="lrn-challenge-history-row" style="margin-top:12px;">
+            <span>Submitted ${escapeHtml(new Date(attempt.submittedAt).toLocaleDateString())}</span>
+          </div>
+          <p class="lrn-practice-hint">${escapeHtml(attempt.explanation)}</p>
+          ${attempt.evidenceUrl ? `<a class="lrn-btn-text" href="${escapeHtml(attempt.evidenceUrl)}" target="_blank" rel="noopener">View submitted evidence</a>` : ''}
+        </div>
+        ${historyHtml}
+        <button class="lrn-btn-primary" id="lrnChallengeBack">Back to dashboard</button>
+      </div>`;
+    bindTopbar();
+    document.getElementById('lrnChallengeBack').addEventListener('click', () => {
+      learningScreen = 'dashboard'; renderLearning();
+    });
+    return;
+  }
+
+  const needsImprovementNote = state && state.status === 'needs_improvement' ? latestChallengeAttempt(levelKey) : null;
+
+  learningRoot.innerHTML = `
+    <div class="lrn-screen lrn-challenge">
+      ${topbar({ showBackToApp: true })}
+      <div class="lrn-challenge-card">
+        <div class="lrn-level-title">${meta.emoji} ${escapeHtml(meta.label)} — Practical Challenge</div>
+        <p>${escapeHtml(challenge.prompt)}</p>
+        ${challenge.guidance ? `<p class="lrn-practice-hint">${escapeHtml(challenge.guidance)}</p>` : ''}
+        ${needsImprovementNote ? `
+          <div class="lrn-challenge-status needs-improvement">Needs Improvement</div>
+          ${needsImprovementNote.reviewNote ? `<p class="lrn-practice-hint"><strong>Reviewer note:</strong> ${escapeHtml(needsImprovementNote.reviewNote)}</p>` : ''}
+        ` : ''}
+      </div>
+
+      <div class="lrn-challenge-card">
+        <h3>Your submission</h3>
+        <div class="lrn-evidence-picker">
+          <button class="lrn-evidence-picker-btn ${activeChallenge.evidenceType === 'file' ? 'active' : ''}" data-type="file">Upload file/screenshot</button>
+          <button class="lrn-evidence-picker-btn ${activeChallenge.evidenceType === 'link' ? 'active' : ''}" data-type="link">Link</button>
+          <button class="lrn-evidence-picker-btn ${activeChallenge.evidenceType === 'none' ? 'active' : ''}" data-type="none">No file</button>
+        </div>
+        ${activeChallenge.evidenceType === 'file' ? `
+          <div class="lrn-evidence-upload">
+            <input type="file" id="lrnChallengeFile" accept="image/*,.pdf,.doc,.docx,.txt">
+            ${activeChallenge.file ? `<span class="lrn-file-chip">${escapeHtml(activeChallenge.file.name)}</span>` : ''}
+          </div>` : ''}
+        ${activeChallenge.evidenceType === 'link' ? `
+          <input type="url" class="lrn-explanation-input" id="lrnChallengeLink" placeholder="https://…" value="${escapeHtml(activeChallenge.link || '')}">` : ''}
+        <div id="lrnEvidenceError" class="lrn-field-error" style="display:none;"></div>
+
+        <h3>Explanation</h3>
+        <p class="lrn-practice-hint">Briefly explain what you did and how you used AI.</p>
+        <textarea class="lrn-explanation-input" id="lrnChallengeExplanation" placeholder="Explain what you did and how you used AI…">${escapeHtml(activeChallenge.explanation || '')}</textarea>
+        <div id="lrnExplanationError" class="lrn-field-error" style="display:none;"></div>
+
+        <button class="lrn-btn-primary" id="lrnChallengeSubmit">Submit challenge</button>
+      </div>
+      ${historyHtml}
+    </div>`;
+  bindTopbar();
+  bindChallenge();
+}
+
+function bindChallenge(){
+  const backBtn = document.getElementById('lrnChallengeBack');
+  if(backBtn) backBtn.addEventListener('click', () => { learningScreen = 'dashboard'; renderLearning(); });
+
+  learningRoot.querySelectorAll('.lrn-evidence-picker-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeChallenge.evidenceType = btn.dataset.type;
+      renderChallenge();
+    });
+  });
+
+  const fileInput = document.getElementById('lrnChallengeFile');
+  if(fileInput) fileInput.addEventListener('change', () => {
+    activeChallenge.file = fileInput.files[0] || null;
+    renderChallenge();
+  });
+
+  const linkInput = document.getElementById('lrnChallengeLink');
+  if(linkInput) linkInput.addEventListener('input', () => { activeChallenge.link = linkInput.value; });
+
+  const explanationInput = document.getElementById('lrnChallengeExplanation');
+  if(explanationInput) explanationInput.addEventListener('input', () => { activeChallenge.explanation = explanationInput.value; });
+
+  const submitBtn = document.getElementById('lrnChallengeSubmit');
+  if(submitBtn) submitBtn.addEventListener('click', submitChallenge);
+}
+
+async function submitChallenge(){
+  const evidenceError = document.getElementById('lrnEvidenceError');
+  const explanationError = document.getElementById('lrnExplanationError');
+  evidenceError.style.display = 'none';
+  explanationError.style.display = 'none';
+
+  const explanation = (activeChallenge.explanation || '').trim();
+  if(explanation.length < 20){
+    explanationError.textContent = 'Please explain briefly how you completed the task.';
+    explanationError.style.display = 'block';
+    return;
+  }
+
+  if(activeChallenge.evidenceType === 'file' && !activeChallenge.file){
+    evidenceError.textContent = 'Please upload evidence of your completed task.';
+    evidenceError.style.display = 'block';
+    return;
+  }
+  if(activeChallenge.evidenceType === 'link'){
+    try{ new URL((activeChallenge.link || '').trim()); }
+    catch(e){
+      evidenceError.textContent = 'Enter a valid link (must start with http:// or https://).';
+      evidenceError.style.display = 'block';
+      return;
+    }
+  }
+
+  const submitBtn = document.getElementById('lrnChallengeSubmit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting…';
+
+  try{
+    let evidenceUrl = null, evidenceFileName = null;
+    if(activeChallenge.evidenceType === 'file'){
+      const user = firebase.auth().currentUser;
+      evidenceUrl = await uploadChallengeEvidence(activeChallenge.file, user.uid);
+      evidenceFileName = activeChallenge.file.name;
+    }else if(activeChallenge.evidenceType === 'link'){
+      evidenceUrl = activeChallenge.link.trim();
+    }
+
+    const levelKey = activeChallenge.levelKey;
+    const attempt = {
+      submittedAt: new Date().toISOString(),
+      evidenceType: activeChallenge.evidenceType,
+      evidenceUrl, evidenceFileName,
+      explanation,
+      reviewedAt: null, reviewedBy: null, reviewStatus: null, reviewNote: null
+    };
+    progress.levelChallenges = progress.levelChallenges || {};
+    const existing = progress.levelChallenges[levelKey] || { status: 'submitted', attempts: [] };
+    existing.attempts = existing.attempts.concat(attempt);
+    existing.status = 'submitted';
+    progress.levelChallenges[levelKey] = existing;
+    saveProgress();
+    renderChallenge();
+  }catch(e){
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit challenge';
+    evidenceError.textContent = 'Could not submit — check your connection and try again.';
+    evidenceError.style.display = 'block';
+  }
 }
 
 // ---------------------------------------------------------------------------

@@ -150,6 +150,72 @@ const DEPARTMENT_OTHER_CATEGORY = {
   'Quarter Master': 'other-quartermaster'
 };
 
+// ---- Level-up practical challenges ------------------------------------------
+// Before advancing past beginner/basic/intermediate/advanced, a learner must
+// complete a practical challenge relevant to their department and submit
+// evidence for admin review — see levelChallenges on progress (learning.js
+// defaultProgress()) and bindOverviewLevelUp()/openChallenge() in learning.js.
+// No entry beyond 'advanced' — there's no level past Expert to gate into.
+// `guidance` is optional supporting text shown under the prompt.
+const CHALLENGE_LIBRARY = {
+  beginner: {
+    'HR': { prompt: 'Use Claude or ChatGPT to draft a short, friendly message to a candidate or employee — for example a job description, an offer of an interview, or a policy reminder.', guidance: 'Upload a screenshot of the chat or the final message, or paste a link to it.' },
+    'Marketing': { prompt: 'Use Claude or ChatGPT to write a social media caption or short piece of marketing copy, then improve it with one follow-up prompt.', guidance: 'Upload a screenshot showing the original and improved versions.' },
+    'Sales': { prompt: 'Use Claude or ChatGPT to draft a follow-up message to a customer enquiry.', guidance: 'Upload a screenshot of the message, or the message itself.' },
+    'Business Support': { prompt: 'Use Claude or ChatGPT to clean up or rewrite a short internal note or email so it reads more clearly.', guidance: 'Upload a screenshot showing the before and after.' },
+    'Fabrication': { prompt: 'Use Claude or ChatGPT to turn a set of rough production notes into a clear, short instruction for the workshop floor.', guidance: 'Upload a screenshot of the note before and after.' },
+    'Finance': { prompt: 'Use Claude or ChatGPT to summarise a short document (e.g. an invoice or statement) in plain language.', guidance: 'Upload a screenshot of the summary AI gave you.' },
+    'Installation Operation': { prompt: 'Use Claude or ChatGPT to turn a short list of site notes into a clear checklist for an installation team.', guidance: 'Upload a screenshot of the checklist.' },
+    'Supply Chain': { prompt: 'Use Claude or ChatGPT to draft a short message to a supplier chasing a delivery update.', guidance: 'Upload a screenshot of the message.' },
+    'Projects': { prompt: 'Use Claude or ChatGPT to turn a few rough project notes into a short, clear update you could send to a manager.', guidance: 'Upload a screenshot of the update.' },
+    'Quarter Master': { prompt: 'Use Claude or ChatGPT to turn a short stock or inventory note into a clear message for the team.', guidance: 'Upload a screenshot of the message.' }
+  },
+  basic: {
+    'HR': { prompt: 'Use AI to summarise a sample document (e.g. a CV or policy) and explain how you checked the result was accurate.', guidance: 'Include what you checked and why.' },
+    'Marketing': { prompt: 'Use AI to create a social media caption for a real or sample post, and explain what you changed from AI’s first draft and why.', guidance: 'Upload the before/after and your explanation.' },
+    'Sales': { prompt: 'Use AI to research a customer or product topic, then summarise the 3 most useful points for your own use.', guidance: 'Upload the AI conversation or a summary.' },
+    'Business Support': { prompt: 'Use AI to turn a messy set of notes into a clear, formatted document (e.g. an agenda or checklist).', guidance: 'Upload the before and after.' },
+    'Fabrication': { prompt: 'Use AI to draft a short quality or safety checklist for a production task, then check it against how the task is actually done.', guidance: 'Explain any changes you made after checking.' },
+    'Finance': { prompt: 'Use AI to help analyse a small set of numbers (e.g. spot a trend in a sample spreadsheet) and explain what you asked it to look for.', guidance: 'Upload a screenshot of the analysis.' },
+    'Installation Operation': { prompt: 'Use AI to draft a short report of a completed or upcoming installation, based on your own notes.', guidance: 'Upload the report and explain what you gave AI to work from.' },
+    'Supply Chain': { prompt: 'Use AI to compare two supplier options or delivery timelines based on information you provide, and explain the recommendation it gave.', guidance: 'Upload a screenshot of the comparison.' },
+    'Projects': { prompt: 'Use AI to turn a set of project notes into a short status report with clear next steps.', guidance: 'Upload the report.' },
+    'Quarter Master': { prompt: 'Use AI to help organise or summarise a stock list into a clearer format, and explain what you asked for.', guidance: 'Upload the before and after.' }
+  },
+  intermediate: {
+    'HR': { prompt: 'Design a short, reusable AI prompt for a recurring HR task (e.g. drafting interview questions or onboarding messages), and show it working on a real example.', guidance: 'Explain why you structured the prompt the way you did.' },
+    'Marketing': { prompt: 'Use AI to plan a small content workflow — e.g. one prompt that generates a caption, another that suggests an image idea — and show the result.', guidance: 'Explain how the two steps connect.' },
+    'Sales': { prompt: 'Use AI to prepare talking points for an upcoming customer call or meeting, based on real context you provide.', guidance: 'Upload the talking points and explain the context you gave AI.' },
+    'Business Support': { prompt: 'Use AI to build a small repeatable workflow for a task you do often (e.g. a template prompt for meeting notes or a weekly summary).', guidance: 'Show the prompt and one example result.' },
+    'Fabrication': { prompt: 'Use AI to help troubleshoot or improve a production process by describing an issue and asking for possible causes or improvements.', guidance: 'Explain which suggestions were useful and why.' },
+    'Finance': { prompt: 'Use AI to help draft a short financial summary or report from raw figures you provide, and explain how you verified the numbers.', guidance: 'Upload the report.' },
+    'Installation Operation': { prompt: 'Use AI to design a short, reusable checklist template for a type of installation you do regularly, and show it applied to one job.', guidance: 'Explain what makes it reusable.' },
+    'Supply Chain': { prompt: 'Use AI to build a simple reusable prompt for chasing suppliers or checking delivery status, and show it used on a real (or sample) case.', guidance: 'Explain what you’d reuse it for.' },
+    'Projects': { prompt: 'Use AI to turn a project plan into a structured update covering progress, risks, and next steps.', guidance: 'Upload the update.' },
+    'Quarter Master': { prompt: 'Use AI to design a simple, reusable way to check and report stock levels, and show it applied to a real or sample stock list.', guidance: 'Explain what you’d reuse it for.' }
+  },
+  advanced: {
+    'HR': { prompt: 'Describe (or set up) a simple AI-assisted workflow for a recurring HR process (e.g. screening applications or drafting onboarding packs) — trigger, steps, and where a human still checks the result.', guidance: 'A written plan is fine if you haven’t built it yet — explain each step.' },
+    'Marketing': { prompt: 'Design a small AI-assisted content workflow covering more than one step (e.g. idea → draft → review), and explain where a human still checks the output before it’s published.', guidance: 'A written plan or real example both count.' },
+    'Sales': { prompt: 'Describe or set up a simple AI-assisted workflow for handling a type of customer enquiry — from first message to reply — and explain where a human reviews it.', guidance: 'Explain the trigger and the steps.' },
+    'Business Support': { prompt: 'Design a small automation or workflow idea that uses AI for a repetitive business support task, including where a human check happens.', guidance: 'A written plan is fine — explain the steps.' },
+    'Fabrication': { prompt: 'Describe a workflow where AI helps flag or explain a production issue, including what triggers it and what a person does with the result.', guidance: 'Explain the trigger, steps, and human check.' },
+    'Finance': { prompt: 'Design a workflow where AI helps process or summarise recurring financial data (e.g. monthly reports), including where a human verifies the output.', guidance: 'A written plan or real example both count.' },
+    'Installation Operation': { prompt: 'Describe a workflow where AI helps prepare or check installation documentation across multiple jobs, including where a person reviews it.', guidance: 'Explain the trigger, steps, and human check.' },
+    'Supply Chain': { prompt: 'Design a workflow where AI helps track or flag supplier/delivery issues automatically, including where a person steps in.', guidance: 'A written plan or real example both count.' },
+    'Projects': { prompt: 'Design a workflow where AI helps turn raw project updates into a consistent report across multiple projects, including where a person reviews it.', guidance: 'Explain the trigger, steps, and human check.' },
+    'Quarter Master': { prompt: 'Design a workflow where AI helps monitor or flag stock levels needing attention, including where a person reviews the result.', guidance: 'A written plan or real example both count.' }
+  }
+};
+
+// Looks up the challenge for a level + department. Returns null if the
+// department isn't set yet, or isn't recognized — callers must handle this
+// (e.g. prompt the learner to set their department first), never assume a result.
+function challengeFor(levelKey, department){
+  const row = CHALLENGE_LIBRARY[levelKey];
+  return (row && department && row[department]) || null;
+}
+
 // ---- Learning paths (per level) --------------------------------------------
 // Lesson ids must exist as keys in LESSON_LIBRARY below. Reorder, add, or
 // remove lessons here to change a level's path — nothing else needs editing.
@@ -797,6 +863,7 @@ const XP_PER_LESSON = 40;
 const XP_PER_QUIZ_CORRECT = 10; // quiz here is a single check, so this is a pass/fail bonus
 const XP_PER_PATH_COMPLETE = 100; // bonus for finishing all 8 lessons in a level's path
 const XP_PER_RESOURCE = 20; // completing a real Hub resource (with or without a knowledge check)
+const XP_PER_CHALLENGE_PASSED = 150; // awarded once, the first time a level's practical challenge is marked Passed
 const XP_PER_LEARNER_LEVEL = 200; // XP needed per "AI LEVEL" (gamification level, distinct from skill level)
 
 function learnerLevelFromXp(xp){
@@ -822,7 +889,8 @@ const BADGE_LIBRARY = [
   { id: 'path-complete-expert', label: 'AI Systems Architect', emoji: '🔴', desc: 'Finish the Expert path', check: p => p.pathCompleted && p.pathCompleted.expert },
   { id: 'streak-3', label: '3-Day Streak', emoji: '🔥', desc: 'Learn 3 days in a row', check: p => (p.streak || 0) >= 3 },
   { id: 'streak-7', label: '7-Day Streak', emoji: '🔥', desc: 'Learn 7 days in a row', check: p => (p.streak || 0) >= 7 },
-  { id: 'assessment-done', label: 'Know Thyself', emoji: '🎯', desc: 'Complete the AI skill assessment', check: p => !!p.assessmentResult }
+  { id: 'assessment-done', label: 'Know Thyself', emoji: '🎯', desc: 'Complete the AI skill assessment', check: p => !!p.assessmentResult },
+  { id: 'first-challenge-passed', label: 'Proven', emoji: '✅', desc: 'Pass your first practical challenge', check: p => Object.values(p.levelChallenges || {}).some(c => c.status === 'passed') }
 ];
 
 function checkNewBadges(progress){
