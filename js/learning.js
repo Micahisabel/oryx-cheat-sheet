@@ -373,6 +373,19 @@ function finishAssessment(){
       return (a.levelIndex >= levelIndex ? 0 : 1) - (b.levelIndex >= levelIndex ? 0 : 1);
     });
 
+  // Archive the previous result (if any) before overwriting it, so a retake can
+  // show a before/after comparison. progress.assessmentResult itself is always
+  // just "the current/latest result" — assessmentHistory is the append-only log.
+  if(progress.assessmentResult){
+    progress.assessmentHistory = (progress.assessmentHistory || []).concat({
+      level: progress.assessmentResult.level,
+      score: progress.assessmentResult.score,
+      date: progress.assessmentDate,
+      gaps: progress.assessmentResult.gaps,
+      gapCategories: progress.assessmentResult.gapCategories
+    });
+  }
+
   progress.assessmentResult = {
     level, score,
     known: known.length ? known : ['Just getting started — no worries, that\'s what this path is for'],
@@ -390,6 +403,30 @@ function finishAssessment(){
 // ---------------------------------------------------------------------------
 // 3. Results
 // ---------------------------------------------------------------------------
+// Shown on the results screen only after a retake (assessmentHistory has at
+// least one prior entry) — a plain, always-positive-or-neutral comparison
+// against the immediately previous assessment. Never frames a lower score as
+// a "decrease", per the org's positive-framing house style.
+function assessmentCompareHtml(r){
+  const history = progress.assessmentHistory || [];
+  if(!history.length) return '';
+  const prev = history[history.length - 1];
+  const prevIndex = LEARNING_LEVEL_ORDER.indexOf(prev.level);
+  const newIndex = LEARNING_LEVEL_ORDER.indexOf(r.level);
+  const prevMeta = LEVEL_META[prev.level];
+  const leveledUp = newIndex > prevIndex;
+  return `
+    <div class="lrn-compare${leveledUp ? ' lrn-compare-up' : ''}">
+      ${leveledUp ? '<div class="lrn-compare-banner">🎉 Level increased!</div>' : ''}
+      <div class="lrn-compare-row">
+        <span class="lrn-compare-prev">${prevMeta.emoji} ${escapeHtml(prevMeta.label)} (${prev.score}%)</span>
+        <span class="lrn-compare-arrow">→</span>
+        <span class="lrn-compare-now">${escapeHtml(LEVEL_META[r.level].emoji)} ${escapeHtml(LEVEL_META[r.level].label)} (${r.score}%)</span>
+      </div>
+      ${!leveledUp ? `<p class="lrn-compare-note">Still ${escapeHtml(LEVEL_META[r.level].label)} — keep going.</p>` : ''}
+    </div>`;
+}
+
 function renderResults(){
   const r = progress.assessmentResult;
   const meta = LEVEL_META[r.level];
@@ -409,6 +446,7 @@ function renderResults(){
           <span class="lrn-score-num">${r.score}%</span>
         </div>
       </div>
+      ${assessmentCompareHtml(r)}
       <div class="lrn-results-grid">
         <div class="lrn-results-col">
           <h3>What you already know</h3>
