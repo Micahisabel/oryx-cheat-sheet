@@ -16,7 +16,7 @@ const viewLearning = document.getElementById('view-learning');
 const viewNotes = document.getElementById('view-notes');
 const openLearningBtn = document.getElementById('openLearning');
 
-let learningScreen = 'onboarding'; // onboarding | assessment | results | dashboard | lesson
+let learningScreen = 'onboarding'; // onboarding | department | assessment | results | dashboard | lesson
 let progress = null;              // the learner's saved progress object
 let learningUnsub = null;         // Firestore snapshot unsubscribe
 let learningLastUid = null;       // uid the in-memory `progress` currently belongs to
@@ -200,6 +200,7 @@ if(openLearningBtn) openLearningBtn.addEventListener('click', enterLearning);
 // ---------------------------------------------------------------------------
 function renderLearning(){
   if(learningScreen === 'onboarding') return renderOnboarding();
+  if(learningScreen === 'department') return renderDepartmentScreen();
   if(learningScreen === 'assessment') return renderAssessment();
   if(learningScreen === 'results') return renderResults();
   if(learningScreen === 'dashboard') return renderDashboard();
@@ -250,9 +251,55 @@ function renderOnboarding(){
 // one 0-100 score, with "what can you actually do" counting for the most.
 // ---------------------------------------------------------------------------
 function startAssessment(){
+  // Ask which department someone's in before the assessment itself, so both
+  // the assessment's framing and the resources/topics recommended afterward
+  // can be tailored to their role — asked once, then reused on every retake.
+  if(!progress.department){
+    learningScreen = 'department';
+    renderLearning();
+    return;
+  }
+  beginAssessmentQuestions();
+}
+
+function beginAssessmentQuestions(){
   assessment = { index: 0, answers: [], selected: [] };
   learningScreen = 'assessment';
   renderLearning();
+}
+
+// ---------------------------------------------------------------------------
+// 1b. Department (asked once, before the first assessment)
+// ---------------------------------------------------------------------------
+function renderDepartmentScreen(){
+  learningRoot.innerHTML = `
+    <div class="lrn-screen lrn-onboarding">
+      ${topbar({ showBackToApp: true })}
+      <div class="lrn-hero">
+        <div class="lrn-greeting-bubble">One quick thing first 👋</div>
+        <div class="lrn-hero-badge"><img src="assets/images/mascot/cat-sunglasses.png" alt="Ginger the cat"></div>
+        <h2>Which department are you in?</h2>
+        <p class="lrn-hero-sub">This helps us show you AI resources and learning topics that are actually relevant to your role, instead of a generic list.</p>
+        <div class="lrn-dept-picker">
+          <select class="filter-select" id="lrnDeptSelectPre">
+            <option value="">Choose your department…</option>
+            ${LIBRARY_DEPARTMENTS.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('')}
+          </select>
+        </div>
+        <button class="lrn-btn-primary" id="lrnDeptContinue" disabled>Continue</button>
+        <button class="lrn-btn-text" id="lrnDeptSkip">Skip for now</button>
+      </div>
+    </div>`;
+  bindTopbar();
+  const select = document.getElementById('lrnDeptSelectPre');
+  const continueBtn = document.getElementById('lrnDeptContinue');
+  select.addEventListener('change', () => { continueBtn.disabled = !select.value; });
+  continueBtn.addEventListener('click', () => {
+    progress.department = select.value;
+    saveProgress();
+    beginAssessmentQuestions();
+  });
+  document.getElementById('lrnDeptSkip').addEventListener('click', beginAssessmentQuestions);
 }
 
 // Retaking keeps XP, completed lessons, and badges — only the assessment result
@@ -497,6 +544,14 @@ function renderResults(){
 // Picks one real Hub entry per knowledge gap (see finishAssessment) so the
 // recommendations don't just repeat the same level-wide list for everyone —
 // they specifically try to fill in what THIS person hasn't shown yet.
+// A learner's own department (if set) — entries tagged for it via entryDepartments()
+// get priority within a category, but nothing is ever excluded on department grounds.
+function learnerDepartmentMatch(e){
+  const dept = progress && progress.department;
+  if(!dept || typeof entryDepartments !== 'function') return 0;
+  return entryDepartments(e).includes(dept) ? 1 : 0;
+}
+
 function getGapEntries(gapCategories){
   const seenCats = new Set();
   const picks = [];
@@ -505,7 +560,11 @@ function getGapEntries(gapCategories){
     seenCats.add(cat);
     const pool = (typeof entries !== 'undefined' ? entries : [])
       .filter(e => e.category === cat)
-      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      .sort((a, b) => {
+        const dm = learnerDepartmentMatch(b) - learnerDepartmentMatch(a);
+        if(dm !== 0) return dm;
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      });
     if(pool[0]) picks.push(Object.assign({}, pool[0], { isGapPick: true }));
   });
   return picks;
@@ -516,15 +575,22 @@ function getRecommendedEntries(level, gapCategories){
   const pickedIds = new Set(gapPicks.map(e => e.id));
   const picked = gapPicks.slice();
 
-  const cats = LEVEL_RECOMMENDED_CATEGORIES[level] || [];
+  const cats = (LEVEL_RECOMMENDED_CATEGORIES[level] || []).slice();
+  // Fold in the learner's own department's "Other AI Tools" bucket (e.g. HR sees
+  // other-hr) so role-relevant tools show up at every level, not just when a
+  // matching gap happens to point there.
+  const deptCat = progress && progress.department && DEPARTMENT_OTHER_CATEGORY[progress.department];
+  if(deptCat && !cats.includes(deptCat)) cats.push(deptCat);
   // Blank difficulty always matches (most of the existing 72 entries have none set) —
   // a resource tagged for a DIFFERENT level is the only thing excluded here.
   const pool = (typeof entries !== 'undefined' ? entries : [])
     .filter(e => cats.includes(e.category) && (!e.difficulty || e.difficulty === level));
   // Round-robin across categories so one category can't crowd out the others.
-  // Within a category, entries tagged for this exact level get a slight edge over
-  // untagged ones, then both fall back to recency.
+  // Within a category, entries tagged for the learner's own department come first,
+  // then entries tagged for this exact level, then both fall back to recency.
   const byCategory = cats.map(cat => pool.filter(e => e.category === cat).sort((a, b) => {
+    const dm = learnerDepartmentMatch(b) - learnerDepartmentMatch(a);
+    if(dm !== 0) return dm;
     const aMatch = a.difficulty === level ? 1 : 0;
     const bMatch = b.difficulty === level ? 1 : 0;
     if(aMatch !== bMatch) return bMatch - aMatch;

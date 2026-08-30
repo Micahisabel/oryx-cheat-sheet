@@ -129,6 +129,27 @@ const LEVEL_RECOMMENDED_CATEGORIES = {
 };
 const RECOMMENDATIONS_COUNT = 4; // how many entries to show at once
 
+// Maps each LIBRARY_DEPARTMENTS value (constants.js) to its matching "Other AI
+// Tools" category — content already organized by department in that tab. Used
+// to fold department-relevant tools into every level's recommendation pool,
+// and to prioritize entries tagged with the learner's own department (see
+// entryDepartments() in constants.js) ahead of generic ones — see
+// getRecommendedEntries()/getGapEntries() in learning.js. Nothing is excluded
+// on department grounds — this only re-orders/adds, so no one's assessment or
+// learning path is narrowed by their role, only made more relevant to it.
+const DEPARTMENT_OTHER_CATEGORY = {
+  'HR': 'other-hr',
+  'Marketing': 'other-marketing',
+  'Sales': 'other-sales',
+  'Business Support': 'other-business-support',
+  'Fabrication': 'other-fabrication',
+  'Finance': 'other-finance',
+  'Installation Operation': 'other-installation',
+  'Supply Chain': 'other-supply-chain',
+  'Projects': 'other-projects',
+  'Quarter Master': 'other-quartermaster'
+};
+
 // ---- Learning paths (per level) --------------------------------------------
 // Lesson ids must exist as keys in LESSON_LIBRARY below. Reorder, add, or
 // remove lessons here to change a level's path — nothing else needs editing.
