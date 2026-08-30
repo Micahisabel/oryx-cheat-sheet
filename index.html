@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-30.123";</script>
+<script>window.APP_VERSION = "2026-08-30.124";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="css/style.css?v=4">
-<link rel="stylesheet" href="css/layout.css?v=9">
+<link rel="stylesheet" href="css/layout.css?v=10">
 <link rel="stylesheet" href="css/sidebar.css?v=16">
 <link rel="stylesheet" href="css/dashboard.css?v=9">
 <link rel="stylesheet" href="css/homepage.css?v=1">
@@ -101,6 +101,9 @@
         <div class="platform-active-indicator" id="platformIndicator"></div>
         <button class="sidebar-analytics-item" id="openAnalyticsNav" style="display:none;">
           <span class="platform-item-label"><span class="platform-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 9l-5 5-3-3-4 4"/></svg></span>Analytics</span>
+        </button>
+        <button class="sidebar-analytics-item" id="openLearningAdminNav" style="display:none;">
+          <span class="platform-item-label"><span class="platform-icon"><svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 1 4 4c0 1.2-.5 2.2-1.3 3 .8.6 1.3 1.6 1.3 2.7A4 4 0 0 1 12 16a4 4 0 0 1-4-4.3c0-1.1.5-2.1 1.3-2.7A3.98 3.98 0 0 1 8 6a4 4 0 0 1 4-4z"/><path d="M12 16v6"/><path d="M9 22h6"/></svg></span>AI Capability</span>
         </button>
         <div class="platform-row">
           <button class="platform-item" data-platform="claude">
@@ -256,6 +259,7 @@
       <div class="grid" id="grid"></div>
       <div class="pagination" id="pagination"></div>
       <div class="analytics-view" id="analyticsView" style="display:none;"></div>
+      <div class="analytics-view" id="learningAdminView" style="display:none;"></div>
       <div class="dept-files-view" id="deptFilesView" style="display:none;"></div>
     </main>
   </div>
@@ -788,20 +792,21 @@
 <script src="js/constants.js?v=46"></script>
 <script src="js/learning-data.js?v=9"></script>
 <script src="js/state.js?v=20"></script>
-<script src="js/sidebar.js?v=31"></script>
+<script src="js/sidebar.js?v=32"></script>
 <script src="js/entries.js?v=60"></script>
 <script src="js/skill-detail.js?v=40"></script>
 <script src="js/add-entry.js?v=25"></script>
 <script src="js/shortcuts-form.js?v=21"></script>
-<script src="js/admin.js?v=22"></script>
+<script src="js/admin.js?v=23"></script>
 <script src="js/suggest.js?v=44"></script>
 <script src="js/favorites.js?v=4"></script>
-<script src="js/learning.js?v=20"></script>
+<script src="js/learning.js?v=21"></script>
 <script src="js/notifications.js?v=8"></script>
 <script src="js/activity.js?v=3"></script>
 <script src="js/review.js?v=15"></script>
-<script src="js/analytics.js?v=5"></script>
-<script src="js/dept-files.js?v=7"></script>
+<script src="js/analytics.js?v=6"></script>
+<script src="js/learning-admin.js?v=1"></script>
+<script src="js/dept-files.js?v=8"></script>
 <script src="js/app.js?v=18"></script>
 <script src="js/tab-overflow.js?v=6"></script>
 

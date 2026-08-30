@@ -154,6 +154,7 @@ async function enterLearning(){
   const signedIn = await ensureStaffSignedIn();
   if(!signedIn) return;
   if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
+  if(typeof exitLearningAdminMode === 'function') exitLearningAdminMode();
   viewNotes.classList.remove('active');
   viewLearning.classList.add('active');
 
@@ -258,6 +259,7 @@ function startAssessment(){
 // (and the current level it points to) gets overwritten once the retake finishes.
 function retakeAssessment(){
   if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
+  if(typeof exitLearningAdminMode === 'function') exitLearningAdminMode();
   viewNotes.classList.remove('active');
   viewLearning.classList.add('active');
   startAssessment();
@@ -1222,6 +1224,7 @@ firebase.auth().onAuthStateChanged((user) => {
       .some(el => el.id !== 'staffAuthOverlay');
     if(otherOverlayOpen || viewLearning.classList.contains('active')) return;
     if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
+  if(typeof exitLearningAdminMode === 'function') exitLearningAdminMode();
     viewNotes.classList.remove('active');
     viewLearning.classList.add('active');
     bumpStreak();

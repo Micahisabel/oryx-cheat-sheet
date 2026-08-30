@@ -15,6 +15,8 @@ function applyAdminUI(){
   openAdd.style.display = isAdmin ? '' : 'none';
   openReview.style.display = isAdmin ? '' : 'none';
   document.getElementById('openAnalyticsNav').style.display = isAdmin ? '' : 'none';
+  const learningAdminNavBtn = document.getElementById('openLearningAdminNav');
+  if(learningAdminNavBtn) learningAdminNavBtn.style.display = isAdmin ? '' : 'none';
   // Claude Code / ChatGPT Code are developer-oriented — show only to admins so
   // non-technical staff aren't confused by them.
   document.querySelectorAll('[data-cat="shortcut-code"], [data-cat="chatgpt-shortcut-code"]').forEach(btn => {
