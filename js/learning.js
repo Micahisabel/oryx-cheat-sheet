@@ -201,12 +201,12 @@ function topbar({ showProgress = null, showBackToApp = true } = {}){
   const xp = (progress && progress.xp) || 0;
   const lvl = learnerLevelFromXp(xp);
   const streakHtml = progress && progress.streak > 1
-    ? `<span class="lrn-streak">🔥 ${progress.streak}</span>` : '';
+    ? `<span class="lrn-streak" title="You've come back to learn ${progress.streak} days in a row.">🔥 ${progress.streak}-day streak</span>` : '';
   return `
     <div class="lrn-topbar">
       ${showBackToApp ? `<button class="lrn-icon-btn" id="lrnExitBtn" aria-label="Back to Knowledge Hub">&larr;</button>` : '<span></span>'}
       ${showProgress !== null ? `<div class="lrn-progress-track"><div class="lrn-progress-fill" style="width:${showProgress}%"></div></div>` : '<div></div>'}
-      <div class="lrn-topbar-stats">${streakHtml}<span class="lrn-xp-pill">⭐ ${xp} XP · Lv.${lvl}</span></div>
+      <div class="lrn-topbar-stats">${streakHtml}<span class="lrn-xp-pill" title="You earn points by finishing lessons. Every 200 points, your level goes up.">⭐ ${xp} points · Level ${lvl}</span></div>
     </div>`;
 }
 
@@ -543,7 +543,7 @@ function renderDashboard(){
         <div class="lrn-welcome-meta">
           <span class="lrn-level-chip" style="--lrn-accent:${meta.color}">${meta.emoji} ${escapeHtml(meta.label)}</span>
           <span>Progress: ${pct}%</span>
-          <span>XP: ${progress.xp || 0}</span>
+          <span title="Points you've earned from finishing lessons.">Points: ${progress.xp || 0}</span>
         </div>
       </div>
 
@@ -594,7 +594,7 @@ function renderOverviewTab(level, meta, done, total, nextId, xpInfo){
       <div class="lrn-level-block">
         <div class="lrn-level-title">AI LEVEL ${LEARNING_LEVEL_ORDER.indexOf(level) + 1} · ${escapeHtml(meta.label)}</div>
         <div class="lrn-progress-track lrn-progress-track-lg"><div class="lrn-progress-fill" style="width:${Math.round((done/total)*100)}%"></div></div>
-        <div class="lrn-level-sub">${done}/${total} lessons complete · ${progress.xp || 0} XP total (${xpInfo.into}/${xpInfo.needed} to next learner level)</div>
+        <div class="lrn-level-sub" title="Finish lessons to earn points. Every 200 points, your level goes up.">${done}/${total} lessons complete · ${progress.xp || 0} points total (${xpInfo.into}/${xpInfo.needed} to next level)</div>
       </div>
       ${nextLessonHtml}
     </div>
@@ -715,12 +715,12 @@ function renderLesson(){
       <div class="lrn-lesson-complete">
         <div class="lrn-complete-emoji"><img src="assets/images/mascot/cat-yawn.png" alt="Ginger celebrating"> 🎉</div>
         <h2>Lesson Complete!</h2>
-        <p>+${XP_PER_LESSON + (activeLesson.wrongAttempt ? 0 : XP_PER_QUIZ_CORRECT)} XP</p>
+        <p title="Points you earn for finishing a lesson.">+${XP_PER_LESSON + (activeLesson.wrongAttempt ? 0 : XP_PER_QUIZ_CORRECT)} points</p>
         ${activeLesson.newBadges && activeLesson.newBadges.length ? `
           <div class="lrn-new-badges">
             ${activeLesson.newBadges.map(id => {
               const b = BADGE_LIBRARY.find(x => x.id === id);
-              return `<div class="lrn-new-badge">${b.emoji} ${escapeHtml(b.label)}</div>`;
+              return `<div class="lrn-new-badge" title="${escapeHtml(b.desc)}">${b.emoji} ${escapeHtml(b.label)} (new award!)</div>`;
             }).join('')}
           </div>` : ''}
         <button class="lrn-btn-primary" id="lrnBackToDashboard">Continue</button>
@@ -863,9 +863,9 @@ function renderMyAiProgressPanel(){
       <div class="lrn-profile-stat"><span>Assessment score</span><strong>${progress.assessmentResult.score}%</strong></div>
       <div class="lrn-profile-stat"><span>Assessment date</span><strong>${formatAssessmentDate(progress.assessmentDate)}</strong></div>
       <div class="lrn-profile-stat"><span>Overall progress</span><strong>${pct}%</strong></div>
-      <div class="lrn-profile-stat"><span>XP earned</span><strong>${progress.xp || 0}</strong></div>
+      <div class="lrn-profile-stat" title="Points you earn by finishing lessons."><span>Points earned</span><strong>${progress.xp || 0}</strong></div>
       <div class="lrn-profile-stat"><span>Lessons completed</span><strong>${(progress.completedLessons || []).length}</strong></div>
-      <div class="lrn-profile-stat"><span>Badges</span><strong>${(progress.badges || []).length}</strong></div>
+      <div class="lrn-profile-stat" title="Little awards you unlock for reaching a milestone, like a learning streak."><span>Badges (awards)</span><strong>${(progress.badges || []).length}</strong></div>
     </div>
     <div class="lrn-profile-course">
       <span>Current course</span>
