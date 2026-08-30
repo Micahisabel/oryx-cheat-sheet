@@ -530,6 +530,21 @@
   border-radius:var(--lrn-radius-sm); padding:13px 15px; margin-bottom:16px;
 }
 .lrn-profile-course span{ font-size:11px; color:var(--label); text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
+.lrn-profile-dept{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--panel); border:1px solid var(--line);
+  border-radius:var(--lrn-radius-sm); padding:11px 15px; margin-bottom:16px;
+}
+.lrn-profile-dept span{ font-size:11px; color:var(--label); text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
+.lrn-profile-dept select{ max-width:180px; }
+
+/* Optional one-time department picker shown at the bottom of the assessment results
+   screen when it hasn't been set yet — same "skip for now" tone as the rest of the app. */
+.lrn-dept-picker{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--lrn-radius);
+  padding:14px 16px; display:flex; flex-direction:column; gap:8px;
+}
+.lrn-dept-picker-label{ font-size:13px; color:var(--black); font-weight:500; }
 .lrn-profile-course strong{ font-family:var(--font-display); font-weight:700; font-size:13.5px; color:var(--black); }
 
 .lrn-profile-actions{ display:flex; flex-direction:column; gap:10px; }

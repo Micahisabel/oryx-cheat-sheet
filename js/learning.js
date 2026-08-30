@@ -465,10 +465,22 @@ function renderResults(){
         <div class="lrn-recommend-lesson">Start with <strong>${escapeHtml(firstLessonTitle)}</strong></div>
       </div>
       ${renderRecommendationsHtml(r.level, cg.gapCategories, cg.gapLabels)}
+      ${!progress.department ? `
+        <div class="lrn-dept-picker">
+          <div class="lrn-dept-picker-label">Which department are you in? <span class="optional-tag">(optional — helps your team see how it's doing with AI)</span></div>
+          <select class="filter-select" id="lrnDeptSelect">
+            <option value="">Skip for now</option>
+            ${LIBRARY_DEPARTMENTS.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('')}
+          </select>
+        </div>` : ''}
       <button class="lrn-btn-primary" id="lrnStartLearning">Start My Learning Journey</button>
     </div>`;
   bindTopbar();
   bindRecommendations(learningRoot);
+  const deptSelect = document.getElementById('lrnDeptSelect');
+  if(deptSelect) deptSelect.addEventListener('change', () => {
+    if(deptSelect.value){ progress.department = deptSelect.value; saveProgress(); }
+  });
   document.getElementById('lrnStartLearning').addEventListener('click', () => {
     learningScreen = 'dashboard';
     dashboardTab = 'overview';
@@ -1173,6 +1185,13 @@ function renderMyAiProgressPanel(){
       <span>Current course</span>
       <strong>${escapeHtml(meta.label)}${nextId ? ` · Next: ${escapeHtml(LESSON_LIBRARY[nextId].title)}` : ' · Path complete'}</strong>
     </div>
+    <div class="lrn-profile-dept">
+      <span>Department</span>
+      <select class="filter-select" id="lrnProfileDeptSelect">
+        <option value="">Not set</option>
+        ${LIBRARY_DEPARTMENTS.map(d => `<option value="${escapeHtml(d)}"${progress.department === d ? ' selected' : ''}>${escapeHtml(d)}</option>`).join('')}
+      </select>
+    </div>
     <div class="lrn-profile-actions">
       <button class="lrn-btn-primary" id="lrnProfileContinueBtn">Continue Learning</button>
       <button class="lrn-btn-text" id="lrnProfileRetakeBtn">Retake AI Assessment</button>
@@ -1186,6 +1205,11 @@ function renderMyAiProgressPanel(){
   document.getElementById('lrnProfileRetakeBtn').addEventListener('click', () => {
     myAiProgressOverlay.classList.remove('open');
     retakeAssessment();
+  });
+  const profileDeptSelect = document.getElementById('lrnProfileDeptSelect');
+  if(profileDeptSelect) profileDeptSelect.addEventListener('change', () => {
+    progress.department = profileDeptSelect.value || null;
+    saveProgress();
   });
 }
 
