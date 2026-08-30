@@ -166,7 +166,6 @@ async function enterLearning(){
 function exitLearningView(){
   viewLearning.classList.remove('active');
   viewNotes.classList.add('active');
-  renderLearningSnapshot();
 }
 
 function subscribeLearningProgress(){
@@ -513,65 +512,6 @@ function bindRecommendations(container){
       if(entry) openNoteDetail(entry);
     });
   });
-}
-
-// ---------------------------------------------------------------------------
-// Homepage "Your AI Learning" snapshot — a compact summary shown at the top of
-// the library (#view-notes), so learning progress is the first thing anyone
-// sees instead of buried behind the "AI Learning" header button. Read-only:
-// reuses the exact same progress/recommendation logic as the full dashboard,
-// no new state or calculation. Re-rendered from entries.js's render() (so it
-// stays fresh on load/entries-change/sign-in-out) and from exitLearningView()
-// (so it's current the instant someone returns from a lesson/assessment).
-// ---------------------------------------------------------------------------
-function renderLearningSnapshot(){
-  const el = document.getElementById('learningSnapshot');
-  if(!el) return;
-  const user = firebase.auth().currentUser;
-  if(!user){ el.style.display = 'none'; el.innerHTML = ''; return; }
-
-  ensureProgressForCurrentUser();
-  if(!progress){ el.style.display = 'none'; el.innerHTML = ''; return; }
-
-  el.style.display = '';
-
-  if(!progress.assessmentResult){
-    el.innerHTML = `
-      <div class="snap-card">
-        <div class="snap-eyebrow">Your AI Learning</div>
-        <h2 class="snap-heading">Learn AI. Discover new tools. Work smarter.</h2>
-        <p class="snap-sub">Take a 2-minute AI skills check to get a learning path built for you.</p>
-        <div class="snap-actions"><button class="lrn-btn-primary" id="snapStartAssessment">Start Assessment</button></div>
-      </div>`;
-    const startBtn = document.getElementById('snapStartAssessment');
-    if(startBtn) startBtn.addEventListener('click', retakeAssessment);
-    return;
-  }
-
-  const level = progress.currentLevel || progress.assessmentResult.level;
-  const meta = LEVEL_META[level];
-  const { done, total, pct } = pathProgressFor(level);
-
-  el.innerHTML = `
-    <div class="snap-card">
-      <div class="snap-top">
-        <div>
-          <div class="snap-eyebrow">Your AI Learning</div>
-          <h2 class="snap-heading">Learn AI. Discover new tools. Work smarter.</h2>
-        </div>
-        <span class="lrn-level-chip" style="--lrn-accent:${meta.color}">${meta.emoji} ${escapeHtml(meta.label)}</span>
-      </div>
-      <div class="snap-progress-row">
-        <div class="lrn-progress-track"><div class="lrn-progress-fill" style="width:${pct}%"></div></div>
-        <span class="snap-progress-label">${done} of ${total} lessons completed</span>
-      </div>
-      <div class="snap-actions"><button class="lrn-btn-primary" id="snapContinueBtn">Continue Learning</button></div>
-    </div>
-    ${renderRecommendationsHtml(level, progress.assessmentResult && progress.assessmentResult.gapCategories, progress.assessmentResult && progress.assessmentResult.gaps)}`;
-
-  const contBtn = document.getElementById('snapContinueBtn');
-  if(contBtn) contBtn.addEventListener('click', enterLearning);
-  bindRecommendations(el);
 }
 
 // ---------------------------------------------------------------------------
