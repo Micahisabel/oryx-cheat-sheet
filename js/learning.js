@@ -394,6 +394,7 @@ function renderResults(){
   const r = progress.assessmentResult;
   const meta = LEVEL_META[r.level];
   const firstLessonTitle = LESSON_LIBRARY[LEARNING_PATHS[r.level][0]].title;
+  const cg = currentGaps();
 
   learningRoot.innerHTML = `
     <div class="lrn-screen lrn-results">
@@ -422,7 +423,7 @@ function renderResults(){
         <div class="lrn-recommend-label">Recommended next step</div>
         <div class="lrn-recommend-lesson">Start with <strong>${escapeHtml(firstLessonTitle)}</strong></div>
       </div>
-      ${renderRecommendationsHtml(r.level, r.gapCategories, r.gaps)}
+      ${renderRecommendationsHtml(r.level, cg.gapCategories, cg.gapLabels)}
       <button class="lrn-btn-primary" id="lrnStartLearning">Start My Learning Journey</button>
     </div>`;
   bindTopbar();
@@ -491,6 +492,33 @@ function getRecommendedEntries(level, gapCategories){
     if(!addedThisRound) break;
   }
   return picked;
+}
+
+// A gap the assessment found stops being shown once the learner has actually
+// completed a real Hub resource on that topic — so the dashboard doesn't keep
+// nagging about something they've demonstrably worked on. This is purely a
+// display-layer filter: progress.assessmentResult itself is never modified,
+// it stays the immutable record of what that assessment run actually found.
+// Not a re-assessment (that's retakeAssessment/finishAssessment) — just an
+// honest "you've done something about this" adjustment to what's shown.
+function currentGaps(){
+  const result = progress && progress.assessmentResult;
+  if(!result) return { gapCategories: [], gapLabels: [] };
+  const origCats = result.gapCategories || [];
+  const origLabels = result.gaps || [];
+  const allEntries = typeof entries !== 'undefined' ? entries : [];
+  const completedIds = Object.keys((progress && progress.resourceProgress) || {})
+    .filter(id => progress.resourceProgress[id] && progress.resourceProgress[id].status === 'completed');
+  const completedCats = new Set(
+    completedIds
+      .map(id => { const e = allEntries.find(x => x.id === id); return e && e.category; })
+      .filter(Boolean)
+  );
+  const gapCategories = [], gapLabels = [];
+  origCats.forEach((cat, i) => {
+    if(!completedCats.has(cat)){ gapCategories.push(cat); gapLabels.push(origLabels[i]); }
+  });
+  return { gapCategories, gapLabels };
 }
 
 function recommendationSnippet(e){
@@ -617,7 +645,7 @@ function renderOverviewTab(level, meta, done, total, nextId, xpInfo){
       </div>
       ${nextLessonHtml}
     </div>
-    ${renderRecommendationsHtml(level, progress.assessmentResult && progress.assessmentResult.gapCategories, progress.assessmentResult && progress.assessmentResult.gaps)}`;
+    ${(() => { const cg = currentGaps(); return renderRecommendationsHtml(level, cg.gapCategories, cg.gapLabels); })()}`;
 }
 
 function bindOverviewLevelUp(){
