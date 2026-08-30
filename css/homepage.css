@@ -1,0 +1,36 @@
+  /* ---------- Homepage "Your AI Learning" snapshot ---------- */
+  /* Sits above the record-browsing tabbar/grid in #view-notes so learning progress
+     is the first thing anyone sees. Reuses several .lrn-* components from
+     learning.css (progress bar, level chip, primary button, recommendations
+     list) — none of those selectors are scoped to #view-learning, but a few
+     rely on --lrn-shadow*/--lrn-accent custom properties that ARE scoped there,
+     so this block restates the same values for reuse outside that view. */
+  #learningSnapshot{
+    --lrn-shadow-sm:0 1px 2px rgba(2,42,58,.05), 0 1px 1px rgba(2,42,58,.04);
+    --lrn-shadow:0 8px 24px -8px rgba(2,42,58,.16), 0 2px 6px rgba(2,42,58,.06);
+    --lrn-shadow-lg:0 20px 48px -12px rgba(2,42,58,.22), 0 4px 12px rgba(2,42,58,.08);
+    margin-bottom:24px;
+  }
+  .snap-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);
+    padding:var(--sp-6) var(--sp-7);box-shadow:var(--sh-card);
+    display:flex;flex-direction:column;gap:var(--sp-4);
+  }
+  .snap-top{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--sp-4);flex-wrap:wrap;}
+  .snap-eyebrow{
+    font-family:var(--font-display);font-weight:600;font-size:11px;letter-spacing:0.12em;
+    text-transform:uppercase;color:var(--oryx-blue);margin:0 0 4px;
+  }
+  .snap-heading{
+    font-family:var(--font-display);font-weight:700;font-size:24px;color:var(--black);
+    margin:0;line-height:1.3;
+  }
+  .snap-sub{font-size:14px;line-height:1.55;color:var(--text-muted);margin:0;max-width:52ch;}
+  .snap-progress-row{display:flex;align-items:center;gap:12px;}
+  .snap-progress-row .lrn-progress-track{flex:1;}
+  .snap-progress-label{font-size:12.5px;font-weight:600;color:var(--text-muted);white-space:nowrap;}
+  .snap-actions{display:flex;gap:12px;flex-wrap:wrap;}
+  /* The reused .lrn-reco block renders directly after .snap-card (see
+     renderLearningSnapshot in js/learning.js), so give it the same card
+     rhythm as the rest of the snapshot. */
+  #learningSnapshot .lrn-reco{margin-top:20px;}
