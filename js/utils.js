@@ -295,6 +295,86 @@ function buildGenericMarkdown(entry){
   return lines.join('\n');
 }
 
+// ---- Optional "Knowledge Check" quiz builder — shared by the Add Entry and Shortcut
+// forms. A resource's knowledgeCheck field is either [] (no quiz — the entry detail
+// page just shows a plain "Mark as complete" button) or 3-5 {question, options:
+// [{text, correct}]} items. Kept deliberately simple: single-select, 2-4 options,
+// exactly one marked correct per question.
+function knowledgeCheckRowHtml(q, i){
+  const question = (q && q.question) || '';
+  const options = (q && q.options && q.options.length) ? q.options : [{text:'',correct:true},{text:'',correct:false}];
+  return `
+    <div class="kc-question" data-qi="${i}">
+      <div class="kc-question-head">
+        <input type="text" class="kc-question-text" placeholder="Question ${i + 1}" value="${escapeHtml(question)}">
+        <button type="button" class="kc-remove-q" aria-label="Remove question">&times;</button>
+      </div>
+      <div class="kc-options">
+        ${options.map((o, oi) => `
+          <div class="kc-option">
+            <input type="radio" name="kc-correct-${i}" class="kc-option-correct" ${o.correct ? 'checked' : ''}>
+            <input type="text" class="kc-option-text" placeholder="Answer ${oi + 1}" value="${escapeHtml(o.text || '')}">
+            <button type="button" class="kc-remove-opt" aria-label="Remove answer">&times;</button>
+          </div>
+        `).join('')}
+      </div>
+      <button type="button" class="kc-add-opt">+ Add answer</button>
+    </div>`;
+}
+function buildKnowledgeCheckEditor(containerEl, addBtnEl){
+  const MAX_QUESTIONS = 5, MAX_OPTIONS = 4;
+  function renumber(){
+    containerEl.querySelectorAll('.kc-question').forEach((q, i) => q.dataset.qi = i);
+  }
+  function addQuestion(q){
+    if(containerEl.querySelectorAll('.kc-question').length >= MAX_QUESTIONS) return;
+    containerEl.insertAdjacentHTML('beforeend', knowledgeCheckRowHtml(q, containerEl.children.length));
+    renumber();
+  }
+  containerEl.addEventListener('click', (ev) => {
+    if(ev.target.classList.contains('kc-remove-q')){
+      ev.target.closest('.kc-question').remove();
+      renumber();
+    }else if(ev.target.classList.contains('kc-add-opt')){
+      const optsEl = ev.target.previousElementSibling;
+      if(optsEl.querySelectorAll('.kc-option').length >= MAX_OPTIONS) return;
+      const qi = ev.target.closest('.kc-question').dataset.qi;
+      optsEl.insertAdjacentHTML('beforeend', `
+        <div class="kc-option">
+          <input type="radio" name="kc-correct-${qi}" class="kc-option-correct">
+          <input type="text" class="kc-option-text" placeholder="Answer">
+          <button type="button" class="kc-remove-opt" aria-label="Remove answer">&times;</button>
+        </div>`);
+    }else if(ev.target.classList.contains('kc-remove-opt')){
+      const optsEl = ev.target.closest('.kc-options');
+      if(optsEl.querySelectorAll('.kc-option').length > 1) ev.target.closest('.kc-option').remove();
+    }
+  });
+  if(addBtnEl) addBtnEl.addEventListener('click', () => addQuestion(null));
+  return {
+    reset(){ containerEl.innerHTML = ''; },
+    setValue(list){
+      containerEl.innerHTML = '';
+      (list || []).forEach(q => addQuestion(q));
+    },
+    // Only questions with real text and at least 2 non-empty options (one marked
+    // correct) are kept — an in-progress/incomplete row is silently dropped rather
+    // than saved half-finished.
+    getValue(){
+      const out = [];
+      containerEl.querySelectorAll('.kc-question').forEach(qEl => {
+        const question = qEl.querySelector('.kc-question-text').value.trim();
+        const options = [...qEl.querySelectorAll('.kc-option')].map(oEl => ({
+          text: oEl.querySelector('.kc-option-text').value.trim(),
+          correct: oEl.querySelector('.kc-option-correct').checked
+        })).filter(o => o.text);
+        if(question && options.length >= 2 && options.some(o => o.correct)) out.push({question, options});
+      });
+      return out;
+    }
+  };
+}
+
 function downloadSkillMd(entry){
   const isSkillFile = isRichCategory(entry.category);
   const md = isSkillFile ? buildClaudeSkillMd(entry) : buildGenericMarkdown(entry);

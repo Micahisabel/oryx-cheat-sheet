@@ -6,6 +6,11 @@ const cancelAddShortcut = document.getElementById('cancelAddShortcut');
 const saveAddShortcut = document.getElementById('saveAddShortcut');
 let editingShortcutId = null;
 
+const scKnowledgeCheckEditor = buildKnowledgeCheckEditor(
+  document.getElementById('scKnowledgeCheck'),
+  document.getElementById('scKnowledgeCheckAdd')
+);
+
 // Prompt categories use a different set of fields (Name, Purpose, Sample prompt,
 // How to use it, ELI5) instead of the keyboard-shortcut fields. Toggle the form to match.
 function applyShortcutFormMode(cat){
@@ -39,6 +44,8 @@ function openShortcutOverlay(){
   try{ savedAuthor = localStorage.getItem(AUTHOR_KEY) || ''; }catch(e){}
   document.getElementById('scAuthor').value = savedAuthor;
   setScDepartments('');
+  document.getElementById('scDifficulty').value = '';
+  scKnowledgeCheckEditor.reset();
 }
 
 function openEditShortcut(entry){
@@ -61,6 +68,8 @@ function openEditShortcut(entry){
   document.getElementById('scNotes').value = entry.notes || '';
   document.getElementById('scAuthor').value = entry.author || '';
   setScDepartments(entry.department || '');
+  document.getElementById('scDifficulty').value = entry.difficulty || '';
+  scKnowledgeCheckEditor.setValue(entry.knowledgeCheck || []);
 }
 
 function closeShortcutOverlay(){
@@ -78,6 +87,8 @@ function closeShortcutOverlay(){
   document.getElementById('errScPurpose').style.display = 'none';
   document.getElementById('errScSamplePrompt').style.display = 'none';
   setScDepartments('');
+  document.getElementById('scDifficulty').value = '';
+  scKnowledgeCheckEditor.reset();
 }
 
 // Departments chip picker for the shortcut form (mirrors the Suggest form's dDepartments).
@@ -163,6 +174,8 @@ saveAddShortcut.addEventListener('click', async () => {
     example: isPrompt ? '' : document.getElementById('scExample').value.trim(),
     notes: isPrompt ? '' : document.getElementById('scNotes').value.trim(),
     link: '', tag: '', body: '', department: getScDepartments().join(', '),
+    difficulty: document.getElementById('scDifficulty').value,
+    knowledgeCheck: scKnowledgeCheckEditor.getValue(),
     platform: shortcutGroup === 'chatgpt' ? 'chatgpt' : 'claude',
     author: author || 'Anonymous',
     suggestedBy: existing ? (existing.suggestedBy || '') : ''

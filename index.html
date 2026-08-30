@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-08-30.117";</script>
+<script>window.APP_VERSION = "2026-08-30.118";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="css/dashboard.css?v=9">
 <link rel="stylesheet" href="css/cards.css?v=20">
 <link rel="stylesheet" href="css/modal.css?v=33">
-<link rel="stylesheet" href="css/forms.css?v=21">
+<link rel="stylesheet" href="css/forms.css?v=22">
 <link rel="stylesheet" href="css/dept-files.css?v=7">
 <link rel="stylesheet" href="css/learning.css?v=10">
 <link rel="stylesheet" href="css/responsive.css?v=4">
@@ -367,6 +367,21 @@
     <label>Departments <span class="optional-tag">(pick any that apply — used by the department filter)</span></label>
     <div class="dept-picker" id="fDepartments"></div>
 
+    <label for="fDifficulty">AI level <span class="optional-tag">(optional — helps match this to the right learner)</span></label>
+    <select id="fDifficulty">
+      <option value="">Not specified — shown to everyone</option>
+      <option value="beginner">Beginner</option>
+      <option value="basic">Basic</option>
+      <option value="intermediate">Intermediate</option>
+      <option value="advanced">Advanced</option>
+      <option value="expert">Expert</option>
+    </select>
+
+    <label>Knowledge check <span class="optional-tag">(optional — a short quiz shown after someone views this)</span></label>
+    <p class="field-hint">Leave empty and people get a simple "Mark as complete" button instead.</p>
+    <div class="kc-editor" id="fKnowledgeCheck"></div>
+    <button type="button" class="btn-ghost" id="fKnowledgeCheckAdd">+ Add question</button>
+
     <label for="fTag">Tag <span class="optional-tag">(optional, shown on the card)</span></label>
     <select id="fTag">
       <option value="">No tag</option>
@@ -450,6 +465,21 @@
       <label>Which teams is this for? <span class="optional-tag">(pick any — or skip)</span></label>
       <div class="dept-picker" id="scDepartments"></div>
     </div>
+
+    <label for="scDifficulty">AI level <span class="optional-tag">(optional — helps match this to the right learner)</span></label>
+    <select id="scDifficulty">
+      <option value="">Not specified — shown to everyone</option>
+      <option value="beginner">Beginner</option>
+      <option value="basic">Basic</option>
+      <option value="intermediate">Intermediate</option>
+      <option value="advanced">Advanced</option>
+      <option value="expert">Expert</option>
+    </select>
+
+    <label>Knowledge check <span class="optional-tag">(optional — a short quiz shown after someone views this)</span></label>
+    <p class="field-hint">Leave empty and people get a simple "Mark as complete" button instead.</p>
+    <div class="kc-editor" id="scKnowledgeCheck"></div>
+    <button type="button" class="btn-ghost" id="scKnowledgeCheckAdd">+ Add question</button>
 
     <label for="scAuthor">Your name</label>
     <input type="text" id="scAuthor" placeholder="e.g. Sara">
@@ -752,15 +782,15 @@
 </div>
 
 <script src="js/firebase.js?v=21"></script>
-<script src="js/utils.js?v=25"></script>
+<script src="js/utils.js?v=26"></script>
 <script src="js/constants.js?v=46"></script>
 <script src="js/learning-data.js?v=8"></script>
 <script src="js/state.js?v=20"></script>
 <script src="js/sidebar.js?v=31"></script>
 <script src="js/entries.js?v=59"></script>
 <script src="js/skill-detail.js?v=39"></script>
-<script src="js/add-entry.js?v=24"></script>
-<script src="js/shortcuts-form.js?v=20"></script>
+<script src="js/add-entry.js?v=25"></script>
+<script src="js/shortcuts-form.js?v=21"></script>
 <script src="js/admin.js?v=22"></script>
 <script src="js/suggest.js?v=44"></script>
 <script src="js/favorites.js?v=4"></script>

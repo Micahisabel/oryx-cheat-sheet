@@ -37,6 +37,11 @@ function getSelectedDepartments(){
 }
 let editingEntryId = null;
 
+const fKnowledgeCheckEditor = buildKnowledgeCheckEditor(
+  document.getElementById('fKnowledgeCheck'),
+  document.getElementById('fKnowledgeCheckAdd')
+);
+
 function toggleEntryFields(){
   const isRich = isRichCategory(fCategory.value);
   simpleFields.style.display = isRich ? 'none' : '';
@@ -155,6 +160,8 @@ function openOverlay(){
   document.getElementById('errHowToAccess').style.display = 'none';
   SKILL_FIELD_IDS.forEach(id => { document.getElementById(id).value = ''; });
   setSelectedDepartments([]);
+  document.getElementById('fDifficulty').value = '';
+  fKnowledgeCheckEditor.reset();
   aiInput.value = '';
   aiResult.value = '';
   setAiStatus('');
@@ -179,6 +186,8 @@ function closeOverlay(){
   document.getElementById('errHowToAccess').style.display = 'none';
   SKILL_FIELD_IDS.forEach(id => { document.getElementById(id).value = ''; });
   setSelectedDepartments([]);
+  document.getElementById('fDifficulty').value = '';
+  fKnowledgeCheckEditor.reset();
   aiInput.value = '';
   aiResult.value = '';
   setAiStatus('');
@@ -207,6 +216,8 @@ function openEditEntry(entry){
 
   SKILL_FIELD_IDS.forEach(id => { document.getElementById(id).value = entry[SKILL_FIELD_KEYS[id]] || ''; });
   setSelectedDepartments(entryDepartments(entry));
+  document.getElementById('fDifficulty').value = entry.difficulty || '';
+  fKnowledgeCheckEditor.setValue(entry.knowledgeCheck || []);
 
   aiInput.value = '';
   aiResult.value = '';
@@ -286,6 +297,8 @@ saveAdd.addEventListener('click', async () => {
     suggestedBy: currentSuggestedBy || '',
     body: isSkill ? '' : body,
     department: getSelectedDepartments().join(', '),
+    difficulty: document.getElementById('fDifficulty').value,
+    knowledgeCheck: fKnowledgeCheckEditor.getValue(),
     purpose: isSkill ? skillValues.fPurpose : '',
     samplePrompt: isSkill ? skillValues.fSamplePrompt : '',
     bestFor: isSkill ? skillValues.fBestFor : '',
