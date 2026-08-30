@@ -3,7 +3,7 @@
     position:sticky;top:0;z-index:30;
     padding:16px 28px;
     background:var(--oryx-blue);
-    box-shadow:0 4px 20px rgba(2,42,58,0.18);
+    box-shadow:var(--sh-header);
   }
   .header-inner{
     display:flex;
@@ -11,6 +11,21 @@
     justify-content:space-between;
     gap:20px;
     flex-wrap:wrap;
+  }
+  /* Mobile sidebar-drawer toggle — inert scaffold, only shown starting the 900px
+     breakpoint added in the responsive pass (see css/responsive.css). */
+  .sidebar-drawer-toggle{
+    display:none;
+    width:38px;height:38px;flex-shrink:0;border:none;border-radius:var(--r-sm);
+    background:rgba(255,255,255,0.08);color:var(--white);cursor:pointer;
+    align-items:center;justify-content:center;
+    transition:background 0.15s ease;
+  }
+  .sidebar-drawer-toggle:hover{background:rgba(255,255,255,0.14);}
+  .sidebar-drawer-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;}
+  .sidebar-drawer-scrim{
+    display:none;position:fixed;inset:0;z-index:40;
+    background:rgba(2,42,58,0.4);
   }
   .brand-row{display:flex;align-items:center;gap:14px;}
   .logo-img{height:52px;width:auto;display:block;}

@@ -22,7 +22,7 @@
   }
   .platform-item, .sidebar-analytics-item{
     display:flex;align-items:center;justify-content:space-between;gap:10px;
-    padding:14px 16px;border:1px solid transparent;border-radius:14px;background:none;
+    padding:14px 16px;border:1px solid transparent;border-radius:var(--r-lg);background:none;
     cursor:pointer;text-align:left;font-family:var(--font-display);font-weight:600;
     font-size:14px;color:rgba(255,255,255,0.82);position:relative;z-index:1;
     width:100%;
@@ -32,8 +32,17 @@
   .platform-item.active, .sidebar-analytics-item.active{background:rgba(255,255,255,0.06);border-color:transparent;color:var(--white);box-shadow:none;}
   .platform-item.disabled{cursor:not-allowed;opacity:0.5;}
   .platform-item-label{display:flex;align-items:center;gap:12px;}
-  .platform-icon{width:18px;height:18px;flex-shrink:0;display:block;}
+  .platform-icon{
+    width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    border-radius:50%;transition:background 0.15s ease, width 0.15s ease, height 0.15s ease, margin 0.15s ease;
+  }
   .platform-icon svg{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  /* Active items get a subtle tinted backdrop behind the icon — a bit more visual
+     weight than color alone, extending the same "highlight" language as the
+     sliding indicator without introducing a new pattern. */
+  .platform-item.active .platform-icon, .sidebar-analytics-item.active .platform-icon{
+    width:28px;height:28px;margin:-5px;background:rgba(255,255,255,0.14);
+  }
   .platform-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
   .platform-badge{
     font-family:var(--font-body);font-weight:600;font-size:12px;background:rgba(255,255,255,0.12);
@@ -44,7 +53,7 @@
   .platform-row{display:flex;align-items:stretch;gap:6px;}
   .platform-row .platform-item{flex:1;}
   .platform-expand-btn{
-    flex-shrink:0;width:36px;border:1px solid transparent;border-radius:14px;background:none;
+    flex-shrink:0;width:36px;border:1px solid transparent;border-radius:var(--r-lg);background:none;
     color:rgba(255,255,255,0.6);cursor:pointer;display:flex;align-items:center;justify-content:center;
     transition:background 0.15s ease, color 0.15s ease;
   }
@@ -53,7 +62,7 @@
   .platform-expand-btn.open svg{transform:rotate(180deg);}
   .platform-submenu{display:flex;flex-direction:column;gap:4px;padding:2px 0 2px 14px;margin:-2px 0 4px;}
   .platform-submenu-item{
-    display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid transparent;border-radius:10px;
+    display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid transparent;border-radius:var(--r-sm);
     background:rgba(255,255,255,0.04);cursor:pointer;text-align:left;font-family:var(--font-body);font-weight:500;
     font-size:13px;color:rgba(255,255,255,0.75);width:100%;transition:background 0.15s ease, color 0.15s ease;
   }
@@ -67,7 +76,7 @@
   .shortcuts-banner-right{display:flex;align-items:center;gap:16px;}
   .shortcuts-create-btn{
     font-family:var(--font-display);font-weight:600;font-size:12px;letter-spacing:0.05em;
-    text-transform:uppercase;background:var(--oryx-blue);color:var(--white);border:none;border-radius:10px;
+    text-transform:uppercase;background:var(--oryx-blue);color:var(--white);border:none;border-radius:var(--r-sm);
     padding:8px 16px;cursor:pointer;transition:background 0.15s ease, box-shadow 0.15s ease;
   }
   .shortcuts-create-btn:hover{box-shadow:0 6px 16px rgba(2,42,58,0.25);}
@@ -81,7 +90,7 @@
   /* ---------- Category tab bar (Oryx blue, icon + badge) ---------- */
   .cat-tabbar{
     display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;position:relative;
-    background:var(--oryx-blue);border-radius:14px;padding:8px;margin-bottom:20px;
+    background:var(--oryx-blue);border-radius:var(--r-lg);padding:8px;margin-bottom:20px;
   }
   .cat-tab-indicator{
     position:absolute;top:8px;left:8px;width:0;height:0;
@@ -94,7 +103,7 @@
   }
   .cat-tab{
     display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:pointer;position:relative;z-index:1;
-    padding:10px 16px;border:1px solid transparent;border-radius:10px;background:none;
+    padding:10px 16px;border:1px solid transparent;border-radius:var(--r-sm);background:none;
     font-family:var(--font-display);font-weight:600;font-size:13px;color:rgba(255,255,255,0.72);
     transition:background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   }
@@ -123,7 +132,7 @@
   #otherToolsNav .cat-tab{padding:10px 13px;gap:7px;}
   .cat-more-btn{
     display:flex;align-items:center;gap:8px;flex-shrink:0;cursor:pointer;position:relative;z-index:1;
-    padding:10px 14px;border:1px solid transparent;border-radius:10px;background:none;
+    padding:10px 14px;border:1px solid transparent;border-radius:var(--r-sm);background:none;
     font-family:var(--font-display);font-weight:600;font-size:13px;color:rgba(255,255,255,0.72);
     transition:background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   }
@@ -137,13 +146,13 @@
   .cat-more-menu{
     position:fixed;z-index:60;min-width:214px;max-height:60vh;overflow-y:auto;
     background:var(--oryx-blue);border:1px solid rgba(255,255,255,0.14);
-    border-radius:12px;padding:6px;box-shadow:0 16px 40px rgba(0,0,0,0.35);
+    border-radius:var(--r-md);padding:6px;box-shadow:0 16px 40px rgba(0,0,0,0.35);
     display:flex;flex-direction:column;gap:2px;
   }
   .cat-more-menu[hidden]{display:none;}
   .cat-more-item{
     display:flex;align-items:center;gap:10px;width:100%;cursor:pointer;text-align:left;
-    padding:9px 12px;border:0;border-radius:8px;background:none;
+    padding:9px 12px;border:0;border-radius:var(--r-xs);background:none;
     font-family:var(--font-display);font-weight:600;font-size:13px;color:rgba(255,255,255,0.8);
   }
   .cat-more-item .cat-badge{margin-left:auto;}
