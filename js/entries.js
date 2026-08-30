@@ -417,13 +417,23 @@ function render(){
     const usedToggleHtml = (isAdmin && usesUsageStatus(e.category))
       ? `<button class="card-used-toggle${isUnusedTool ? '' : ' is-used'}" data-id="${e.id}">${isUnusedTool ? 'Mark used' : 'Mark unused'}</button>`
       : '';
+    // Light per-type visual treatment on top of the shared card layout — media-forward
+    // for video, doc-forward for instructions/skills, tool-forward for agents/connectors/
+    // Other AI Tools. Purely a CSS modifier class; the render pipeline/data are unchanged.
+    const cardTypeClass = e.category === 'discoveries' ? ' card--media'
+      : (e.category === 'instructions' || e.category === 'skills') ? ' card--doc'
+      : (e.category === 'agents' || e.category === 'mcps' || isOtherToolsCategory(e.category)) ? ' card--tool'
+      : '';
+    // Same 7-day freshness window as the Recently Added strip, surfaced on grid cards too.
+    const isNew = e.createdAt && (Date.now() - e.createdAt) <= RECENT_STRIP_WINDOW_MS;
+    const newBadgeHtml = isNew ? `<span class="badge badge-new card-new-badge">New</span>` : '';
     return `
-      <div class="card${isUnusedTool ? ' card-unused' : ''}" data-id="${e.id}">
+      <div class="card${cardTypeClass}${isUnusedTool ? ' card-unused' : ''}" data-id="${e.id}">
         ${platformBadgeHtml}
         ${unusedBadgeHtml}
         <button class="card-fav-btn${isFav ? ' active' : ''}" data-id="${e.id}" aria-label="${isFav ? 'Remove from favorites' : 'Add to favorites'}">${FAV_STAR_SVG}</button>
         ${thumbHtml}
-        <span class="card-tag">${escapeHtml(cardTagLabel)}</span>
+        <div class="card-tag-row"><span class="card-tag">${escapeHtml(cardTagLabel)}</span>${newBadgeHtml}</div>
         <p class="card-title">${escapeHtml(e.title)}</p>
         ${shortcutDeptHtml}
         <p class="card-body">${escapeHtml(preview)}</p>

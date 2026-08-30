@@ -50,7 +50,9 @@
   .card:hover{
     border-color:var(--line);box-shadow:0 12px 28px rgba(2,42,58,0.12);transform:translateY(-3px);
   }
+  .card-tag-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .card-tag{font-family:var(--font-display);font-weight:600;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--oryx-blue);}
+  .card-new-badge{font-size:9.5px;letter-spacing:0.04em;text-transform:uppercase;padding:1px 7px;}
   .card-title{font-family:var(--font-display);font-weight:600;font-size:16px;color:var(--black);margin:0;line-height:1.3;}
   .card-dept{
     display:inline-block;max-width:100%;box-sizing:border-box;
@@ -194,3 +196,17 @@
   }
   .badge-new{background:var(--accent);color:var(--oryx-blue);}
   .badge-recommended{background:var(--oryx-blue);color:var(--white);}
+
+  /* ---------- Type-based card treatment (media/doc/tool) ---------- */
+  /* Video: the thumbnail is already the focal point — just give it a touch more polish. */
+  .card--media .link-thumb-wrap{border-radius:var(--r-md);box-shadow:var(--sh-subtle);}
+  /* Instructions/Skills: de-emphasize the icon banner so the title/description lead. */
+  .card--doc .card-placeholder{height:44px;}
+  .card--doc .card-placeholder svg{width:20px;height:20px;}
+  /* Assistants/Connectors/Other AI Tools: a compact icon tile instead of a full-width
+     banner, closer to how a launcher/app icon reads. */
+  .card--tool .card-placeholder{
+    width:44px;height:44px;flex-shrink:0;border-radius:var(--r-md);align-self:flex-start;
+  }
+  .card--tool .card-favicon-img{width:24px;height:24px;}
+  .card--tool .card-placeholder svg{width:20px;height:20px;}
