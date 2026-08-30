@@ -7,6 +7,7 @@
 const learningAdminView = document.getElementById('learningAdminView');
 const openLearningAdminNavBtn = document.getElementById('openLearningAdminNav');
 let learningAdminDocs = null; // cached once per open, refreshed via the Refresh button
+let learningAdminDept = 'all'; // 'all' or one of LIBRARY_DEPARTMENTS ('Unassigned' for null/blank)
 
 function exitLearningAdminMode(){
   if(!hubMainEl.classList.contains('learning-admin-mode')) return;
@@ -111,14 +112,28 @@ function renderLearningAdmin(){
     return;
   }
 
-  const stats = computeLearningStats(learningAdminDocs);
+  const scopedDocs = learningAdminDept === 'all'
+    ? learningAdminDocs
+    : learningAdminDocs.filter(d => (d.department || 'Unassigned') === learningAdminDept);
+  const stats = computeLearningStats(scopedDocs);
   const maxGap = Math.max(1, ...stats.sortedGaps.map(([, c]) => c));
   const maxUsage = Math.max(1, ...stats.sortedUsage.map(u => u.count));
+
+  const deptOptions = ['all', ...LIBRARY_DEPARTMENTS, 'Unassigned'];
+  const deptLabel = (d) => d === 'all' ? 'All Departments' : d;
+  const deptSelectHtml = `
+    <select class="filter-select" id="learningAdminDeptSelect">
+      ${deptOptions.map(d => `<option value="${escapeHtml(d)}"${d === learningAdminDept ? ' selected' : ''}>${escapeHtml(deptLabel(d))}</option>`).join('')}
+    </select>`;
 
   learningAdminView.innerHTML = `
     <div class="analytics-page-head">
       <h2>AI Capability</h2>
-      <p class="analytics-page-sub">How the whole company is progressing in AI knowledge</p>
+      <p class="analytics-page-sub">How ${learningAdminDept === 'all' ? 'the whole company is' : escapeHtml(learningAdminDept) + ' is'} progressing in AI knowledge</p>
+    </div>
+    <div class="analytics-section-head" style="margin-bottom:16px;">
+      <h3>Department</h3>
+      ${deptSelectHtml}
     </div>
     <div class="analytics-kpis analytics-kpis--wide">
       <div class="analytics-kpi"><span class="analytics-kpi-label">Employees Assessed</span><span class="analytics-kpi-value">${stats.total}</span></div>
@@ -161,6 +176,12 @@ function renderLearningAdmin(){
 
   const refreshBtn = document.getElementById('learningAdminRefresh');
   if(refreshBtn) refreshBtn.addEventListener('click', () => { learningAdminDocs = null; renderLearningAdmin(); });
+
+  const deptSelect = document.getElementById('learningAdminDeptSelect');
+  if(deptSelect) deptSelect.addEventListener('change', () => {
+    learningAdminDept = deptSelect.value;
+    renderLearningAdmin();
+  });
 }
 
 function enterLearningAdminMode(){
@@ -171,6 +192,7 @@ function enterLearningAdminMode(){
   hubMainEl.classList.add('learning-admin-mode');
   repositionAllTabIndicators();
   learningAdminDocs = null; // always fetch fresh on entry
+  learningAdminDept = 'all';
   renderLearningAdmin();
 }
 
