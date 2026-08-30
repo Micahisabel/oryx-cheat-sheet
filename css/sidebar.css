@@ -76,7 +76,7 @@
     font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--oryx-blue);padding:6px 0;}
   .shortcuts-back-btn:hover{text-decoration:underline;}
   .shortcuts-banner-label{font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--label);}
-  .shortcut-key-text{font-family:'Courier New',monospace;color:var(--white);font-size:14px;font-weight:600;padding:0 12px;text-align:center;}
+  .shortcut-key-text{font-family:var(--font-mono);color:var(--white);font-size:14px;font-weight:600;padding:0 12px;text-align:center;}
 
   /* ---------- Category tab bar (Oryx blue, icon + badge) ---------- */
   .cat-tabbar{
