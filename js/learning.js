@@ -14,7 +14,7 @@ const LEARNING_STORAGE_PREFIX = 'oryx-ai-learning-progress:';
 const learningRoot = document.getElementById('learningRoot');
 const viewLearning = document.getElementById('view-learning');
 const viewNotes = document.getElementById('view-notes');
-const openLearningBtn = document.getElementById('openLearning');
+const openLearningNavBtn = document.getElementById('openLearningNav');
 
 let learningScreen = 'onboarding'; // onboarding | department | assessment | results | dashboard | lesson
 let progress = null;              // the learner's saved progress object
@@ -51,7 +51,6 @@ function defaultProgress(){
     streak: 0,
     lastActiveDate: null,
     resourceProgress: {},         // { [entryId]: { status:'in-progress'|'completed', startedAt, completedAt, quizPassed } }
-    lastHomepageVisit: null,      // ISO string — powers the homepage's "New For You" section
     department: null,             // one of LIBRARY_DEPARTMENTS, or null until self-selected
     userEmail: null,              // mirrored from firebase.auth() so the admin dashboard can label rows
     levelChallenges: {}           // { [levelKey]: { status:'submitted'|'passed'|'needs_improvement', attempts:[{submittedAt,evidenceType,evidenceUrl,evidenceFileName,explanation,reviewedAt,reviewedBy,reviewStatus,reviewNote}] } } — see CHALLENGE_LIBRARY in learning-data.js
@@ -159,6 +158,8 @@ async function enterLearning(){
   if(!signedIn) return;
   if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
   if(typeof exitLearningAdminMode === 'function') exitLearningAdminMode();
+  document.querySelectorAll('.platform-item.active, .sidebar-analytics-item.active').forEach(b => b.classList.remove('active'));
+  if(openLearningNavBtn) openLearningNavBtn.classList.add('active');
   viewNotes.classList.remove('active');
   viewLearning.classList.add('active');
 
@@ -178,7 +179,8 @@ async function enterLearning(){
 function exitLearningView(){
   viewLearning.classList.remove('active');
   viewNotes.classList.add('active');
-  renderLearningSnapshot();
+  if(openLearningNavBtn) openLearningNavBtn.classList.remove('active');
+  if(typeof repositionAllTabIndicators === 'function') repositionAllTabIndicators();
 }
 
 function subscribeLearningProgress(){
@@ -197,7 +199,7 @@ function subscribeLearningProgress(){
   }, () => { /* no rule yet, or offline — keep using localStorage silently */ });
 }
 
-if(openLearningBtn) openLearningBtn.addEventListener('click', enterLearning);
+if(openLearningNavBtn) openLearningNavBtn.addEventListener('click', enterLearning);
 
 const headerLogo = document.getElementById('headerLogo');
 if(headerLogo) headerLogo.addEventListener('click', () => {
@@ -686,119 +688,6 @@ function bindRecommendations(container){
       if(entry) openNoteDetail(entry);
     });
   });
-}
-
-// Entries added since the learner's last homepage visit, in categories relevant
-// to their level — powers the homepage's "New For You" section. Updates
-// progress.lastHomepageVisit itself (see renderLearningSnapshot), so the same
-// items don't keep reappearing every visit.
-function getNewForYouEntries(level){
-  const cutoff = progress.lastHomepageVisit ? new Date(progress.lastHomepageVisit).getTime() : 0;
-  const cats = LEVEL_RECOMMENDED_CATEGORIES[level] || [];
-  return (typeof entries !== 'undefined' ? entries : [])
-    .filter(e => cats.includes(e.category) && (e.createdAt || 0) > cutoff)
-    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-    .slice(0, 3);
-}
-
-// ---------------------------------------------------------------------------
-// Homepage "Your AI Learning" snapshot — a compact summary shown at the top of
-// the library (#view-notes), so learning progress is the first thing anyone
-// sees instead of buried behind the "AI Learning" header button. Read-only:
-// reuses the exact same progress/recommendation logic as the full dashboard,
-// no new state or calculation (aside from marking lastHomepageVisit). Refreshed
-// from entries.js's render() (covers load/entries-change/sign-in-out) and from
-// exitLearningView() (instant refresh on return from a lesson/assessment).
-// ---------------------------------------------------------------------------
-function renderLearningSnapshot(){
-  const el = document.getElementById('learningSnapshot');
-  if(!el) return;
-  const user = firebase.auth().currentUser;
-  if(!user){ el.style.display = 'none'; el.innerHTML = ''; return; }
-
-  ensureProgressForCurrentUser();
-  if(!progress){ el.style.display = 'none'; el.innerHTML = ''; return; }
-
-  el.style.display = '';
-
-  if(!progress.assessmentResult){
-    el.innerHTML = `
-      <div class="snap-card">
-        <div class="snap-eyebrow">Your AI Learning</div>
-        <h2 class="snap-heading">Learn AI. Discover new tools. Work smarter.</h2>
-        <p class="snap-sub">Take a 2-minute AI skills check to get a learning path built for you.</p>
-        <div class="snap-actions"><button class="lrn-btn-primary" id="snapStartAssessment">Start Assessment</button></div>
-      </div>`;
-    const startBtn = document.getElementById('snapStartAssessment');
-    if(startBtn) startBtn.addEventListener('click', retakeAssessment);
-    return;
-  }
-
-  const name = (user.displayName || user.email || 'there').split('@')[0];
-  const level = progress.currentLevel || progress.assessmentResult.level;
-  const meta = LEVEL_META[level];
-  const nextId = nextLessonFor(level);
-  const xpInfo = xpProgressInLevel(progress.xp || 0);
-  const cg = currentGaps();
-  const newForYou = getNewForYouEntries(level);
-
-  const continueHtml = nextId
-    ? `<div class="snap-continue">
-         <div class="snap-block-label">Continue Learning</div>
-         <div class="snap-continue-title">${escapeHtml(LESSON_LIBRARY[nextId].title)}</div>
-         <button class="lrn-btn-primary" id="snapContinueBtn">Continue</button>
-       </div>`
-    : `<div class="snap-continue">
-         <div class="snap-block-label">Continue Learning</div>
-         <div class="snap-continue-title">🎉 You've finished the ${escapeHtml(meta.label)} path</div>
-         <button class="lrn-btn-primary" id="snapContinueBtn">Open AI Learning</button>
-       </div>`;
-
-  const gapsHtml = cg.gapLabels.length
-    ? `<div class="snap-gaps">
-         <div class="snap-block-label">Your Knowledge Gaps</div>
-         <ul class="snap-gaps-list">${cg.gapLabels.map(l => `<li>🎯 ${escapeHtml(l)}</li>`).join('')}</ul>
-       </div>` : '';
-
-  const newForYouHtml = newForYou.length
-    ? `<div class="snap-new">
-         <div class="snap-block-label">New For You</div>
-         <ul class="snap-new-list">${newForYou.map(e => `<li>✨ ${escapeHtml(e.title)}</li>`).join('')}</ul>
-       </div>` : '';
-
-  el.innerHTML = `
-    <div class="snap-card">
-      <div class="snap-top">
-        <div>
-          <div class="snap-eyebrow">Welcome back, ${escapeHtml(name)}</div>
-          <h2 class="snap-heading">Learn AI. Discover new tools. Work smarter.</h2>
-        </div>
-        <span class="lrn-level-chip" style="--lrn-accent:${meta.color}">${meta.emoji} ${escapeHtml(meta.label)}</span>
-      </div>
-      <div class="snap-progress-row">
-        <div class="lrn-progress-track"><div class="lrn-progress-fill" style="width:${xpInfo.pct}%"></div></div>
-        <span class="snap-progress-label">${xpInfo.into}/${xpInfo.needed} points to next level</span>
-      </div>
-      <div class="snap-grid">
-        ${continueHtml}
-        ${gapsHtml}
-        ${newForYouHtml}
-      </div>
-    </div>
-    ${renderRecommendationsHtml(level, cg.gapCategories, cg.gapLabels)}
-    <button class="snap-explore" id="snapExploreBtn">Explore AI resources below ↓</button>`;
-
-  const contBtn = document.getElementById('snapContinueBtn');
-  if(contBtn) contBtn.addEventListener('click', enterLearning);
-  const exploreBtn = document.getElementById('snapExploreBtn');
-  if(exploreBtn) exploreBtn.addEventListener('click', () => {
-    const visibleTabbar = [...document.querySelectorAll('.cat-tabbar')].find(nav => nav.offsetParent !== null);
-    (visibleTabbar || document.getElementById('sideNav')).scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-  bindRecommendations(el);
-
-  progress.lastHomepageVisit = new Date().toISOString();
-  saveProgress();
 }
 
 // ---------------------------------------------------------------------------

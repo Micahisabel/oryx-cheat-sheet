@@ -38,9 +38,4 @@
     .recent-row{ -webkit-overflow-scrolling:touch; }
 
     .lrn-results-grid{grid-template-columns:1fr;}
-
-    .snap-card{padding:var(--sp-5);}
-    .snap-heading{font-size:20px;}
-    .snap-top{flex-direction:column;align-items:flex-start;}
-    .snap-grid{grid-template-columns:1fr;}
   }
