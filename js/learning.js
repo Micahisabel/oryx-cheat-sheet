@@ -199,6 +199,11 @@ function subscribeLearningProgress(){
 
 if(openLearningBtn) openLearningBtn.addEventListener('click', enterLearning);
 
+const headerLogo = document.getElementById('headerLogo');
+if(headerLogo) headerLogo.addEventListener('click', () => {
+  if(viewLearning.classList.contains('active')) exitLearningView();
+});
+
 // ---------------------------------------------------------------------------
 // Render dispatch
 // ---------------------------------------------------------------------------
