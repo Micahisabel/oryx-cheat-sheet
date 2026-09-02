@@ -591,3 +591,44 @@ function enterLearningAdminMode(){
 }
 
 openLearningAdminNavBtn.addEventListener('click', enterLearningAdminMode);
+
+// ---------------------------------------------------------------------------
+// Settings overlay (admin only) — a category list + the selected category's
+// form. Reuses the same reportSettingsHtml()/bindReportSettings() as the
+// Report & Reminder section on the AI Capability dashboard, so there's only
+// one place that settings form's markup/logic lives.
+// ---------------------------------------------------------------------------
+const settingsOverlay = document.getElementById('settingsOverlay');
+const settingsContent = document.getElementById('settingsContent');
+const openSettingsNavBtn = document.getElementById('openSettingsNav');
+let activeSettingsCategory = 'reportReminder';
+
+const SETTINGS_CATEGORY_RENDERERS = {
+  reportReminder: () => {
+    settingsContent.innerHTML = reportSettingsHtml();
+    bindReportSettings();
+  }
+};
+
+function renderSettingsCategory(cat){
+  activeSettingsCategory = cat;
+  document.querySelectorAll('.settings-cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  const renderer = SETTINGS_CATEGORY_RENDERERS[cat];
+  if(renderer) renderer();
+}
+
+function openSettingsOverlay(){
+  if(typeof closeAccountMenu === 'function') closeAccountMenu();
+  learningReportSettings = null; // always fetch fresh on entry
+  settingsContent.innerHTML = '<div class="s-empty">Loading settings…</div>';
+  settingsOverlay.classList.add('open');
+  loadLearningReportSettings()
+    .then(() => renderSettingsCategory(activeSettingsCategory))
+    .catch(() => { settingsContent.innerHTML = '<div class="s-empty">Could not load settings. Check your connection and try again.</div>'; });
+}
+
+if(openSettingsNavBtn) openSettingsNavBtn.addEventListener('click', openSettingsOverlay);
+document.getElementById('closeSettings').addEventListener('click', () => settingsOverlay.classList.remove('open'));
+document.querySelectorAll('.settings-cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => renderSettingsCategory(btn.dataset.cat));
+});

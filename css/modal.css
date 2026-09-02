@@ -396,3 +396,16 @@
 /* On a Video Discovery detail page the player is the main content, so give it more room. */
 .skill-thumb .video-embed{max-width:560px;}
 .skill-thumb .video-embed-portrait{max-width:320px;}
+
+  /* ---------- Settings overlay (admin only) ---------- */
+  .panel-wide{width:640px;}
+  .settings-layout{display:flex;gap:24px;align-items:flex-start;}
+  .settings-categories{display:flex;flex-direction:column;gap:4px;flex-shrink:0;width:160px;}
+  .settings-cat-btn{
+    text-align:left;background:none;border:none;border-radius:8px;padding:10px 12px;
+    font-family:var(--font-body);font-size:13.5px;font-weight:500;color:var(--label);
+    cursor:pointer;transition:background 0.15s ease,color 0.15s ease;
+  }
+  .settings-cat-btn:hover{background:var(--panel);color:var(--black);}
+  .settings-cat-btn.active{background:var(--oryx-blue);color:#fff;}
+  .settings-content{flex:1;min-width:0;}
