@@ -32,7 +32,7 @@ let reviewLevel = null;        // level being viewed in the Learning Path tab
 let activeLesson = null; // { levelKey, lessonId, step: 'learn'|'practice'|'quiz'|'done', wrongAttempt:false }
 
 // ---- Active level-up challenge session (transient — only the submitted attempt is persisted) ----
-let activeChallenge = null; // { levelKey, evidenceType:'file'|'link'|'none', file:null, link:'', explanation:'' }
+let activeChallenge = null; // { levelKey, evidenceType:'file'|'link', file:null, link:'', explanation:'' }
 
 // ---------------------------------------------------------------------------
 // Progress persistence (localStorage always; Firestore best-effort per user)
@@ -1143,7 +1143,6 @@ function renderChallenge(){
         <div class="lrn-evidence-picker">
           <button class="lrn-evidence-picker-btn ${activeChallenge.evidenceType === 'file' ? 'active' : ''}" data-type="file">Upload file/screenshot</button>
           <button class="lrn-evidence-picker-btn ${activeChallenge.evidenceType === 'link' ? 'active' : ''}" data-type="link">Link</button>
-          <button class="lrn-evidence-picker-btn ${activeChallenge.evidenceType === 'none' ? 'active' : ''}" data-type="none">No file</button>
         </div>
         ${activeChallenge.evidenceType === 'file' ? `
           <div class="lrn-evidence-upload">
