@@ -53,8 +53,37 @@ function defaultProgress(){
     resourceProgress: {},         // { [entryId]: { status:'in-progress'|'completed', startedAt, completedAt, quizPassed } }
     department: null,             // one of LIBRARY_DEPARTMENTS, or null until self-selected
     userEmail: null,              // mirrored from firebase.auth() so the admin dashboard can label rows
-    levelChallenges: {}           // { [levelKey]: { status:'submitted'|'passed'|'needs_improvement', attempts:[{submittedAt,evidenceType,evidenceUrl,evidenceFileName,explanation,reviewedAt,reviewedBy,reviewStatus,reviewNote}] } } — see CHALLENGE_LIBRARY in learning-data.js
+    levelChallenges: {},          // { [levelKey]: { status:'submitted'|'passed'|'needs_improvement', attempts:[{submittedAt,evidenceType,evidenceUrl,evidenceFileName,explanation,reviewedAt,reviewedBy,reviewStatus,reviewNote}] } } — see CHALLENGE_LIBRARY in learning-data.js
+    activityDates: [],            // rolling log of 'YYYY-MM-DD' days the learner was active, trimmed to the last 90 — powers the ranking system's consistency score (see bumpStreak())
+    progressHistory: [],          // [{date, xp, completedLessonsCount, score}] — capped snapshot log powering the personal progress graph
+    rankingScore: null,           // 0-100, written only by the scheduled ranking job — null/"Not available" until enough data exists. Never set this from client code.
+    rank: null,                   // "#N of Total" position, written only by the scheduled ranking job
+    rankTotal: null,
+    currentAchievements: [],      // comparative achievement IDs (Champion, Most Improved, etc.) for the current period — written only by the scheduled ranking job
+    lastReminderSentAt: null      // ISO date — written only by the scheduled ranking job, prevents duplicate inactivity reminders
   };
+}
+
+// Appends today (if not already the most recent entry) to the rolling activity
+// log used by the ranking system's consistency score, trimmed to the last 90
+// days so the array never grows unbounded for long-tenured users.
+function logActivityDate(dateStr){
+  progress.activityDates = progress.activityDates || [];
+  if(progress.activityDates[progress.activityDates.length - 1] !== dateStr){
+    progress.activityDates = progress.activityDates.concat(dateStr).slice(-90);
+  }
+}
+
+// Appends a snapshot to the personal progress graph, capped at 52 points
+// (roughly a year of weekly-ish activity) so the array stays small.
+function logProgressSnapshot(){
+  progress.progressHistory = progress.progressHistory || [];
+  progress.progressHistory = progress.progressHistory.concat({
+    date: new Date().toISOString(),
+    xp: progress.xp || 0,
+    completedLessonsCount: (progress.completedLessons || []).length,
+    score: progress.assessmentResult ? progress.assessmentResult.score : null
+  }).slice(-52);
 }
 
 // Every signed-in user gets their own localStorage key (oryx-ai-learning-progress:{uid})
@@ -115,6 +144,7 @@ function bumpStreak(){
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
   progress.streak = (progress.lastActiveDate === yesterday) ? (progress.streak || 0) + 1 : 1;
   progress.lastActiveDate = today;
+  logActivityDate(today);
 }
 
 function awardXp(amount){
@@ -457,6 +487,7 @@ function finishAssessment(){
   progress.currentLevel = level;
   progress.assessmentDate = new Date().toISOString();
   applyNewBadges();
+  logProgressSnapshot();
   saveProgress();
   learningScreen = 'results';
   renderLearning();
@@ -1011,6 +1042,7 @@ function completeLesson(){
   const newBadges = applyNewBadges();
   activeLesson.newBadges = newBadges;
   activeLesson.step = 'done';
+  logProgressSnapshot();
   saveProgress();
   renderLearning();
 }
@@ -1296,6 +1328,7 @@ function completeResource(entryId, quizPassed){
   };
   awardXp(XP_PER_RESOURCE);
   applyNewBadges();
+  logProgressSnapshot();
   saveProgress();
 }
 
@@ -1378,6 +1411,49 @@ function formatAssessmentDate(iso){
   catch(e){ return '—'; }
 }
 
+// "Your Rank" card — rankingScore/rank/rankTotal are only ever written by the
+// scheduled ranking job (see plan), never by client code, so this is always
+// read-only display. Shows a plain "not enough data yet" state until that job
+// has run at least once for this account.
+function rankCardHtml(){
+  if(progress.rankingScore == null || progress.rank == null){
+    return `
+      <div class="lrn-profile-rank lrn-profile-rank--pending">
+        <span class="lrn-profile-rank-label">Your Rank</span>
+        <strong>Not enough data yet</strong>
+        <p>Keep learning — your rank appears here once there's enough activity to compare.</p>
+      </div>`;
+  }
+  return `
+    <div class="lrn-profile-rank">
+      <span class="lrn-profile-rank-label">Your Rank</span>
+      <strong>#${progress.rank} of ${progress.rankTotal}</strong>
+      <p title="Rankings are based on progress, consistency, and improvement — not your starting level. Updated overnight.">How is this calculated?</p>
+    </div>`;
+}
+
+// Simple inline SVG line chart from progress.progressHistory (no charting
+// library — this app has no build step, so anything client-side stays
+// dependency-free). Plots XP over time; falls back to a plain message when
+// there's fewer than 2 points to draw a meaningful line.
+function progressGraphSvg(){
+  const points = progress.progressHistory || [];
+  if(points.length < 2){
+    return `<div class="s-empty">Your progress graph will appear here after a bit more learning activity.</div>`;
+  }
+  const w = 560, h = 140, pad = 12;
+  const xs = points.map((p, i) => pad + (i / (points.length - 1)) * (w - pad * 2));
+  const maxXp = Math.max(...points.map(p => p.xp), 1);
+  const ys = points.map(p => h - pad - (p.xp / maxXp) * (h - pad * 2));
+  const path = xs.map((x, i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
+  const lastX = xs[xs.length - 1], lastY = ys[ys.length - 1];
+  return `
+    <svg viewBox="0 0 ${w} ${h}" class="lrn-progress-graph-svg" preserveAspectRatio="none">
+      <path d="${path}" fill="none" stroke="var(--oryx-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+      <circle cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="4" fill="var(--oryx-blue)"></circle>
+    </svg>`;
+}
+
 function renderMyAiProgressPanel(){
   if(typeof closeAccountMenu === 'function') closeAccountMenu();
   const user = firebase.auth().currentUser;
@@ -1416,6 +1492,11 @@ function renderMyAiProgressPanel(){
       <div class="lrn-profile-stat" title="Points you earn by finishing lessons."><span>Points earned</span><strong class="lrn-profile-stat-accent">${progress.xp || 0}</strong></div>
       <div class="lrn-profile-stat"><span>Lessons completed</span><strong>${(progress.completedLessons || []).length}</strong></div>
       <div class="lrn-profile-stat" title="Little awards you unlock for reaching a milestone, like a learning streak."><span>Badges (awards)</span><strong class="lrn-profile-stat-accent">${(progress.badges || []).length}</strong></div>
+    </div>
+    ${rankCardHtml()}
+    <div class="lrn-profile-graph">
+      <span class="lrn-profile-graph-label">Your progress over time</span>
+      ${progressGraphSvg()}
     </div>
     <div class="lrn-profile-course">
       <span>Current course</span>

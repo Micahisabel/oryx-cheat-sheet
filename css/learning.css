@@ -524,6 +524,24 @@
 .lrn-profile-stat strong{ font-family:var(--font-display); font-weight:700; font-size:15.5px; color:var(--black); font-variant-numeric:tabular-nums; }
 .lrn-profile-stat-accent{ color:var(--accent-deep) !important; }
 
+.lrn-profile-rank{
+  display:flex; flex-direction:column; gap:3px;
+  background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--oryx-blue);
+  border-radius:var(--lrn-radius-sm); padding:13px 15px; margin-bottom:16px;
+}
+.lrn-profile-rank--pending{ border-left-color:var(--silver, var(--line)); }
+.lrn-profile-rank-label{ font-size:11px; color:var(--label); text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
+.lrn-profile-rank strong{ font-family:var(--font-display); font-weight:800; font-size:18px; color:var(--oryx-blue); }
+.lrn-profile-rank p{ margin:2px 0 0; font-size:11.5px; color:var(--label); cursor:default; }
+
+.lrn-profile-graph{
+  display:flex; flex-direction:column; gap:6px;
+  background:var(--white); border:1px solid var(--line);
+  border-radius:var(--lrn-radius-sm); padding:13px 15px; margin-bottom:16px;
+}
+.lrn-profile-graph-label{ font-size:11px; color:var(--label); text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
+.lrn-progress-graph-svg{ width:100%; height:90px; display:block; }
+
 .lrn-profile-course{
   display:flex; flex-direction:column; gap:3px;
   background:var(--panel); border:1px solid var(--line);

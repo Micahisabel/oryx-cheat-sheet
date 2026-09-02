@@ -9,6 +9,263 @@ const openLearningAdminNavBtn = document.getElementById('openLearningAdminNav');
 let learningAdminDocs = null; // cached once per open, refreshed via the Refresh button
 let learningAdminDept = 'all'; // 'all' or one of LIBRARY_DEPARTMENTS ('Unassigned' for null/blank)
 
+// ---- Report & reminder settings (adminState/learningReportSettings) — read by
+// the scheduled Apps Script job on every run, so changes here take effect on
+// the next nightly/monthly run without redeploying anything. ----
+let learningReportSettings = null; // null until first loaded
+const LEARNING_REPORT_SETTINGS_DEFAULTS = {
+  reportEmail: '',
+  reportDay: 1,
+  inactivityThresholdDays: 14,
+  reminderFrequencyDays: 14,
+  rankingEnabled: true,
+  leaderboardVisible: false
+};
+
+async function loadLearningReportSettings(){
+  const snap = await adminStateCollection.doc('learningReportSettings').get();
+  learningReportSettings = Object.assign({}, LEARNING_REPORT_SETTINGS_DEFAULTS, snap.exists ? snap.data() : {});
+}
+
+async function saveLearningReportSettings(patch){
+  learningReportSettings = Object.assign({}, learningReportSettings, patch);
+  await adminStateCollection.doc('learningReportSettings').set(learningReportSettings, { merge: true });
+}
+
+function reportSettingsHtml(){
+  if(!learningReportSettings) return '<div class="s-empty">Loading settings…</div>';
+  const s = learningReportSettings;
+  return `
+    <div class="lrn-admin-settings">
+      <label class="lrn-admin-settings-row">
+        <span>Monthly report recipient email</span>
+        <input type="email" class="lrn-admin-search" id="lrnSettingReportEmail" placeholder="name@oryxdoors.com" value="${escapeHtml(s.reportEmail || '')}">
+      </label>
+      <label class="lrn-admin-settings-row">
+        <span>Day of month the report is sent</span>
+        <input type="number" min="1" max="28" class="lrn-admin-search" id="lrnSettingReportDay" value="${s.reportDay}">
+      </label>
+      <label class="lrn-admin-settings-row">
+        <span>Inactive after (days with no activity)</span>
+        <input type="number" min="1" class="lrn-admin-search" id="lrnSettingInactivityDays" value="${s.inactivityThresholdDays}">
+      </label>
+      <label class="lrn-admin-settings-row">
+        <span>Don't remind again for (days)</span>
+        <input type="number" min="1" class="lrn-admin-search" id="lrnSettingReminderFrequency" value="${s.reminderFrequencyDays}">
+      </label>
+      <label class="lrn-admin-settings-row lrn-admin-settings-row--check">
+        <span>Ranking enabled</span>
+        <input type="checkbox" class="lrn-admin-checkbox" id="lrnSettingRankingEnabled" ${s.rankingEnabled ? 'checked' : ''}>
+      </label>
+      <label class="lrn-admin-settings-row lrn-admin-settings-row--check">
+        <span>Show a public leaderboard to all staff</span>
+        <input type="checkbox" class="lrn-admin-checkbox" id="lrnSettingLeaderboardVisible" ${s.leaderboardVisible ? 'checked' : ''}>
+      </label>
+      <p class="lrn-admin-settings-note">Rankings, achievements, and reminders update overnight — not instantly. Settings saved here apply on the next scheduled run.</p>
+      <div id="lrnSettingsSaveStatus" class="lrn-admin-settings-status"></div>
+    </div>`;
+}
+
+function bindReportSettings(){
+  const fieldMap = [
+    ['lrnSettingReportEmail', 'reportEmail', v => v.trim()],
+    ['lrnSettingReportDay', 'reportDay', v => Math.min(28, Math.max(1, Number(v) || 1))],
+    ['lrnSettingInactivityDays', 'inactivityThresholdDays', v => Math.max(1, Number(v) || 1)],
+    ['lrnSettingReminderFrequency', 'reminderFrequencyDays', v => Math.max(1, Number(v) || 1)],
+    ['lrnSettingRankingEnabled', 'rankingEnabled', (v, el) => el.checked],
+    ['lrnSettingLeaderboardVisible', 'leaderboardVisible', (v, el) => el.checked]
+  ];
+  fieldMap.forEach(([id, key, transform]) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const eventName = el.type === 'checkbox' ? 'change' : 'blur';
+    el.addEventListener(eventName, async () => {
+      const value = transform(el.value, el);
+      const status = document.getElementById('lrnSettingsSaveStatus');
+      if(status) status.textContent = 'Saving…';
+      try{
+        await saveLearningReportSettings({ [key]: value });
+        if(status) status.textContent = 'Saved.';
+      }catch(e){
+        if(status) status.textContent = 'Could not save — check your connection and try again.';
+      }
+    });
+  });
+}
+
+// ---- Employee table state (search/filter/sort) ----
+let learningAdminSearch = '';
+let learningAdminStatusFilter = 'all'; // all | active | inactive | top | improved | encourage
+let learningAdminSort = { key: 'score', dir: 'desc' };
+const INACTIVE_DAYS_THRESHOLD = 14; // local display-only threshold for the "Inactive" status column — separate from the admin-configurable reminder threshold used by the scheduled ranking/reminder job
+
+// Every path total in one place — the ranking formula and the employee table
+// both need "how many lessons exist across all 5 levels" (currently 40).
+function totalLessonCount(){
+  return LEARNING_LEVEL_ORDER.reduce((sum, lv) => sum + ((LEARNING_PATHS[lv] || []).length), 0);
+}
+
+// Average % progress across all 5 levels for one doc — rewards well-rounded
+// progress rather than raw volume, matching the "Overall Learning Progress"
+// ranking factor.
+function docOverallProgressPct(doc){
+  const pcts = LEARNING_LEVEL_ORDER.map(lv => {
+    const path = LEARNING_PATHS[lv] || [];
+    if(!path.length) return 0;
+    const done = path.filter(id => (doc.completedLessons || []).includes(id)).length;
+    return (done / path.length) * 100;
+  });
+  return pcts.reduce((a, b) => a + b, 0) / pcts.length;
+}
+
+// How many AI levels this employee has moved up since their first recorded
+// assessment — never negative, never rewards a high starting level.
+function docLevelImprovement(doc){
+  const current = doc.currentLevel || (doc.assessmentResult && doc.assessmentResult.level);
+  if(!current) return null;
+  const history = doc.assessmentHistory || [];
+  const firstLevel = history.length ? history[0].level : current;
+  const delta = LEARNING_LEVEL_ORDER.indexOf(current) - LEARNING_LEVEL_ORDER.indexOf(firstLevel);
+  return Math.max(0, delta);
+}
+
+// The official rankingScore is only ever written by the scheduled ranking job
+// (see plan) — until that's run at least once for a doc, the admin table
+// falls back to a client-side estimate using only the factors we can compute
+// here (progress, lessons, assessment score, streak — reweighted to still sum
+// to 100%). Consistency and level-improvement (25% of the real formula) are
+// left to the real job since they need org-wide/day-log data this estimate
+// doesn't have — so this is always labeled "(est.)" in the UI, never treated
+// as the real score.
+function docQuickScoreEstimate(doc){
+  const progressPct = docOverallProgressPct(doc);
+  const lessonsPct = Math.min(100, ((doc.completedLessons || []).length / totalLessonCount()) * 100);
+  const scorePct = doc.assessmentResult ? doc.assessmentResult.score : 0;
+  const streakPct = Math.min(100, ((doc.streak || 0) / 30) * 100);
+  const weightSum = 0.30 + 0.20 + 0.20 + 0.05;
+  const raw = progressPct * 0.30 + lessonsPct * 0.20 + scorePct * 0.20 + streakPct * 0.05;
+  return Math.round(raw / weightSum);
+}
+
+function docDaysSinceActive(doc){
+  if(!doc.lastActiveDate) return null;
+  return Math.floor((Date.now() - new Date(doc.lastActiveDate).getTime()) / (24 * 60 * 60 * 1000));
+}
+
+function docStatusLabel(doc){
+  const days = docDaysSinceActive(doc);
+  if(days == null) return { key: 'inactive', label: 'Inactive' };
+  return days <= INACTIVE_DAYS_THRESHOLD ? { key: 'active', label: 'Active' } : { key: 'inactive', label: 'Inactive' };
+}
+
+// Builds the row data every filter/sort/search operates on — computed once
+// per render from whatever docs are already in scope (department-filtered).
+function employeeRows(docs){
+  return docs.map(d => {
+    const hasOfficialScore = d.rankingScore != null;
+    const score = hasOfficialScore ? d.rankingScore : docQuickScoreEstimate(d);
+    const improvement = docLevelImprovement(d);
+    const status = docStatusLabel(d);
+    return {
+      uid: d.uid,
+      email: d.userEmail || d.uid,
+      department: d.department || 'Unassigned',
+      level: d.currentLevel || (d.assessmentResult && d.assessmentResult.level) || null,
+      lessons: (d.completedLessons || []).length,
+      assessmentScore: d.assessmentResult ? d.assessmentResult.score : null,
+      progressPct: Math.round(docOverallProgressPct(d)),
+      lastActiveDate: d.lastActiveDate,
+      daysSinceActive: docDaysSinceActive(d),
+      streak: d.streak || 0,
+      improvement,
+      score,
+      scoreIsEstimate: !hasOfficialScore,
+      rank: d.rank,
+      rankTotal: d.rankTotal,
+      statusKey: status.key,
+      statusLabel: status.label
+    };
+  });
+}
+
+function filterAndSortEmployeeRows(rows){
+  let filtered = rows;
+  const q = learningAdminSearch.trim().toLowerCase();
+  if(q) filtered = filtered.filter(r => r.email.toLowerCase().includes(q));
+
+  if(learningAdminStatusFilter === 'active') filtered = filtered.filter(r => r.statusKey === 'active');
+  else if(learningAdminStatusFilter === 'inactive') filtered = filtered.filter(r => r.statusKey === 'inactive');
+  else if(learningAdminStatusFilter === 'top'){
+    const sorted = filtered.slice().sort((a, b) => b.score - a.score);
+    filtered = sorted.slice(0, Math.max(1, Math.ceil(sorted.length * 0.1))); // top 10%
+  }else if(learningAdminStatusFilter === 'improved'){
+    filtered = filtered.filter(r => (r.improvement || 0) >= 1).sort((a, b) => (b.improvement || 0) - (a.improvement || 0));
+  }else if(learningAdminStatusFilter === 'encourage'){
+    filtered = filtered.filter(r => r.statusKey === 'inactive' || r.progressPct < 20);
+  }
+
+  const { key, dir } = learningAdminSort;
+  const mult = dir === 'asc' ? 1 : -1;
+  filtered = filtered.slice().sort((a, b) => {
+    let av = a[key], bv = b[key];
+    if(key === 'email' || key === 'level' || key === 'statusLabel'){
+      av = (av || '').toString().toLowerCase(); bv = (bv || '').toString().toLowerCase();
+      return av < bv ? -mult : av > bv ? mult : 0;
+    }
+    av = av == null ? -Infinity : av; bv = bv == null ? -Infinity : bv;
+    return (av - bv) * mult;
+  });
+  return filtered;
+}
+
+function employeeTableHtml(rows){
+  if(!rows.length) return '<div class="s-empty">No employees match this search/filter.</div>';
+  const col = (key, label) => {
+    const active = learningAdminSort.key === key;
+    const arrow = active ? (learningAdminSort.dir === 'asc' ? ' ▲' : ' ▼') : '';
+    return `<th data-sort-key="${key}" class="${active ? 'sorted' : ''}">${label}${arrow}</th>`;
+  };
+  return `
+    <div class="lrn-admin-table-wrap">
+      <table class="lrn-admin-table">
+        <thead>
+          <tr>
+            ${col('email', 'Employee')}
+            ${col('level', 'AI Level')}
+            ${col('lessons', 'Lessons')}
+            ${col('assessmentScore', 'Assessment')}
+            ${col('progressPct', 'Progress')}
+            ${col('lastActiveDate', 'Last Activity')}
+            ${col('streak', 'Streak')}
+            ${col('improvement', 'Improvement')}
+            ${col('rank', 'Rank')}
+            ${col('score', 'Score')}
+            ${col('statusLabel', 'Status')}
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => {
+            const meta = r.level ? LEVEL_META[r.level] : null;
+            return `
+              <tr>
+                <td>${escapeHtml(r.email)}<div class="lrn-admin-table-dept">${escapeHtml(r.department)}</div></td>
+                <td>${meta ? `${meta.emoji} ${escapeHtml(meta.label)}` : '—'}</td>
+                <td>${r.lessons}</td>
+                <td>${r.assessmentScore != null ? r.assessmentScore + '%' : '—'}</td>
+                <td>${r.progressPct}%</td>
+                <td>${r.lastActiveDate ? new Date(r.lastActiveDate).toLocaleDateString() : '—'}${r.daysSinceActive != null ? ` <span class="lrn-admin-table-dim">(${r.daysSinceActive}d ago)</span>` : ''}</td>
+                <td>${r.streak}</td>
+                <td>${r.improvement != null ? '+' + r.improvement : '—'}</td>
+                <td>${r.rank != null ? '#' + r.rank + (r.rankTotal ? ' of ' + r.rankTotal : '') : '—'}</td>
+                <td>${r.score}${r.scoreIsEstimate ? ' <span class="lrn-admin-table-dim" title="Official ranking not computed yet — this is a rough estimate from what we can see today.">(est.)</span>' : ''}</td>
+                <td><span class="lrn-admin-status lrn-admin-status--${r.statusKey}">${escapeHtml(r.statusLabel)}</span></td>
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
 function exitLearningAdminMode(){
   if(!hubMainEl.classList.contains('learning-admin-mode')) return;
   hubMainEl.classList.remove('learning-admin-mode');
@@ -190,6 +447,12 @@ function renderLearningAdmin(){
     });
     return;
   }
+  if(!learningReportSettings){
+    loadLearningReportSettings().then(renderLearningAdmin).catch(() => {
+      learningReportSettings = Object.assign({}, LEARNING_REPORT_SETTINGS_DEFAULTS);
+      renderLearningAdmin();
+    });
+  }
 
   const scopedDocs = learningAdminDept === 'all'
     ? learningAdminDocs
@@ -226,6 +489,20 @@ function renderLearningAdmin(){
       <div class="analytics-kpi"><span class="analytics-kpi-label">Active (30 days)</span><span class="analytics-kpi-value">${stats.activeMonth}</span></div>
     </div>
 
+    <h3 class="analytics-section-head" style="margin-top:28px;">Employee Learning Progress</h3>
+    <div class="lrn-admin-table-controls">
+      <input type="search" class="lrn-admin-search" id="learningAdminSearch" placeholder="Search by email…" value="${escapeHtml(learningAdminSearch)}">
+      <select class="filter-select" id="learningAdminStatusFilter">
+        <option value="all"${learningAdminStatusFilter === 'all' ? ' selected' : ''}>All employees</option>
+        <option value="active"${learningAdminStatusFilter === 'active' ? ' selected' : ''}>Active (last ${INACTIVE_DAYS_THRESHOLD} days)</option>
+        <option value="inactive"${learningAdminStatusFilter === 'inactive' ? ' selected' : ''}>Inactive</option>
+        <option value="top"${learningAdminStatusFilter === 'top' ? ' selected' : ''}>Top performers</option>
+        <option value="improved"${learningAdminStatusFilter === 'improved' ? ' selected' : ''}>Most improved</option>
+        <option value="encourage"${learningAdminStatusFilter === 'encourage' ? ' selected' : ''}>Needs encouragement</option>
+      </select>
+    </div>
+    ${employeeTableHtml(filterAndSortEmployeeRows(employeeRows(scopedDocs)))}
+
     <h3 class="analytics-section-head" style="margin-top:28px;">Challenges Awaiting Review${pendingChallenges.length ? ` (${pendingChallenges.length})` : ''}</h3>
     <div id="learningAdminPendingChallenges">${pendingChallengesHtml(pendingChallenges)}</div>
 
@@ -252,6 +529,9 @@ function renderLearningAdmin(){
       `).join('') : '<div class="s-empty">No resources completed yet.</div>'}
     </div>
 
+    <h3 class="analytics-section-head" style="margin-top:28px;">Report &amp; Reminder Settings</h3>
+    ${reportSettingsHtml()}
+
     <p class="analytics-footnote">
       <button class="lrn-btn-text" id="learningAdminRefresh">Refresh data</button>
     </p>
@@ -260,12 +540,39 @@ function renderLearningAdmin(){
   const refreshBtn = document.getElementById('learningAdminRefresh');
   if(refreshBtn) refreshBtn.addEventListener('click', () => { learningAdminDocs = null; renderLearningAdmin(); });
 
+  bindReportSettings();
   bindPendingChallenges(learningAdminView);
 
   const deptSelect = document.getElementById('learningAdminDeptSelect');
   if(deptSelect) deptSelect.addEventListener('change', () => {
     learningAdminDept = deptSelect.value;
     renderLearningAdmin();
+  });
+
+  const searchInput = document.getElementById('learningAdminSearch');
+  if(searchInput){
+    searchInput.addEventListener('input', () => {
+      learningAdminSearch = searchInput.value;
+      renderLearningAdmin();
+      const el = document.getElementById('learningAdminSearch');
+      if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+    });
+  }
+  const statusFilter = document.getElementById('learningAdminStatusFilter');
+  if(statusFilter) statusFilter.addEventListener('change', () => {
+    learningAdminStatusFilter = statusFilter.value;
+    renderLearningAdmin();
+  });
+  learningAdminView.querySelectorAll('.lrn-admin-table th[data-sort-key]').forEach(th => {
+    th.addEventListener('click', () => {
+      const key = th.dataset.sortKey;
+      if(learningAdminSort.key === key){
+        learningAdminSort.dir = learningAdminSort.dir === 'asc' ? 'desc' : 'asc';
+      }else{
+        learningAdminSort = { key, dir: 'desc' };
+      }
+      renderLearningAdmin();
+    });
   });
 }
 
@@ -278,6 +585,7 @@ function enterLearningAdminMode(){
   repositionAllTabIndicators();
   learningAdminDocs = null; // always fetch fresh on entry
   learningAdminDept = 'all';
+  learningReportSettings = null; // always fetch fresh on entry
   renderLearningAdmin();
 }
 
