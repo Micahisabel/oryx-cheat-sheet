@@ -258,7 +258,7 @@ const LESSON_LIBRARY = {
       question: 'What is the best way to think of an AI assistant?',
       options: [
         { text: 'A search engine that copies web pages', correct: false },
-        { text: 'An assistant that generates helpful replies based on your instructions', correct: true },
+        { text: 'An assistant that writes helpful replies based on what you type', correct: true },
         { text: 'A robot that only follows fixed menu options', correct: false }
       ]
     }
@@ -272,7 +272,7 @@ const LESSON_LIBRARY = {
     quiz: {
       question: 'Why should you double-check important facts from AI?',
       options: [
-        { text: 'Because AI generates likely answers, which can occasionally be wrong', correct: true },
+        { text: 'Because AI guesses the most likely answer, and that guess can sometimes be wrong', correct: true },
         { text: 'Because AI never gives useful answers', correct: false },
         { text: 'Because AI charges more for correct answers', correct: false }
       ]
@@ -303,7 +303,7 @@ const LESSON_LIBRARY = {
       question: 'What makes a prompt more likely to get a useful reply?',
       options: [
         { text: 'Keeping it as short and vague as possible', correct: false },
-        { text: 'Being specific about the task, audience, and tone', correct: true },
+        { text: 'Being clear about the task, who it\'s for, and how it should sound', correct: true },
         { text: 'Only ever asking one-word questions', correct: false }
       ]
     }
@@ -409,7 +409,7 @@ const LESSON_LIBRARY = {
     quiz: {
       question: 'Why might it help to try more than one AI assistant?',
       options: [
-        { text: 'Each has its own strengths and fits differently into your workflow', correct: true },
+        { text: 'Each one is good at different things and fits differently into how you work', correct: true },
         { text: 'They are all identical with no real differences', correct: false },
         { text: 'Only one AI assistant is allowed to exist', correct: false }
       ]
@@ -484,7 +484,7 @@ const LESSON_LIBRARY = {
     quiz: {
       question: 'What\'s the natural next step after building basic AI habits?',
       options: [
-        { text: 'Learning more structure, like reusable prompts and simple workflows', correct: true },
+        { text: 'Learning more structure, like prompts you can reuse and simple step-by-step routines', correct: true },
         { text: 'Stopping using AI altogether', correct: false },
         { text: 'Only ever using AI for one single task forever', correct: false }
       ]
@@ -574,7 +574,7 @@ const LESSON_LIBRARY = {
     practice: 'Pick one upcoming business task and ask AI to help you prepare for it.',
     practiceExample: '"Draft 3 talking points for tomorrow\'s call with our aluminium supplier about the price increase."',
     quiz: {
-      question: 'What should always happen before a customer- or finance-facing AI draft is sent?',
+      question: 'What should always happen before an AI draft about a customer or money is sent?',
       options: [
         { text: 'A human review step', correct: true },
         { text: 'Nothing — send it straight away', correct: false },
@@ -591,7 +591,7 @@ const LESSON_LIBRARY = {
     quiz: {
       question: 'Why break a task into steps for AI instead of one big request?',
       options: [
-        { text: 'Each step gets clearer attention, making the overall result more reliable', correct: true },
+        { text: 'Each step gets more focus, so the final result is more reliable', correct: true },
         { text: 'It uses fewer words overall', correct: false },
         { text: 'AI can only handle one sentence at a time', correct: false }
       ]
@@ -850,7 +850,7 @@ const LESSON_LIBRARY = {
     quiz: {
       question: 'What\'s the shift expert-level AI thinking makes?',
       options: [
-        { text: 'From single prompts to designing complete end-to-end systems', correct: true },
+        { text: 'From writing single prompts to designing a full system, start to finish', correct: true },
         { text: 'From using AI to never using AI', correct: false },
         { text: 'From written prompts to only spoken prompts', correct: false }
       ]
