@@ -53,6 +53,7 @@ function defaultProgress(){
     resourceProgress: {},         // { [entryId]: { status:'in-progress'|'completed', startedAt, completedAt, quizPassed } }
     department: null,             // one of LIBRARY_DEPARTMENTS, or null until self-selected
     userEmail: null,              // mirrored from firebase.auth() so the admin dashboard can label rows
+    userName: null,               // mirrored from firebase.auth() (display name, if set) so reports can show a real name
     levelChallenges: {},          // { [levelKey]: { status:'submitted'|'passed'|'needs_improvement', attempts:[{submittedAt,evidenceType,evidenceUrl,evidenceFileName,explanation,reviewedAt,reviewedBy,reviewStatus,reviewNote}] } } — see CHALLENGE_LIBRARY in learning-data.js
     activityDates: [],            // rolling log of 'YYYY-MM-DD' days the learner was active, trimmed to the last 90 — powers the ranking system's consistency score (see bumpStreak())
     progressHistory: [],          // [{date, xp, completedLessonsCount, score}] — capped snapshot log powering the personal progress graph
@@ -116,7 +117,10 @@ function loadLocalProgress(){
 
 function saveProgress(){
   const user = firebase.auth().currentUser;
-  if(user && progress) progress.userEmail = user.email || null;
+  if(user && progress){
+    progress.userEmail = user.email || null;
+    progress.userName = user.displayName || null; // mirrored so the admin table/reports can show a real name instead of just an email
+  }
   const key = learningStorageKey(user && user.uid);
   if(key){ try{ localStorage.setItem(key, JSON.stringify(progress)); }catch(e){} }
   if(user && typeof learningCollection !== 'undefined'){

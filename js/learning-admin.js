@@ -168,6 +168,7 @@ function employeeRows(docs){
     const status = docStatusLabel(d);
     return {
       uid: d.uid,
+      name: d.userName || null,
       email: d.userEmail || d.uid,
       department: d.department || 'Unassigned',
       level: d.currentLevel || (d.assessmentResult && d.assessmentResult.level) || null,
@@ -191,7 +192,7 @@ function employeeRows(docs){
 function filterAndSortEmployeeRows(rows){
   let filtered = rows;
   const q = learningAdminSearch.trim().toLowerCase();
-  if(q) filtered = filtered.filter(r => r.email.toLowerCase().includes(q));
+  if(q) filtered = filtered.filter(r => r.email.toLowerCase().includes(q) || (r.name && r.name.toLowerCase().includes(q)));
 
   if(learningAdminStatusFilter === 'active') filtered = filtered.filter(r => r.statusKey === 'active');
   else if(learningAdminStatusFilter === 'inactive') filtered = filtered.filter(r => r.statusKey === 'inactive');
@@ -248,7 +249,7 @@ function employeeTableHtml(rows){
             const meta = r.level ? LEVEL_META[r.level] : null;
             return `
               <tr>
-                <td>${escapeHtml(r.email)}<div class="lrn-admin-table-dept">${escapeHtml(r.department)}</div></td>
+                <td>${r.name ? `${escapeHtml(r.name)}<div class="lrn-admin-table-dim">${escapeHtml(r.email)}</div>` : escapeHtml(r.email)}<div class="lrn-admin-table-dept">${escapeHtml(r.department)}</div></td>
                 <td>${meta ? `${meta.emoji} ${escapeHtml(meta.label)}` : '—'}</td>
                 <td>${r.lessons}</td>
                 <td>${r.assessmentScore != null ? r.assessmentScore + '%' : '—'}</td>
