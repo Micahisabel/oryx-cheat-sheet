@@ -1139,7 +1139,7 @@ function renderChallenge(){
       ${challengeHowToHtml()}
 
       <div class="lrn-challenge-card">
-        <h3>Your submission</h3>
+        <h3>Your submission <span class="lrn-required-mark">*</span></h3>
         <div class="lrn-evidence-picker">
           <button class="lrn-evidence-picker-btn ${activeChallenge.evidenceType === 'file' ? 'active' : ''}" data-type="file">Upload file/screenshot</button>
           <button class="lrn-evidence-picker-btn ${activeChallenge.evidenceType === 'link' ? 'active' : ''}" data-type="link">Link</button>
@@ -1153,7 +1153,7 @@ function renderChallenge(){
           <input type="url" class="lrn-explanation-input" id="lrnChallengeLink" placeholder="https://…" value="${escapeHtml(activeChallenge.link || '')}">` : ''}
         <div id="lrnEvidenceError" class="lrn-field-error" style="display:none;"></div>
 
-        <h3>Explanation</h3>
+        <h3>Explanation <span class="lrn-required-mark">*</span></h3>
         <p class="lrn-practice-hint">Briefly explain what you did and how you used AI.</p>
         <textarea class="lrn-explanation-input" id="lrnChallengeExplanation" placeholder="Explain what you did and how you used AI…">${escapeHtml(activeChallenge.explanation || '')}</textarea>
         <div id="lrnExplanationError" class="lrn-field-error" style="display:none;"></div>
