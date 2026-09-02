@@ -65,3 +65,5 @@
   .hub-main.learning-admin-mode #learningAdminView{display:block !important;}
   .hub-main.dept-files-mode > *:not(#deptFilesView){display:none !important;}
   .hub-main.dept-files-mode #deptFilesView{display:block !important;}
+  .hub-main.settings-mode > *:not(#settingsView){display:none !important;}
+  .hub-main.settings-mode #settingsView{display:block !important;}

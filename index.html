@@ -6,7 +6,7 @@
 <title>AI Knowledge Hub</title>
 <!-- Deployed app version. MUST match version.json. Bump BOTH together on every deploy
      that should push an update to open tabs (see the version-check script before </body>). -->
-<script>window.APP_VERSION = "2026-09-02.142";</script>
+<script>window.APP_VERSION = "2026-09-02.143";</script>
 <link rel="icon" type="image/png" href="assets/logos/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,11 +16,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="css/style.css?v=4">
-<link rel="stylesheet" href="css/layout.css?v=11">
+<link rel="stylesheet" href="css/layout.css?v=12">
 <link rel="stylesheet" href="css/sidebar.css?v=16">
 <link rel="stylesheet" href="css/dashboard.css?v=10">
 <link rel="stylesheet" href="css/cards.css?v=20">
-<link rel="stylesheet" href="css/modal.css?v=35">
+<link rel="stylesheet" href="css/modal.css?v=36">
 <link rel="stylesheet" href="css/forms.css?v=22">
 <link rel="stylesheet" href="css/dept-files.css?v=7">
 <link rel="stylesheet" href="css/learning.css?v=16">
@@ -69,23 +69,6 @@
 </div>
 
 <!-- My AI Progress (assessment result + learning record, saved to the signed-in user's profile) -->
-<!-- Settings (admin only) — a category list on the left, the selected category's
-     settings form on the right. Only one category exists today (Report & Reminder),
-     but this shell is built to hold more as the Hub grows. -->
-<div class="overlay" id="settingsOverlay">
-  <div class="panel panel-wide">
-    <button class="close-x" id="closeSettings">&times;</button>
-    <h2>Settings</h2>
-    <p class="sub">Hub configuration</p>
-    <div class="settings-layout">
-      <nav class="settings-categories" id="settingsCategories">
-        <button class="settings-cat-btn active" data-cat="reportReminder">Report &amp; Reminder</button>
-      </nav>
-      <div class="settings-content" id="settingsContent"></div>
-    </div>
-  </div>
-</div>
-
 <div class="overlay" id="myAiProgressOverlay">
   <div class="panel">
     <button class="close-x" id="closeMyAiProgress">&times;</button>
@@ -281,6 +264,7 @@
       <div class="analytics-view" id="analyticsView" style="display:none;"></div>
       <div class="analytics-view" id="learningAdminView" style="display:none;"></div>
       <div class="dept-files-view" id="deptFilesView" style="display:none;"></div>
+      <div class="analytics-view" id="settingsView" style="display:none;"></div>
     </main>
   </div>
 </div>
@@ -812,7 +796,7 @@
 <script src="js/constants.js?v=46"></script>
 <script src="js/learning-data.js?v=12"></script>
 <script src="js/state.js?v=20"></script>
-<script src="js/sidebar.js?v=32"></script>
+<script src="js/sidebar.js?v=33"></script>
 <script src="js/entries.js?v=61"></script>
 <script src="js/skill-detail.js?v=40"></script>
 <script src="js/add-entry.js?v=25"></script>
@@ -820,13 +804,13 @@
 <script src="js/admin.js?v=24"></script>
 <script src="js/suggest.js?v=45"></script>
 <script src="js/favorites.js?v=4"></script>
-<script src="js/learning.js?v=34"></script>
+<script src="js/learning.js?v=35"></script>
 <script src="js/notifications.js?v=8"></script>
 <script src="js/activity.js?v=3"></script>
 <script src="js/review.js?v=15"></script>
-<script src="js/analytics.js?v=6"></script>
-<script src="js/learning-admin.js?v=6"></script>
-<script src="js/dept-files.js?v=9"></script>
+<script src="js/analytics.js?v=7"></script>
+<script src="js/learning-admin.js?v=7"></script>
+<script src="js/dept-files.js?v=10"></script>
 <script src="js/app.js?v=18"></script>
 <script src="js/tab-overflow.js?v=6"></script>
 

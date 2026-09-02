@@ -28,6 +28,7 @@ function enterShortcutsMode(group){
   exitAnalyticsMode();
   if(typeof exitDeptFilesMode === "function") exitDeptFilesMode();
   if(typeof exitLearningAdminMode === "function") exitLearningAdminMode();
+  if(typeof exitSettingsMode === "function") exitSettingsMode();
   viewMode = 'shortcuts';
   shortcutGroup = group;
   const cats = group === 'chatgpt' ? CHATGPT_SHORTCUT_CATS : CLAUDE_SHORTCUT_CATS;
@@ -137,6 +138,7 @@ platformNav.addEventListener('click', (ev) => {
   exitAnalyticsMode();
   if(typeof exitDeptFilesMode === "function") exitDeptFilesMode();
   if(typeof exitLearningAdminMode === "function") exitLearningAdminMode();
+  if(typeof exitSettingsMode === "function") exitSettingsMode();
   platformNav.querySelectorAll('.platform-item').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   activePlatform = btn.dataset.platform;

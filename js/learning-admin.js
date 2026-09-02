@@ -580,6 +580,7 @@ function renderLearningAdmin(){
 function enterLearningAdminMode(){
   if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
   if(typeof exitDeptFilesMode === 'function') exitDeptFilesMode();
+  if(typeof exitSettingsMode === 'function') exitSettingsMode();
   document.querySelectorAll('.platform-item.active, .platform-submenu-item.active').forEach(b => b.classList.remove('active'));
   openLearningAdminNavBtn.classList.add('active');
   hubMainEl.classList.add('learning-admin-mode');
@@ -593,42 +594,78 @@ function enterLearningAdminMode(){
 openLearningAdminNavBtn.addEventListener('click', enterLearningAdminMode);
 
 // ---------------------------------------------------------------------------
-// Settings overlay (admin only) — a category list + the selected category's
-// form. Reuses the same reportSettingsHtml()/bindReportSettings() as the
-// Report & Reminder section on the AI Capability dashboard, so there's only
-// one place that settings form's markup/logic lives.
+// Settings page (admin only) — a full page like AI Capability/Analytics, not
+// a slide-in panel. A category list on the left, the selected category's form
+// on the right. Reuses the same reportSettingsHtml()/bindReportSettings() as
+// the Report & Reminder section used to show inline on the AI Capability
+// dashboard, so there's only one place that settings form's markup/logic lives.
 // ---------------------------------------------------------------------------
-const settingsOverlay = document.getElementById('settingsOverlay');
-const settingsContent = document.getElementById('settingsContent');
+const settingsView = document.getElementById('settingsView');
 const openSettingsNavBtn = document.getElementById('openSettingsNav');
 let activeSettingsCategory = 'reportReminder';
 
+const SETTINGS_CATEGORIES = [
+  { key: 'reportReminder', label: 'Report & Reminder' }
+];
+
 const SETTINGS_CATEGORY_RENDERERS = {
-  reportReminder: () => {
-    settingsContent.innerHTML = reportSettingsHtml();
+  reportReminder: (container) => {
+    container.innerHTML = reportSettingsHtml();
     bindReportSettings();
   }
 };
 
+function settingsCategoryNavHtml(){
+  return SETTINGS_CATEGORIES.map(c => `
+    <button class="settings-cat-btn${c.key === activeSettingsCategory ? ' active' : ''}" data-cat="${c.key}">${escapeHtml(c.label)}</button>
+  `).join('');
+}
+
+function renderSettingsPage(){
+  settingsView.innerHTML = `
+    <div class="analytics-page-head">
+      <h2>Settings</h2>
+      <p class="analytics-page-sub">Hub configuration</p>
+    </div>
+    <div class="settings-layout">
+      <nav class="settings-categories" id="settingsCategories">${settingsCategoryNavHtml()}</nav>
+      <div class="settings-content" id="settingsContent"><div class="s-empty">Loading settings…</div></div>
+    </div>`;
+  settingsView.querySelectorAll('.settings-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => renderSettingsCategory(btn.dataset.cat));
+  });
+  renderSettingsCategory(activeSettingsCategory);
+}
+
 function renderSettingsCategory(cat){
   activeSettingsCategory = cat;
-  document.querySelectorAll('.settings-cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  settingsView.querySelectorAll('.settings-cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  const container = document.getElementById('settingsContent');
   const renderer = SETTINGS_CATEGORY_RENDERERS[cat];
-  if(renderer) renderer();
-}
-
-function openSettingsOverlay(){
-  if(typeof closeAccountMenu === 'function') closeAccountMenu();
-  learningReportSettings = null; // always fetch fresh on entry
-  settingsContent.innerHTML = '<div class="s-empty">Loading settings…</div>';
-  settingsOverlay.classList.add('open');
+  if(!renderer){ container.innerHTML = '<div class="s-empty">Nothing here yet.</div>'; return; }
+  if(learningReportSettings){ renderer(container); return; }
+  container.innerHTML = '<div class="s-empty">Loading settings…</div>';
   loadLearningReportSettings()
-    .then(() => renderSettingsCategory(activeSettingsCategory))
-    .catch(() => { settingsContent.innerHTML = '<div class="s-empty">Could not load settings. Check your connection and try again.</div>'; });
+    .then(() => renderer(container))
+    .catch(() => { container.innerHTML = '<div class="s-empty">Could not load settings. Check your connection and try again.</div>'; });
 }
 
-if(openSettingsNavBtn) openSettingsNavBtn.addEventListener('click', openSettingsOverlay);
-document.getElementById('closeSettings').addEventListener('click', () => settingsOverlay.classList.remove('open'));
-document.querySelectorAll('.settings-cat-btn').forEach(btn => {
-  btn.addEventListener('click', () => renderSettingsCategory(btn.dataset.cat));
-});
+function exitSettingsMode(){
+  if(!hubMainEl.classList.contains('settings-mode')) return;
+  hubMainEl.classList.remove('settings-mode');
+  openSettingsNavBtn.classList.remove('active');
+}
+
+function enterSettingsMode(){
+  if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
+  if(typeof exitLearningAdminMode === 'function') exitLearningAdminMode();
+  if(typeof exitDeptFilesMode === 'function') exitDeptFilesMode();
+  document.querySelectorAll('.platform-item.active, .platform-submenu-item.active, .sidebar-analytics-item.active').forEach(b => b.classList.remove('active'));
+  openSettingsNavBtn.classList.add('active');
+  hubMainEl.classList.add('settings-mode');
+  if(typeof repositionAllTabIndicators === 'function') repositionAllTabIndicators();
+  learningReportSettings = null; // always fetch fresh on entry
+  renderSettingsPage();
+}
+
+if(openSettingsNavBtn) openSettingsNavBtn.addEventListener('click', enterSettingsMode);

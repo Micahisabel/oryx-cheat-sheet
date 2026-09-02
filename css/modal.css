@@ -397,8 +397,7 @@
 .skill-thumb .video-embed{max-width:560px;}
 .skill-thumb .video-embed-portrait{max-width:320px;}
 
-  /* ---------- Settings overlay (admin only) ---------- */
-  .panel-wide{width:640px;}
+  /* ---------- Settings page (admin only) ---------- */
   .settings-layout{display:flex;gap:24px;align-items:flex-start;}
   .settings-categories{display:flex;flex-direction:column;gap:4px;flex-shrink:0;width:160px;}
   .settings-cat-btn{

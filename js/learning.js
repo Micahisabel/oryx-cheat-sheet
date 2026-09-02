@@ -192,6 +192,7 @@ async function enterLearning(){
   if(!signedIn) return;
   if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
   if(typeof exitLearningAdminMode === 'function') exitLearningAdminMode();
+  if(typeof exitSettingsMode === 'function') exitSettingsMode();
   document.querySelectorAll('.platform-item.active, .sidebar-analytics-item.active').forEach(b => b.classList.remove('active'));
   if(openLearningNavBtn) openLearningNavBtn.classList.add('active');
   viewNotes.classList.remove('active');
