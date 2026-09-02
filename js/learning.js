@@ -232,9 +232,9 @@ function topbar({ showProgress = null, showBackToApp = true } = {}){
     </div>`;
 }
 
-function bindTopbar(){
+function bindTopbar(onBack){
   const exitBtn = document.getElementById('lrnExitBtn');
-  if(exitBtn) exitBtn.addEventListener('click', exitLearningView);
+  if(exitBtn) exitBtn.addEventListener('click', onBack || exitLearningView);
 }
 
 // ---------------------------------------------------------------------------
@@ -935,7 +935,12 @@ function renderLesson(){
         </div>` : ''}
       ${body}
     </div>`;
-  bindTopbar();
+  bindTopbar(() => {
+    reviewLevel = activeLesson.levelKey;
+    dashboardTab = 'path';
+    learningScreen = 'dashboard';
+    renderLearning();
+  });
 
   const nextBtn = document.getElementById('lrnNextStep');
   if(nextBtn) nextBtn.addEventListener('click', advanceLessonStep);
