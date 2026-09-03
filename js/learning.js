@@ -16,7 +16,7 @@ const viewLearning = document.getElementById('view-learning');
 const viewNotes = document.getElementById('view-notes');
 const openLearningNavBtn = document.getElementById('openLearningNav');
 
-let learningScreen = 'onboarding'; // onboarding | department | assessment | results | dashboard | lesson
+let learningScreen = 'onboarding'; // onboarding | department | plan | assessment | results | dashboard | lesson
 let progress = null;              // the learner's saved progress object
 let learningUnsub = null;         // Firestore snapshot unsubscribe
 let learningLastUid = null;       // uid the in-memory `progress` currently belongs to
@@ -27,6 +27,9 @@ let assessment = null; // { index, answers:[], selected:[] } — selected is the
 // ---- Dashboard sub-navigation ----
 let dashboardTab = 'overview'; // overview | path | achievements
 let reviewLevel = null;        // level being viewed in the Learning Path tab
+
+// ---- Plan selection screen (transient — null until a plan's been clicked this visit) ----
+let planSelectStep = null; // null | 'free' | 'paid' — set once they've picked, before Continue is shown
 
 // ---- Active lesson session ----
 let activeLesson = null; // { levelKey, lessonId, step: 'learn'|'practice'|'quiz'|'done', wrongAttempt:false }
@@ -52,6 +55,7 @@ function defaultProgress(){
     lastActiveDate: null,
     resourceProgress: {},         // { [entryId]: { status:'in-progress'|'completed', startedAt, completedAt, quizPassed } }
     department: null,             // one of LIBRARY_DEPARTMENTS, or null until self-selected
+    plan: null,                    // 'free' | 'paid', or null until self-selected — asked once for new accounts, see startAssessment()
     userEmail: null,              // mirrored from firebase.auth() so the admin dashboard can label rows
     userName: null,               // mirrored from firebase.auth() (display name, if set) so reports can show a real name
     levelChallenges: {},          // { [levelKey]: { status:'submitted'|'passed'|'needs_improvement', attempts:[{submittedAt,evidenceType,evidenceUrl,evidenceFileName,explanation,reviewedAt,reviewedBy,reviewStatus,reviewNote}] } } — see CHALLENGE_LIBRARY in learning-data.js
@@ -247,6 +251,7 @@ if(headerLogo) headerLogo.addEventListener('click', () => {
 function renderLearning(){
   if(learningScreen === 'onboarding') return renderOnboarding();
   if(learningScreen === 'department') return renderDepartmentScreen();
+  if(learningScreen === 'plan') return renderPlanScreen();
   if(learningScreen === 'assessment') return renderAssessment();
   if(learningScreen === 'results') return renderResults();
   if(learningScreen === 'dashboard') return renderDashboard();
@@ -306,6 +311,23 @@ function startAssessment(){
     renderLearning();
     return;
   }
+  proceedFromDepartment();
+}
+
+// Called after the department step is resolved — whether they picked one or
+// hit "Skip for now" (which deliberately leaves department null). Deciding
+// what's next from here, rather than re-running startAssessment() from the
+// top, matters: department stays null after a skip, so routing back through
+// startAssessment() would just show the department screen again forever.
+function proceedFromDepartment(){
+  // Same idea for which plan they're on (Free vs Paid/Pro) — asked once for
+  // new accounts only, never re-asked on retake (see retakeAssessment()).
+  if(!progress.plan){
+    planSelectStep = null;
+    learningScreen = 'plan';
+    renderLearning();
+    return;
+  }
   beginAssessmentQuestions();
 }
 
@@ -344,9 +366,71 @@ function renderDepartmentScreen(){
   continueBtn.addEventListener('click', () => {
     progress.department = select.value;
     saveProgress();
-    beginAssessmentQuestions();
+    proceedFromDepartment();
   });
-  document.getElementById('lrnDeptSkip').addEventListener('click', beginAssessmentQuestions);
+  document.getElementById('lrnDeptSkip').addEventListener('click', proceedFromDepartment);
+}
+
+// ---------------------------------------------------------------------------
+// 1c. Plan — Free vs Paid/Pro (asked once, before the first assessment)
+// ---------------------------------------------------------------------------
+const PLAN_META = {
+  free: {
+    label: 'Free',
+    heading: 'You picked: Free plan',
+    body: [
+      'On a Free plan, what you can do with AI tools like Claude, ChatGPT, and other AI tools is limited.',
+      'Some features only work if you upgrade to a Paid or Pro plan.'
+    ]
+  },
+  paid: {
+    label: 'Paid / Pro',
+    heading: 'You picked: Paid / Pro plan',
+    body: [
+      'On a Paid or Pro plan, you can access a lot more than the Free plan.',
+      'This gives you more features and more ways to use AI tools like Claude and ChatGPT.'
+    ]
+  }
+};
+
+function renderPlanScreen(){
+  const chosen = planSelectStep ? PLAN_META[planSelectStep] : null;
+  learningRoot.innerHTML = `
+    <div class="lrn-screen lrn-onboarding">
+      ${topbar({ showBackToApp: true })}
+      <div class="lrn-hero">
+        <div class="lrn-greeting-bubble">One more quick thing 👋</div>
+        <div class="lrn-hero-badge"><img src="assets/images/mascot/cat-sunglasses.png" alt="Ginger the cat"></div>
+        ${chosen ? `
+          <h2>${escapeHtml(chosen.heading)}</h2>
+          ${chosen.body.map(p => `<p class="lrn-hero-sub">${escapeHtml(p)}</p>`).join('')}
+          <button class="lrn-btn-primary" id="lrnPlanContinue">Continue</button>
+          <button class="lrn-btn-text" id="lrnPlanBack">Choose again</button>
+        ` : `
+          <h2>Which plan are you currently using?</h2>
+          <p class="lrn-hero-sub">This helps us show you AI learning content that matches what you actually have access to.</p>
+          <div class="lrn-plan-options">
+            <button class="lrn-btn-primary" id="lrnPlanFree">Free</button>
+            <button class="lrn-btn-primary" id="lrnPlanPaid">Paid / Pro</button>
+          </div>
+          <button class="lrn-btn-text" id="lrnPlanSkip">Skip for now</button>
+        `}
+      </div>
+    </div>`;
+  bindTopbar();
+
+  if(!chosen){
+    document.getElementById('lrnPlanFree').addEventListener('click', () => { planSelectStep = 'free'; renderPlanScreen(); });
+    document.getElementById('lrnPlanPaid').addEventListener('click', () => { planSelectStep = 'paid'; renderPlanScreen(); });
+    document.getElementById('lrnPlanSkip').addEventListener('click', beginAssessmentQuestions);
+  }else{
+    document.getElementById('lrnPlanContinue').addEventListener('click', () => {
+      progress.plan = planSelectStep;
+      saveProgress();
+      beginAssessmentQuestions();
+    });
+    document.getElementById('lrnPlanBack').addEventListener('click', () => { planSelectStep = null; renderPlanScreen(); });
+  }
 }
 
 // Retaking keeps XP, completed lessons, and badges — only the assessment result
@@ -780,10 +864,16 @@ function renderRecommendationsHtml(level, gapCategories, gapLabels){
   const items = getRecommendedEntries(level, gapCategories);
   if(!items.length) return '';
   const topGap = (items.some(e => e.isGapPick) && gapLabels && gapLabels[0]) ? gapLabels[0] : '';
+  const planNote = progress && progress.plan === 'free'
+    ? "You're on the Free plan — some AI features shown here may need a Paid or Pro plan to use."
+    : (progress && progress.plan === 'paid'
+      ? "You're on a Paid/Pro plan, so you can make full use of the features below."
+      : '');
   return `
     <div class="lrn-reco">
       <div class="lrn-reco-heading">Recommended for you</div>
       ${topGap ? `<div class="lrn-reco-gap-note">Because you're working on: <strong>${escapeHtml(topGap)}</strong></div>` : ''}
+      ${planNote ? `<div class="lrn-reco-gap-note">${escapeHtml(planNote)}</div>` : ''}
       <div class="lrn-reco-list">
         ${items.map(e => `
           <button class="lrn-reco-item" data-id="${e.id}">
@@ -1641,6 +1731,14 @@ function renderMyAiProgressPanel(){
         ${LIBRARY_DEPARTMENTS.map(d => `<option value="${escapeHtml(d)}"${progress.department === d ? ' selected' : ''}>${escapeHtml(d)}</option>`).join('')}
       </select>
     </div>
+    <div class="lrn-profile-dept">
+      <span>Plan</span>
+      <select class="filter-select" id="lrnProfilePlanSelect">
+        <option value="">Not set</option>
+        <option value="free"${progress.plan === 'free' ? ' selected' : ''}>Free</option>
+        <option value="paid"${progress.plan === 'paid' ? ' selected' : ''}>Paid / Pro</option>
+      </select>
+    </div>
     <div class="lrn-profile-actions">
       <button class="lrn-btn-primary" id="lrnProfileContinueBtn">Continue Learning</button>
       <button class="lrn-btn-text" id="lrnProfileRetakeBtn">Retake AI Assessment</button>
@@ -1658,6 +1756,11 @@ function renderMyAiProgressPanel(){
   const profileDeptSelect = document.getElementById('lrnProfileDeptSelect');
   if(profileDeptSelect) profileDeptSelect.addEventListener('change', () => {
     progress.department = profileDeptSelect.value || null;
+    saveProgress();
+  });
+  const profilePlanSelect = document.getElementById('lrnProfilePlanSelect');
+  if(profilePlanSelect) profilePlanSelect.addEventListener('change', () => {
+    progress.plan = profilePlanSelect.value || null;
     saveProgress();
   });
 }

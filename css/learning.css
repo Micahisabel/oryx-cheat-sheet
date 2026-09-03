@@ -615,6 +615,9 @@
   padding:14px 16px; display:flex; flex-direction:column; gap:8px;
 }
 .lrn-dept-picker-label{ font-size:13px; color:var(--black); font-weight:500; }
+
+.lrn-plan-options{ display:flex; gap:12px; width:100%; }
+.lrn-plan-options .lrn-btn-primary{ flex:1; }
 .lrn-profile-course strong{ font-family:var(--font-display); font-weight:700; font-size:13.5px; color:var(--black); }
 
 .lrn-profile-actions{ display:flex; flex-direction:column; gap:10px; }
