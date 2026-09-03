@@ -67,3 +67,5 @@
   .hub-main.dept-files-mode #deptFilesView{display:block !important;}
   .hub-main.settings-mode > *:not(#settingsView){display:none !important;}
   .hub-main.settings-mode #settingsView{display:block !important;}
+  .hub-main.my-ai-progress-mode > *:not(#myAiProgressView){display:none !important;}
+  .hub-main.my-ai-progress-mode #myAiProgressView{display:block !important;}

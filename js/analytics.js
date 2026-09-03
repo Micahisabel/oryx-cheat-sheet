@@ -123,6 +123,7 @@ function enterAnalyticsMode(){
   if(typeof exitDeptFilesMode === "function") exitDeptFilesMode();
   if(typeof exitLearningAdminMode === "function") exitLearningAdminMode();
   if(typeof exitSettingsMode === "function") exitSettingsMode();
+  if(typeof exitMyAiProgressMode === "function") exitMyAiProgressMode();
   document.querySelectorAll('.platform-item.active, .platform-submenu-item.active').forEach(b => b.classList.remove('active'));
   openAnalyticsNavBtn.classList.add('active');
   hubMainEl.classList.add('analytics-mode');

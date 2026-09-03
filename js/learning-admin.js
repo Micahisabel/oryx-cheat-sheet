@@ -570,6 +570,7 @@ function enterLearningAdminMode(){
   if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
   if(typeof exitDeptFilesMode === 'function') exitDeptFilesMode();
   if(typeof exitSettingsMode === 'function') exitSettingsMode();
+  if(typeof exitMyAiProgressMode === 'function') exitMyAiProgressMode();
   document.querySelectorAll('.platform-item.active, .platform-submenu-item.active').forEach(b => b.classList.remove('active'));
   openLearningAdminNavBtn.classList.add('active');
   hubMainEl.classList.add('learning-admin-mode');
@@ -649,6 +650,7 @@ function enterSettingsMode(){
   if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
   if(typeof exitLearningAdminMode === 'function') exitLearningAdminMode();
   if(typeof exitDeptFilesMode === 'function') exitDeptFilesMode();
+  if(typeof exitMyAiProgressMode === 'function') exitMyAiProgressMode();
   document.querySelectorAll('.platform-item.active, .platform-submenu-item.active, .sidebar-analytics-item.active').forEach(b => b.classList.remove('active'));
   openSettingsNavBtn.classList.add('active');
   hubMainEl.classList.add('settings-mode');

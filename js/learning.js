@@ -197,6 +197,7 @@ async function enterLearning(){
   if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
   if(typeof exitLearningAdminMode === 'function') exitLearningAdminMode();
   if(typeof exitSettingsMode === 'function') exitSettingsMode();
+  exitMyAiProgressMode();
   document.querySelectorAll('.platform-item.active, .sidebar-analytics-item.active').forEach(b => b.classList.remove('active'));
   if(openLearningNavBtn) openLearningNavBtn.classList.add('active');
   viewNotes.classList.remove('active');
@@ -1623,8 +1624,7 @@ function bindResourceProgressSection(container, entry){
 // (the app's existing "Profile" surface — see My Components / My Favorites).
 // Always reflects the same `progress` object the Learning view itself uses.
 // ---------------------------------------------------------------------------
-const myAiProgressOverlay = document.getElementById('myAiProgressOverlay');
-const myAiProgressBody = document.getElementById('myAiProgressBody');
+const myAiProgressView = document.getElementById('myAiProgressView');
 const openMyAiProgressBtn = document.getElementById('openMyAiProgress');
 
 function formatAssessmentDate(iso){
@@ -1676,22 +1676,46 @@ function progressGraphSvg(){
     </svg>`;
 }
 
-function renderMyAiProgressPanel(){
-  if(typeof closeAccountMenu === 'function') closeAccountMenu();
+// Short, level-appropriate encouragement line for the profile banner — plain
+// motivational copy, not a claim about anything factual, so safe to write
+// directly rather than needing a real data source.
+const LEVEL_ENCOURAGEMENT = {
+  beginner: "Great start! You're on your way to becoming an AI pro. Keep learning and exploring!",
+  basic: "You've got the basics down — keep building on them, one lesson at a time.",
+  intermediate: "Solid progress! You're using AI with real confidence now.",
+  advanced: "Impressive work — you're handling AI tasks most people haven't even tried yet.",
+  expert: "You've reached Expert level — a great person to help others get started too."
+};
+
+function recentActivityHtml(){
+  const history = (progress.progressHistory || []).slice(-5).reverse();
+  if(!history.length){
+    return `<div class="s-empty">No activity yet — start a lesson to see it here.</div>`;
+  }
+  return history.map(h => `
+    <div class="lrn-profile-activity-row">
+      <span class="lrn-profile-activity-icon">📈</span>
+      <div class="lrn-profile-activity-text">
+        <strong>${h.xp} points total</strong>
+        <span>${h.completedLessonsCount} lesson${h.completedLessonsCount === 1 ? '' : 's'} done · ${formatAssessmentDate(h.date)}</span>
+      </div>
+    </div>`).join('');
+}
+
+function myAiProgressPageHtml(){
   const user = firebase.auth().currentUser;
-  if(!user) return;
+  if(!user) return '';
   ensureProgressForCurrentUser();
 
   if(!progress.assessmentResult){
-    myAiProgressBody.innerHTML = `
+    return `
+      <div class="analytics-page-head">
+        <button class="lrn-btn-text" id="lrnProfileBackLink">&larr; Back to Knowledge Hub</button>
+        <h2>My AI Progress</h2>
+        <p class="analytics-page-sub">Your AI skill level and learning journey so far</p>
+      </div>
       <div class="s-empty">You haven't taken the AI skill assessment yet.</div>
       <button class="lrn-btn-primary" id="lrnProfileStartBtn">Start Assessment</button>`;
-    myAiProgressOverlay.classList.add('open');
-    document.getElementById('lrnProfileStartBtn').addEventListener('click', () => {
-      myAiProgressOverlay.classList.remove('open');
-      retakeAssessment();
-    });
-    return;
   }
 
   const level = progress.currentLevel || progress.assessmentResult.level;
@@ -1699,58 +1723,90 @@ function renderMyAiProgressPanel(){
   const { done, total, pct } = pathProgressFor(level);
   const nextId = nextLessonFor(level);
 
-  myAiProgressBody.innerHTML = `
-    <div class="lrn-profile-level" style="--lrn-accent:${meta.color}">
-      <span class="lrn-profile-emoji">${meta.emoji}</span>
-      <div>
-        <div class="lrn-profile-level-label">AI Level</div>
-        <div class="lrn-profile-level-value">${escapeHtml(meta.label)}</div>
+  return `
+    <div class="analytics-page-head">
+      <button class="lrn-btn-text" id="lrnProfileBackLink">&larr; Back to Knowledge Hub</button>
+      <h2>My AI Progress</h2>
+      <p class="analytics-page-sub">Your AI skill level and learning journey so far</p>
+    </div>
+    <div class="lrn-profile-banner" style="--lrn-accent:${meta.color}">
+      <div class="lrn-profile-banner-head">
+        <span class="lrn-profile-emoji-badge">${meta.emoji}</span>
+        <div>
+          <div class="lrn-profile-level-label">AI Level</div>
+          <div class="lrn-profile-level-value">${escapeHtml(meta.label)}</div>
+        </div>
+      </div>
+      <div class="lrn-profile-banner-msg">
+        <img src="assets/images/mascot/cat-sunglasses.png" alt="Ginger the cat">
+        <p>${escapeHtml(LEVEL_ENCOURAGEMENT[level] || LEVEL_ENCOURAGEMENT.beginner)}</p>
       </div>
     </div>
     <div class="lrn-profile-stats">
-      <div class="lrn-profile-stat"><span>Assessment score</span><strong>${progress.assessmentResult.score}%</strong></div>
-      <div class="lrn-profile-stat"><span>Assessment date</span><strong>${formatAssessmentDate(progress.assessmentDate)}</strong></div>
-      <div class="lrn-profile-stat"><span>Overall progress</span><strong>${pct}%</strong></div>
-      <div class="lrn-profile-stat" title="Points you earn by finishing lessons."><span>Points earned</span><strong class="lrn-profile-stat-accent">${progress.xp || 0}</strong></div>
-      <div class="lrn-profile-stat"><span>Lessons completed</span><strong>${(progress.completedLessons || []).length}</strong></div>
-      <div class="lrn-profile-stat" title="Little awards you unlock for reaching a milestone, like a learning streak."><span>Badges (awards)</span><strong class="lrn-profile-stat-accent">${(progress.badges || []).length}</strong></div>
+      <div class="lrn-profile-stat"><span class="lrn-profile-stat-icon">📊</span><span class="lrn-profile-stat-text"><span>Assessment score</span><strong>${progress.assessmentResult.score}%</strong></span></div>
+      <div class="lrn-profile-stat"><span class="lrn-profile-stat-icon">📅</span><span class="lrn-profile-stat-text"><span>Assessment date</span><strong>${formatAssessmentDate(progress.assessmentDate)}</strong></span></div>
+      <div class="lrn-profile-stat"><span class="lrn-profile-stat-icon">📈</span><span class="lrn-profile-stat-text"><span>Overall progress</span><strong>${pct}%</strong></span></div>
+      <div class="lrn-profile-stat" title="Points you earn by finishing lessons."><span class="lrn-profile-stat-icon">⭐</span><span class="lrn-profile-stat-text"><span>Points earned</span><strong class="lrn-profile-stat-accent">${progress.xp || 0}</strong></span></div>
+      <div class="lrn-profile-stat"><span class="lrn-profile-stat-icon">📚</span><span class="lrn-profile-stat-text"><span>Lessons completed</span><strong>${(progress.completedLessons || []).length}</strong></span></div>
+      <div class="lrn-profile-stat" title="Little awards you unlock for reaching a milestone, like a learning streak."><span class="lrn-profile-stat-icon">🏆</span><span class="lrn-profile-stat-text"><span>Badges (awards)</span><strong class="lrn-profile-stat-accent">${(progress.badges || []).length}</strong></span></div>
     </div>
-    ${rankCardHtml()}
-    <div class="lrn-profile-graph">
-      <span class="lrn-profile-graph-label">Your progress over time</span>
-      ${progressGraphSvg()}
+    <div class="lrn-profile-two-col">
+      ${rankCardHtml()}
+      <div class="lrn-profile-graph">
+        <span class="lrn-profile-graph-label">Your progress over time</span>
+        ${progressGraphSvg()}
+      </div>
     </div>
-    <div class="lrn-profile-course">
-      <span>Current course</span>
-      <strong>${escapeHtml(meta.label)}${nextId ? ` · Next: ${escapeHtml(LESSON_LIBRARY[nextId].title)}` : ' · Path complete'}</strong>
+    <div class="lrn-profile-two-col">
+      <div class="lrn-profile-course">
+        <span>Current course</span>
+        <strong>${escapeHtml(meta.label)}${nextId ? ` · Next: ${escapeHtml(LESSON_LIBRARY[nextId].title)}` : ' · Path complete'}</strong>
+      </div>
+      <div class="lrn-profile-dept-stack">
+        <div class="lrn-profile-dept">
+          <span>Department</span>
+          <select class="filter-select" id="lrnProfileDeptSelect">
+            <option value="">Not set</option>
+            ${LIBRARY_DEPARTMENTS.map(d => `<option value="${escapeHtml(d)}"${progress.department === d ? ' selected' : ''}>${escapeHtml(d)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="lrn-profile-dept">
+          <span>Plan</span>
+          <select class="filter-select" id="lrnProfilePlanSelect">
+            <option value="">Not set</option>
+            <option value="free"${progress.plan === 'free' ? ' selected' : ''}>Free</option>
+            <option value="paid"${progress.plan === 'paid' ? ' selected' : ''}>Paid / Pro</option>
+          </select>
+        </div>
+      </div>
     </div>
-    <div class="lrn-profile-dept">
-      <span>Department</span>
-      <select class="filter-select" id="lrnProfileDeptSelect">
-        <option value="">Not set</option>
-        ${LIBRARY_DEPARTMENTS.map(d => `<option value="${escapeHtml(d)}"${progress.department === d ? ' selected' : ''}>${escapeHtml(d)}</option>`).join('')}
-      </select>
-    </div>
-    <div class="lrn-profile-dept">
-      <span>Plan</span>
-      <select class="filter-select" id="lrnProfilePlanSelect">
-        <option value="">Not set</option>
-        <option value="free"${progress.plan === 'free' ? ' selected' : ''}>Free</option>
-        <option value="paid"${progress.plan === 'paid' ? ' selected' : ''}>Paid / Pro</option>
-      </select>
+    <div class="lrn-profile-activity">
+      <div class="lrn-profile-activity-head">Recent Activity</div>
+      ${recentActivityHtml()}
     </div>
     <div class="lrn-profile-actions">
       <button class="lrn-btn-primary" id="lrnProfileContinueBtn">Continue Learning</button>
       <button class="lrn-btn-text" id="lrnProfileRetakeBtn">Retake AI Assessment</button>
     </div>`;
-  myAiProgressOverlay.classList.add('open');
+}
 
-  document.getElementById('lrnProfileContinueBtn').addEventListener('click', async () => {
-    myAiProgressOverlay.classList.remove('open');
+function renderMyAiProgressPage(){
+  myAiProgressView.innerHTML = myAiProgressPageHtml();
+
+  const backLink = document.getElementById('lrnProfileBackLink');
+  if(backLink) backLink.addEventListener('click', exitMyAiProgressMode);
+
+  const startBtn = document.getElementById('lrnProfileStartBtn');
+  if(startBtn) startBtn.addEventListener('click', () => { exitMyAiProgressMode(); retakeAssessment(); });
+
+  const continueBtn = document.getElementById('lrnProfileContinueBtn');
+  if(continueBtn) continueBtn.addEventListener('click', async () => {
+    exitMyAiProgressMode();
     await enterLearning();
   });
-  document.getElementById('lrnProfileRetakeBtn').addEventListener('click', () => {
-    myAiProgressOverlay.classList.remove('open');
+  const retakeBtn = document.getElementById('lrnProfileRetakeBtn');
+  if(retakeBtn) retakeBtn.addEventListener('click', () => {
+    exitMyAiProgressMode();
     retakeAssessment();
   });
   const profileDeptSelect = document.getElementById('lrnProfileDeptSelect');
@@ -1765,9 +1821,29 @@ function renderMyAiProgressPanel(){
   });
 }
 
-if(openMyAiProgressBtn) openMyAiProgressBtn.addEventListener('click', renderMyAiProgressPanel);
-document.getElementById('closeMyAiProgress').addEventListener('click', () => myAiProgressOverlay.classList.remove('open'));
-myAiProgressOverlay.addEventListener('click', (ev) => { if(ev.target === myAiProgressOverlay) myAiProgressOverlay.classList.remove('open'); });
+function exitMyAiProgressMode(){
+  if(!hubMainEl.classList.contains('my-ai-progress-mode')) return;
+  hubMainEl.classList.remove('my-ai-progress-mode');
+}
+
+function enterMyAiProgressMode(){
+  if(typeof closeAccountMenu === 'function') closeAccountMenu();
+  const user = firebase.auth().currentUser;
+  if(!user) return;
+  if(typeof exitAnalyticsMode === 'function') exitAnalyticsMode();
+  if(typeof exitLearningAdminMode === 'function') exitLearningAdminMode();
+  if(typeof exitDeptFilesMode === 'function') exitDeptFilesMode();
+  if(typeof exitSettingsMode === 'function') exitSettingsMode();
+  viewLearning.classList.remove('active');
+  viewNotes.classList.add('active');
+  if(openLearningNavBtn) openLearningNavBtn.classList.remove('active');
+  document.querySelectorAll('.platform-item.active, .platform-submenu-item.active, .sidebar-analytics-item.active').forEach(b => b.classList.remove('active'));
+  hubMainEl.classList.add('my-ai-progress-mode');
+  if(typeof repositionAllTabIndicators === 'function') repositionAllTabIndicators();
+  renderMyAiProgressPage();
+}
+
+if(openMyAiProgressBtn) openMyAiProgressBtn.addEventListener('click', enterMyAiProgressMode);
 
 // ---------------------------------------------------------------------------
 // Mandatory first-time assessment: the moment a first-time user signs in
