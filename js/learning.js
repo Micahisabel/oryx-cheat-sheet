@@ -363,10 +363,19 @@ function renderAssessment(){
   const total = ASSESSMENT_QUESTIONS.length;
   if(assessment.index >= total){ return finishAssessment(); }
   const question = ASSESSMENT_QUESTIONS[assessment.index];
-  assessment.selected = []; // reset per-question selection state
-  assessment.otherDetail = '';
+
+  // If they've been here before (came back via the back arrow), restore
+  // whatever they'd picked so a stray click is easy to see and fix, instead
+  // of wiping it and forcing them to redo the question from scratch.
+  const prevAnswer = assessment.answers.find(a => a.questionId === question.id);
+  assessment.selected = prevAnswer ? prevAnswer.optionIndexes.slice() : [];
+  assessment.otherDetail = (prevAnswer && typeof prevAnswer.otherDetail === 'string') ? prevAnswer.otherDetail : '';
 
   const detailOpt = question.options.find(o => o.requiresDetail);
+  const detailIndex = detailOpt ? question.options.indexOf(detailOpt) : -1;
+  const detailNeeded = detailIndex !== -1 && assessment.selected.includes(detailIndex);
+  const detailFilled = !detailNeeded || assessment.otherDetail.trim().length > 0;
+  const initialDisabled = assessment.selected.length === 0 || !detailFilled;
 
   learningRoot.innerHTML = `
     <div class="lrn-screen lrn-assessment">
@@ -381,17 +390,17 @@ function renderAssessment(){
       </div>
       <div class="lrn-options ${question.multi ? 'lrn-options-multi' : ''}">
         ${question.options.map((opt, i) => `
-          <button class="lrn-option-btn" data-i="${i}">${escapeHtml(opt.text)}</button>
+          <button class="lrn-option-btn ${assessment.selected.includes(i) ? 'selected' : ''}" data-i="${i}">${escapeHtml(opt.text)}</button>
         `).join('')}
       </div>
       ${detailOpt ? `
-        <div class="lrn-other-detail" id="lrnOtherDetail" style="display:none;">
+        <div class="lrn-other-detail" id="lrnOtherDetail" style="display:${detailNeeded ? 'block' : 'none'};">
           <label for="lrnOtherDetailInput">Please specify</label>
-          <input type="text" id="lrnOtherDetailInput" class="lrn-other-detail-input" placeholder="e.g. Perplexity, Grok…">
+          <input type="text" id="lrnOtherDetailInput" class="lrn-other-detail-input" placeholder="e.g. Perplexity, Grok…" value="${escapeHtml(assessment.otherDetail)}">
         </div>` : ''}
-      ${question.multi ? `<button class="lrn-btn-primary" id="lrnMultiContinue" disabled>Continue</button>` : ''}
+      ${question.multi ? `<button class="lrn-btn-primary" id="lrnMultiContinue" ${initialDisabled ? 'disabled' : ''}>Continue</button>` : ''}
     </div>`;
-  bindTopbar();
+  bindTopbar(() => goToPreviousAssessmentQuestion());
 
   if(question.multi){
     const continueBtn = document.getElementById('lrnMultiContinue');
@@ -411,6 +420,20 @@ function renderAssessment(){
       btn.addEventListener('click', () => answerAssessmentQuestion(question, [Number(btn.dataset.i)]));
     });
   }
+}
+
+// Steps back one question so an accidental click can be corrected — the
+// answer already given for that question (if any) is restored on re-render
+// (see renderAssessment's prevAnswer lookup), not just cleared. On question 1
+// there's nothing to go back to, so it returns to the onboarding screen instead.
+function goToPreviousAssessmentQuestion(){
+  if(assessment.index === 0){
+    learningScreen = 'onboarding';
+    renderLearning();
+    return;
+  }
+  assessment.index -= 1;
+  renderLearning();
 }
 
 function toggleMultiOption(question, i, continueBtn){

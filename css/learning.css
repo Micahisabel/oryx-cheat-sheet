@@ -223,6 +223,11 @@
   content:'✓'; background:var(--oryx-blue); border-color:var(--oryx-blue); color:var(--white);
   font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center;
 }
+/* Single-choice questions: highlight a restored previous answer (e.g. after
+   using the back arrow) without touching the A/B/C/D lettering. */
+.lrn-options:not(.lrn-options-multi) .lrn-option-btn.selected{ border-color:var(--oryx-blue); background:var(--panel); }
+.lrn-options:not(.lrn-options-multi) .lrn-option-btn.selected::before{ background:var(--oryx-blue); color:var(--white); }
+
 .lrn-btn-primary:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; }
 .lrn-btn-primary:disabled:hover{ transform:none; filter:none; box-shadow:none; }
 
