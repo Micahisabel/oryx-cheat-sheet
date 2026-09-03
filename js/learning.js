@@ -898,18 +898,8 @@ function renderOverviewTab(level, meta, done, total, nextId, xpInfo){
     <div class="lrn-card">
       <div class="lrn-level-block">
         <div class="lrn-level-title">AI LEVEL ${LEARNING_LEVEL_ORDER.indexOf(level) + 1} · ${escapeHtml(meta.label)}</div>
-
-        <div class="lrn-progress-row">
-          <div class="lrn-progress-row-label">Lessons: ${done}/${total} (${Math.round((done/total)*100)}%)</div>
-          <div class="lrn-progress-track lrn-progress-track-lg"><div class="lrn-progress-fill" style="width:${Math.round((done/total)*100)}%"></div></div>
-        </div>
-
-        <div class="lrn-progress-row">
-          <div class="lrn-progress-row-label" title="Every 200 points, your level goes up.">Points to next level: ${xpInfo.into}/${xpInfo.needed} (${xpInfo.pct}%)</div>
-          <div class="lrn-progress-track lrn-progress-track-lg"><div class="lrn-progress-fill" style="width:${xpInfo.pct}%"></div></div>
-        </div>
-
-        <div class="lrn-level-sub">${progress.xp || 0} points total</div>
+        <div class="lrn-progress-track lrn-progress-track-lg"><div class="lrn-progress-fill" style="width:${Math.round((done/total)*100)}%"></div></div>
+        <div class="lrn-level-sub" title="Finish lessons to earn points. Every 200 points, your level goes up.">${done}/${total} lessons complete · ${progress.xp || 0} points total (${xpInfo.into}/${xpInfo.needed} to next level)</div>
       </div>
       ${nextLessonHtml}
     </div>
