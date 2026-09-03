@@ -1032,7 +1032,7 @@ function renderLesson(){
           <ul class="lrn-practice-checklist">${lesson.practiceChecklist.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>` : ''}
         <textarea class="lrn-practice-input" id="lrnPracticeInput" placeholder="Type your attempt here — a prompt, a note, whatever fits this task…">${escapeHtml(activeLesson.practiceAttempt || '')}</textarea>
         ${hasExample ? `
-          <button class="lrn-btn-text lrn-reveal-btn" id="lrnRevealExample" ${(activeLesson.practiceAttempt || '').trim().length < 3 ? 'disabled' : ''}>Show me a strong example</button>
+          <button class="lrn-btn-text lrn-reveal-btn" id="lrnRevealExample">Show me a strong example</button>
           ${activeLesson.practiceRevealed ? `
             <div class="lrn-practice-example">
               <div class="lrn-practice-example-label">Here's a strong example</div>
@@ -1108,7 +1108,6 @@ function renderLesson(){
     if(practiceInput){
       practiceInput.addEventListener('input', () => {
         activeLesson.practiceAttempt = practiceInput.value;
-        if(revealBtn) revealBtn.disabled = practiceInput.value.trim().length < 3;
       });
     }
     if(revealBtn){
