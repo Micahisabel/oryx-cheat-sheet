@@ -220,6 +220,27 @@ function filterAndSortEmployeeRows(rows){
   return filtered;
 }
 
+// Top scorers, highest first — same score value/estimate-flag already
+// computed in employeeRows(), just ranked and capped rather than
+// re-derived.
+function leaderboardHtml(rows, limit){
+  const ranked = rows.filter(r => r.score != null).slice().sort((a, b) => b.score - a.score).slice(0, limit || 10);
+  if(!ranked.length) return '<div class="s-empty">No scores yet.</div>';
+  const medals = ['🥇', '🥈', '🥉'];
+  return `
+    <div class="lrn-leaderboard">
+      ${ranked.map((r, i) => `
+        <div class="lrn-leaderboard-row">
+          <span class="lrn-leaderboard-rank">${medals[i] || (i + 1)}</span>
+          <div class="lrn-leaderboard-name">
+            <strong>${r.name ? escapeHtml(r.name) : escapeHtml(r.email)}</strong>
+            <span class="lrn-admin-table-dim">${escapeHtml(r.department)}</span>
+          </div>
+          <span class="lrn-leaderboard-score">${r.score}${r.scoreIsEstimate ? ' <span class="lrn-admin-table-dim">(est.)</span>' : ''}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
 function employeeTableHtml(rows){
   if(!rows.length) return '<div class="s-empty">No employees match this search/filter.</div>';
   const col = (key, label) => {
@@ -733,6 +754,7 @@ function renderLearningAdmin(){
   const maxGap = Math.max(1, ...stats.sortedGaps.map(([, c]) => c));
   const maxUsage = Math.max(1, ...stats.sortedUsage.map(u => u.count));
   const pendingChallenges = pendingChallengeSubmissions(scopedDocs);
+  const allRows = employeeRows(scopedDocs);
 
   const deptOptions = ['all', ...LIBRARY_DEPARTMENTS, 'Unassigned'];
   const deptLabel = (d) => d === 'all' ? 'All Departments' : d;
@@ -772,6 +794,9 @@ function renderLearningAdmin(){
     <h4 class="analytics-section-head" style="margin-top:24px;">Learning Activity Over Time</h4>
     ${activityOverTimeSvg(activitySeries)}
 
+    <h4 class="analytics-section-head" style="margin-top:24px;">Leaderboard</h4>
+    ${leaderboardHtml(allRows, 10)}
+
     <h3 class="analytics-section-head" style="margin-top:32px;">Employee Learning Progress</h3>
     <div class="lrn-admin-table-controls">
       <input type="search" class="lrn-admin-search" id="learningAdminSearch" placeholder="Search by email…" value="${escapeHtml(learningAdminSearch)}">
@@ -784,7 +809,7 @@ function renderLearningAdmin(){
         <option value="encourage"${learningAdminStatusFilter === 'encourage' ? ' selected' : ''}>Needs encouragement</option>
       </select>
     </div>
-    ${employeeTableHtml(filterAndSortEmployeeRows(employeeRows(scopedDocs)))}
+    ${employeeTableHtml(filterAndSortEmployeeRows(allRows))}
 
     <h3 class="analytics-section-head" style="margin-top:28px;">Challenges Awaiting Review${pendingChallenges.length ? ` (${pendingChallenges.length})` : ''}</h3>
     <div id="learningAdminPendingChallenges">${pendingChallengesHtml(pendingChallenges)}</div>

@@ -89,6 +89,18 @@
   .lrn-chart-hit{ cursor:pointer; transition:opacity 0.12s ease; }
   .lrn-chart-hit:hover{ opacity:0.82; }
 
+  .lrn-leaderboard{
+    display:flex; flex-direction:column;
+    background:var(--white); border:1px solid var(--line); border-radius:var(--lrn-radius-sm, 10px);
+    overflow:hidden;
+  }
+  .lrn-leaderboard-row{ display:flex; align-items:center; gap:12px; padding:10px 16px; border-bottom:1px solid var(--line-soft); }
+  .lrn-leaderboard-row:last-child{ border-bottom:none; }
+  .lrn-leaderboard-rank{ width:26px; flex-shrink:0; text-align:center; font-size:15px; font-weight:700; color:var(--oryx-blue); }
+  .lrn-leaderboard-name{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+  .lrn-leaderboard-name strong{ font-size:13.5px; color:var(--black); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .lrn-leaderboard-score{ flex-shrink:0; font-size:15px; font-weight:700; color:var(--oryx-blue); }
+
   .lrn-chart-tooltip{
     display:none; position:fixed; z-index:999; pointer-events:none;
     background:var(--oryx-blue); color:var(--white);
