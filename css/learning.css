@@ -359,8 +359,10 @@
 }
 .lrn-level-switch-btn:hover{ transform:translateY(-1px); border-color:var(--oryx-blue); }
 .lrn-level-switch-btn.active{ background:var(--oryx-blue); color:var(--white); border-color:var(--oryx-blue); }
-.lrn-level-switch-btn.locked{ opacity:.5; cursor:not-allowed; color:var(--label); }
-.lrn-level-switch-btn.locked:hover{ transform:none; border-color:var(--line); }
+.lrn-level-locked-note{
+  background:#fff4e5; border:1px solid #f0c987; color:#8a5a00; border-radius:var(--lrn-radius-sm);
+  padding:11px 15px; font-size:13px; margin-bottom:14px;
+}
 
 .lrn-path-list{ display:flex; flex-direction:column; gap:9px; }
 .lrn-path-item{

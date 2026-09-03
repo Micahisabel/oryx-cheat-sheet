@@ -100,7 +100,7 @@ let learningAdminSort = { key: 'score', dir: 'desc' };
 const INACTIVE_DAYS_THRESHOLD = 14; // local display-only threshold for the "Inactive" status column — separate from the admin-configurable reminder threshold used by the scheduled ranking/reminder job
 
 // Every path total in one place — the ranking formula and the employee table
-// both need "how many lessons exist across all 5 levels" (currently 40).
+// both need "how many lessons exist across all 5 levels" (currently 20).
 function totalLessonCount(){
   return LEARNING_LEVEL_ORDER.reduce((sum, lv) => sum + ((LEARNING_PATHS[lv] || []).length), 0);
 }

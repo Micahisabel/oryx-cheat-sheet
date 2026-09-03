@@ -221,26 +221,11 @@ function challengeFor(levelKey, department){
 // Lesson ids must exist as keys in LESSON_LIBRARY below. Reorder, add, or
 // remove lessons here to change a level's path — nothing else needs editing.
 const LEARNING_PATHS = {
-  beginner: [
-    'what-is-ai', 'how-assistants-work', 'intro-chatgpt-claude', 'basic-prompt',
-    'ask-better-questions', 'ai-everyday-work', 'working-with-documents', 'ai-safety'
-  ],
-  basic: [
-    'ai-strengths-weaknesses', 'everyday-prompting', 'comparing-ai-assistants', 'refining-ai-answers',
-    'ai-for-quick-tasks', 'intro-file-work', 'spotting-ai-mistakes', 'from-basic-to-practical'
-  ],
-  intermediate: [
-    'better-prompting', 'prompt-structure', 'context-and-instructions', 'documents-intermediate',
-    'ai-for-productivity', 'ai-for-business-tasks', 'ai-workflows', 'intro-automation'
-  ],
-  advanced: [
-    'advanced-prompting', 'complex-workflows', 'ai-automation', 'ai-agents',
-    'tool-integrations', 'data-analysis-ai', 'business-process-automation', 'building-ai-workflows'
-  ],
-  expert: [
-    'advanced-architecture', 'ai-agents-expert', 'mcps', 'apis-integrations',
-    'advanced-automation', 'multistep-workflows', 'ai-implementation', 'designing-ai-systems'
-  ]
+  beginner: ['what-is-ai', 'how-assistants-work', 'intro-chatgpt-claude', 'basic-prompt'],
+  basic: ['ai-strengths-weaknesses', 'everyday-prompting', 'refining-ai-answers', 'ai-for-quick-tasks'],
+  intermediate: ['prompt-structure', 'context-and-instructions', 'documents-intermediate', 'ai-for-productivity'],
+  advanced: ['advanced-prompting', 'complex-workflows', 'ai-automation', 'ai-agents'],
+  expert: ['apis-integrations', 'advanced-automation', 'ai-implementation', 'designing-ai-systems']
 };
 
 // ---- Lesson content ----------------------------------------------------------
@@ -357,68 +342,6 @@ const LESSON_LIBRARY = {
       ]
     }
   },
-  'ask-better-questions': {
-    title: 'How to ask better questions',
-    learn: 'If the first reply isn\'t useful, don\'t give up — refine it. Add missing detail, correct a wrong assumption, or ask AI to try a different angle. Good prompting is often a short back-and-forth, not one perfect message.',
-    example: { label: 'Refining', good: 'First: "Write a message about the delay." Then: "Make it shorter and less formal, and mention the new date."' },
-    practice: 'Ask AI a question, then reply with one specific correction to improve the answer.',
-    practiceExample: 'First: "Draft a note about the delay." Then: "Make it shorter, and mention the new delivery date is Friday."',
-    quiz: {
-      question: 'If an AI reply misses the point, what\'s the best next step?',
-      options: [
-        { text: 'Clarify or correct it in a follow-up message', correct: true },
-        { text: 'Assume AI can\'t help and stop', correct: false },
-        { text: 'Repeat the exact same prompt again', correct: false }
-      ]
-    }
-  },
-  'ai-everyday-work': {
-    title: 'Using AI for everyday work',
-    learn: 'AI is great for repetitive writing and thinking tasks: summarising emails, drafting replies, brainstorming, checking tone. It\'s not meant to make final decisions on its own — you stay in charge of what goes out.',
-    example: { label: 'Good use', good: 'Ask AI to draft a reply to a customer enquiry, then you review and send it.' },
-    practice: 'Pick one repetitive task you do weekly and ask AI to help draft it.',
-    practiceExample: 'Draft a short weekly update for my manager summarising what shipped this week, in 3 bullet points.',
-    quiz: {
-      question: 'What\'s the right role for AI in daily work tasks?',
-      options: [
-        { text: 'A helpful drafting assistant you review before sending', correct: true },
-        { text: 'A replacement for making your own decisions', correct: false },
-        { text: 'Only useful for spelling checks', correct: false }
-      ]
-    }
-  },
-  'working-with-documents': {
-    title: 'Working with documents',
-    learn: 'You can paste or upload text — like an email, contract, or report — and ask AI to summarise it, pull out key points, or answer questions about it. This saves time reading long documents.',
-    example: { label: 'Try this', good: '"Summarise this document in 3 bullet points and flag any dates or numbers."' },
-    practice: 'Paste a long email or document into AI and ask for a 3-bullet summary.',
-    practiceExample: 'Summarise this email in 3 bullet points, and flag any dates or amounts mentioned.',
-    quiz: {
-      question: 'What\'s a good use of AI with a long document?',
-      options: [
-        { text: 'Asking it to guess the contents without seeing the document', correct: false },
-        { text: 'Pasting or uploading it and asking for a summary or key points', correct: true },
-        { text: 'Reading the whole thing yourself every time, regardless', correct: false }
-      ]
-    }
-  },
-  'ai-safety': {
-    title: 'AI safety and responsible use',
-    learn: 'Never paste confidential customer, financial, or password information into AI tools unless your company has approved that use. Always double-check important facts, and remember you\'re responsible for what you send — AI is a draft, not a decision.',
-    example: { label: 'Rule of thumb', good: 'If you wouldn\'t post it publicly, don\'t paste it into AI without checking it\'s approved.' },
-    practice: 'Review one recent AI conversation you had — was anything sensitive shared that shouldn\'t have been?',
-    practiceExample: 'Example check: I noticed I\'d pasted a customer\'s full address into a chat — next time I\'ll remove personal details before asking my question.',
-    quiz: {
-      question: 'What should you avoid pasting into an AI tool?',
-      options: [
-        { text: 'Confidential customer or financial information, unless approved', correct: true },
-        { text: 'Any text at all — AI tools should never be used', correct: false },
-        { text: 'Nothing — everything is safe to share', correct: false }
-      ]
-    }
-  },
-
-  // ================= BASIC =================
   'ai-strengths-weaknesses': {
     title: "What AI Is Good At (and Not)",
     whatYoullLearn: 'Which tasks AI is naturally strong at, and which ones still need a person.',
@@ -473,21 +396,6 @@ const LESSON_LIBRARY = {
       ]
     }
   },
-  'comparing-ai-assistants': {
-    title: 'Comparing AI Assistants',
-    learn: 'Claude, ChatGPT, Copilot, and Gemini all work in a similar way — you chat, they generate a reply — but each has its own strengths and fits into different tools (Copilot, for example, works inside Microsoft apps). Trying more than one helps you see what fits your workflow best.',
-    example: { label: 'Why it helps', good: 'Copilot can work directly inside Word or Outlook, while Claude or ChatGPT are often used in a separate chat window.' },
-    practice: 'If you\'ve only used one AI tool, try asking the same question to a second one and compare the replies.',
-    practiceExample: 'Asking both Claude and Copilot to "summarise this email" — Copilot could work directly inside Outlook, while Claude needed the text pasted in separately.',
-    quiz: {
-      question: 'Why might it help to try more than one AI assistant?',
-      options: [
-        { text: 'Each one is good at different things and fits differently into how you work', correct: true },
-        { text: 'They are all identical with no real differences', correct: false },
-        { text: 'Only one AI assistant is allowed to exist', correct: false }
-      ]
-    }
-  },
   'refining-ai-answers': {
     title: 'Refining AI Answers',
     whatYoullLearn: 'How to improve an AI answer with a quick, specific follow-up instead of starting over.',
@@ -539,68 +447,6 @@ const LESSON_LIBRARY = {
         { text: 'Draft the email without including the sensitive details, and add them separately afterwards', correct: true, feedback: 'Right — AI can still help with the wording of the email without ever needing to see the customer\'s private financial details.' },
         { text: 'Don\'t use AI for anything related to customers', correct: false, feedback: 'This overcorrects — plenty of customer-related drafting is fine, the issue is specifically sharing private financial details.' },
         { text: 'Ask AI if it\'s safe to share the details first', correct: false, feedback: 'AI can\'t verify your company\'s own data rules — that\'s a question for your own policy, not something to ask the AI tool itself.' }
-      ]
-    }
-  },
-  'intro-file-work': {
-    title: 'Getting Started with Files and Documents',
-    learn: 'You can share a document or a block of text with AI and ask simple questions about it — like "what are the main points?" This is one of the most useful basic skills once you\'re comfortable chatting with AI.',
-    example: { label: 'Try this', good: '"Here\'s an email — what are the 3 key points?"' },
-    practice: 'Paste a short document or email into AI and ask for the 3 main points.',
-    practiceExample: '"Here\'s an email — what are the 3 key points I need to action?"',
-    quiz: {
-      question: 'What\'s a simple way to start working with documents in AI?',
-      options: [
-        { text: 'Paste or share the text and ask a simple question about it', correct: true },
-        { text: 'Only ever describe the document from memory', correct: false },
-        { text: 'Documents can\'t be used with AI at all', correct: false }
-      ]
-    }
-  },
-  'spotting-ai-mistakes': {
-    title: 'Spotting AI Mistakes',
-    learn: 'AI can sound confident even when it\'s wrong — sometimes called a "hallucination." A good habit is to double-check any fact, number, or name that really matters before you rely on it.',
-    example: { label: 'Good habit', good: 'Quickly checking a name, date, or number AI gives you against a real source before using it.' },
-    practice: 'Next time AI gives you a specific fact or number, take 10 seconds to verify it.',
-    practiceExample: 'AI said our supplier\'s payment terms are 45 days — checking the actual contract showed it was 30, so it got corrected before sending.',
-    quiz: {
-      question: 'What should you do with an important fact or number AI gives you?',
-      options: [
-        { text: 'Quickly double-check it before relying on it', correct: true },
-        { text: 'Always trust it completely, no matter what', correct: false },
-        { text: 'Ignore anything AI ever says', correct: false }
-      ]
-    }
-  },
-  'from-basic-to-practical': {
-    title: 'From Basic to Practical AI Use',
-    learn: 'You\'ve got the fundamentals — now it\'s about making AI a regular habit: for messages, summaries, quick research, and decisions. The next step is structure — building prompts and simple workflows that get consistently good results.',
-    example: { label: 'Next step', good: 'Instead of one-off prompts, start thinking about a repeatable structure you can reuse.' },
-    practice: 'Pick one task you now do with AI regularly, and write down the prompt you use so you can reuse it.',
-    practiceExample: 'My go-to prompt: "Turn these meeting notes into action items, each with an owner if mentioned."',
-    quiz: {
-      question: 'What\'s the natural next step after building basic AI habits?',
-      options: [
-        { text: 'Learning more structure, like prompts you can reuse and simple step-by-step routines', correct: true },
-        { text: 'Stopping using AI altogether', correct: false },
-        { text: 'Only ever using AI for one single task forever', correct: false }
-      ]
-    }
-  },
-
-  // ================= INTERMEDIATE =================
-  'better-prompting': {
-    title: 'Better Prompting',
-    learn: 'Beyond being specific, strong prompts often include: the goal, the audience, the format you want (bullet points? a table? an email?), and any constraints (length, tone). The more of these you give up front, the fewer rounds of back-and-forth you\'ll need.',
-    example: { label: 'Stronger prompt', good: '"Write a 3-bullet summary for my manager, in a neutral tone, no more than 60 words."' },
-    practice: 'Rewrite one of your recent prompts to include goal, audience, format, and length.',
-    practiceExample: '"Write a 3-bullet summary of this report for my manager, neutral tone, under 60 words."',
-    quiz: {
-      question: 'Which detail is NOT usually needed in a strong prompt?',
-      options: [
-        { text: 'The desired format (email, bullets, table)', correct: false },
-        { text: 'The audience it\'s for', correct: false },
-        { text: 'The exact model version number', correct: true }
       ]
     }
   },
@@ -713,53 +559,6 @@ const LESSON_LIBRARY = {
       ]
     }
   },
-  'ai-for-business-tasks': {
-    title: 'AI for Business Tasks',
-    learn: 'AI can help draft quotes, summarise supplier terms, prepare talking points for meetings, or check a document\'s tone before it goes to a client. Always keep a human review step for anything customer- or finance-facing.',
-    example: { label: 'Good use', good: 'Ask AI to draft talking points for a supplier call, then you review and adjust before the call.' },
-    practice: 'Pick one upcoming business task and ask AI to help you prepare for it.',
-    practiceExample: '"Draft 3 talking points for tomorrow\'s call with our aluminium supplier about the price increase."',
-    quiz: {
-      question: 'What should always happen before an AI draft about a customer or money is sent?',
-      options: [
-        { text: 'A human review step', correct: true },
-        { text: 'Nothing — send it straight away', correct: false },
-        { text: 'Translate it twice', correct: false }
-      ]
-    }
-  },
-  'ai-workflows': {
-    title: 'AI Workflows',
-    learn: 'A "workflow" is a repeatable sequence of steps: e.g. Step 1 — summarise the enquiry; Step 2 — draft a reply; Step 3 — check tone. Breaking work into steps like this makes AI more reliable than one giant request.',
-    example: { label: 'Simple workflow', good: '1) Summarise the enquiry. 2) Draft a reply using our tone guide. 3) List anything that needs manager approval.' },
-    practice: 'Break one task you do into 3 clear steps you could ask AI to help with one at a time.',
-    practiceExample: '1) Summarise the enquiry. 2) Draft a reply using our tone guide. 3) List anything needing manager approval.',
-    quiz: {
-      question: 'Why break a task into steps for AI instead of one big request?',
-      options: [
-        { text: 'Each step gets more focus, so the final result is more reliable', correct: true },
-        { text: 'It uses fewer words overall', correct: false },
-        { text: 'AI can only handle one sentence at a time', correct: false }
-      ]
-    }
-  },
-  'intro-automation': {
-    title: 'Introduction to Automation',
-    learn: 'Automation means setting up AI (or AI plus other tools) to run a repeatable task with little or no manual effort each time — for example, automatically drafting a reply template whenever a certain type of enquiry comes in. This is the bridge between "using AI" and "AI working for you in the background."',
-    example: { label: 'Simple automation idea', good: 'A saved template that auto-drafts a reply whenever a delivery-delay enquiry comes in, which staff then just review and send.' },
-    practice: 'Think of one repeatable task in your role that could become a saved template or simple automation.',
-    practiceExample: 'A saved template that auto-drafts a reply whenever a delivery-delay enquiry comes in, which staff then just review and send.',
-    quiz: {
-      question: 'What best describes automation?',
-      options: [
-        { text: 'A one-off task done manually', correct: false },
-        { text: 'A repeatable task set up to run with little manual effort each time', correct: true },
-        { text: 'Turning off AI tools to save time', correct: false }
-      ]
-    }
-  },
-
-  // ================= ADVANCED =================
   'advanced-prompting': {
     title: 'Advanced Prompting',
     whatYoullLearn: 'How to write a prompt that reliably handles a bigger, more complex task.',
@@ -868,113 +667,6 @@ const LESSON_LIBRARY = {
       ]
     }
   },
-  'tool-integrations': {
-    title: 'AI Tool Integrations',
-    learn: 'Integrations (often called Connectors or MCPs) let AI read from or act on other systems — like Zoho CRM, Google Drive, or Microsoft 365 — instead of only working inside the chat window. This is what makes AI genuinely useful for real business systems.',
-    example: { label: 'Integration example', good: 'Connecting Claude to Zoho CRM so it can look up a customer record directly, instead of you copy-pasting the details in.' },
-    practice: 'Check the Knowledge Hub\'s Connectors tab for one integration relevant to your team.',
-    practiceExample: 'The Zoho CRM connector lets Claude look up a customer\'s record directly, instead of someone copy-pasting the details in first.',
-    quiz: {
-      question: 'What do AI integrations (Connectors/MCPs) let AI do?',
-      options: [
-        { text: 'Read from or act on other business systems, not just chat', correct: true },
-        { text: 'Only change the AI\'s reply colour', correct: false },
-        { text: 'Nothing — they\'re decorative', correct: false }
-      ]
-    }
-  },
-  'data-analysis-ai': {
-    title: 'Data Analysis with AI',
-    learn: 'AI can spot patterns, summarise trends, and flag outliers in data you provide — e.g. a sales spreadsheet or a set of survey responses. It works best when you tell it exactly what question you want answered, not just "analyse this."',
-    example: { label: 'Good ask', good: '"Looking at this sales data, which month had the biggest drop, and what changed compared to the month before?"' },
-    practice: 'Take a small dataset you work with and ask AI one specific analytical question about it.',
-    practiceExample: '"Looking at this sales data, which month had the biggest drop, and what changed compared to the month before?"',
-    quiz: {
-      question: 'What gets the best results when asking AI to analyse data?',
-      options: [
-        { text: 'A specific question, not just "analyse this"', correct: true },
-        { text: 'Uploading the data with no question at all', correct: false },
-        { text: 'Asking it to guess without seeing any data', correct: false }
-      ]
-    }
-  },
-  'business-process-automation': {
-    title: 'Business Process Automation',
-    learn: 'Look for processes that are repetitive, rule-based, and high-volume — these are the best automation candidates. Map the current manual steps first, then decide which steps AI or an integration can take over, and which still need a human check.',
-    example: { label: 'Good candidate', good: 'A weekly report that always follows the same format and pulls from the same sources — ideal for automating the draft, with a human doing a final check.' },
-    practice: 'Map out the steps of one repetitive process you run, and mark which steps could be automated.',
-    practiceExample: 'Weekly report: 1) Pull sales figures (automatable) 2) Draft summary (automatable) 3) Manager reviews and approves (needs a human).',
-    quiz: {
-      question: 'What kind of process is the best automation candidate?',
-      options: [
-        { text: 'Repetitive, rule-based, and high-volume', correct: true },
-        { text: 'One-off and highly unpredictable', correct: false },
-        { text: 'Something that changes completely every single time', correct: false }
-      ]
-    }
-  },
-  'building-ai-workflows': {
-    title: 'Building AI-powered workflows',
-    learn: 'Putting it together: define the goal, break it into steps, decide which steps need AI, which need an integration, and which need a human check — then document it so others can repeat it. A written-down workflow is what turns a one-off trick into a real business tool.',
-    example: { label: 'Documented workflow', good: 'A short written guide: "1) New enquiry arrives. 2) AI drafts a categorised summary. 3) Staff review and forward to the right department."' },
-    practice: 'Write down one AI-assisted workflow you already use informally, so a teammate could follow it.',
-    practiceExample: '"1) New enquiry arrives. 2) AI drafts a categorised summary. 3) Staff review and forward to the right department."',
-    quiz: {
-      question: 'Why document an AI-assisted workflow?',
-      options: [
-        { text: 'So it becomes repeatable and others on the team can follow it', correct: true },
-        { text: 'Documentation has no real benefit here', correct: false },
-        { text: 'To make the process harder to follow on purpose', correct: false }
-      ]
-    }
-  },
-
-  // ================= EXPERT =================
-  'advanced-architecture': {
-    title: 'Advanced AI Architecture',
-    learn: 'Modern AI systems are often more than one model call — they combine retrieval (pulling in relevant documents), tools (actions the AI can take), and memory (context carried across a session). Understanding these pieces helps you design more reliable systems instead of relying on a single prompt to do everything.',
-    example: { label: 'Architecture piece', good: 'Retrieval: searching your company\'s documents for the relevant policy before answering, instead of relying on the model\'s general knowledge alone.' },
-    practice: 'Identify one task where pulling in a specific document first (retrieval) would make the AI\'s answer more accurate.',
-    practiceExample: 'Answering "what\'s our returns policy?" is more accurate if AI first retrieves the actual policy document, rather than relying on general knowledge.',
-    quiz: {
-      question: 'What does "retrieval" add to an AI system?',
-      options: [
-        { text: 'The ability to pull in specific, relevant documents before answering', correct: true },
-        { text: 'A way to make replies shorter', correct: false },
-        { text: 'Nothing measurable', correct: false }
-      ]
-    }
-  },
-  'ai-agents-expert': {
-    title: 'AI Agents (Expert)',
-    learn: 'At an expert level, designing agents means defining clear goals, the tools they\'re allowed to use, guardrails (what they must never do), and how their work gets checked. A well-designed agent is scoped narrowly enough to be reliable, not given unlimited freedom.',
-    example: { label: 'Good agent scope', good: 'An agent allowed to draft and categorise support tickets, but not allowed to send a final reply without a human approving it.' },
-    practice: 'Define a goal, allowed tools, and one guardrail for an agent you\'d want to build for your team.',
-    practiceExample: 'Goal: draft and categorise support tickets. Tools: ticketing system, knowledge base search. Guardrail: never send a final reply without a human approving it first.',
-    quiz: {
-      question: 'What makes an agent design reliable?',
-      options: [
-        { text: 'A clear goal, defined tools, and guardrails on what it must not do', correct: true },
-        { text: 'Giving it unlimited freedom with no checks', correct: false },
-        { text: 'Removing all goals so it can decide everything itself', correct: false }
-      ]
-    }
-  },
-  'mcps': {
-    title: 'MCPs (Connectors)',
-    learn: 'MCP (Model Context Protocol) is the technical standard behind what the Hub calls "Connectors" — it defines how an AI assistant securely connects to an external system\'s data and actions. Knowing the standard helps you evaluate new connectors and understand what they can and can\'t do.',
-    example: { label: 'Why it matters', good: 'Understanding MCP means you can judge whether a new connector genuinely gives AI safe, useful access — not just a marketing claim.' },
-    practice: 'Look at one Connector entry in the Hub and identify what system it connects to and what actions it allows.',
-    practiceExample: 'The Xero connector lets Claude read invoices, bills, and contacts, and answer bookkeeping questions — but it can\'t send payments on its own.',
-    quiz: {
-      question: 'What does MCP define?',
-      options: [
-        { text: 'How an AI assistant securely connects to external data and actions', correct: true },
-        { text: 'A file format for images', correct: false },
-        { text: 'A pricing plan for AI tools', correct: false }
-      ]
-    }
-  },
   'apis-integrations': {
     title: 'APIs and Integrations',
     whatYoullLearn: 'What an API does in an AI solution, and why access should be limited.',
@@ -1026,21 +718,6 @@ const LESSON_LIBRARY = {
         { text: 'When information is missing, the system has no defined safe behaviour and may send an incorrect or incomplete result', correct: true, feedback: 'Right — advanced automations need a defined error path, not just a plan for when everything goes smoothly.' },
         { text: 'AI cannot be used in automations at all', correct: false, feedback: 'AI is well suited to automations — the issue is the design missing an error path, not AI\'s suitability.' },
         { text: 'The automation will stop working entirely', correct: false, feedback: 'The bigger risk usually isn\'t a stoppage — it\'s the system pushing ahead with an incorrect or incomplete result when something doesn\'t fit the expected path.' }
-      ]
-    }
-  },
-  'multistep-workflows': {
-    title: 'Multi-step AI Workflows',
-    learn: 'At expert level, workflows often branch and loop: an AI step might trigger different follow-up steps depending on its output, or repeat until a condition is met. Designing these well means mapping every branch, not just the "happy path."',
-    example: { label: 'Branching example', good: 'If AI\'s draft passes a quality check, send it; if not, loop back for a revision before trying again.' },
-    practice: 'Sketch one branch point ("if X, do Y; otherwise, do Z") for a workflow you\'ve designed.',
-    practiceExample: 'If AI\'s draft passes a quality check, send it. If not, loop back for a revision before trying again.',
-    quiz: {
-      question: 'What should you map when designing a branching workflow?',
-      options: [
-        { text: 'Every likely branch, not just the ideal path', correct: true },
-        { text: 'Only the best-case scenario', correct: false },
-        { text: 'Nothing — branches sort themselves out automatically', correct: false }
       ]
     }
   },
@@ -1103,7 +780,7 @@ const LESSON_LIBRARY = {
 // ---- XP & levelling -----------------------------------------------------------
 const XP_PER_LESSON = 40;
 const XP_PER_QUIZ_CORRECT = 10; // quiz here is a single check, so this is a pass/fail bonus
-const XP_PER_PATH_COMPLETE = 100; // bonus for finishing all 8 lessons in a level's path
+const XP_PER_PATH_COMPLETE = 100; // bonus for finishing all 4 lessons in a level's path
 const XP_PER_RESOURCE = 20; // completing a real Hub resource (with or without a knowledge check)
 const XP_PER_CHALLENGE_PASSED = 150; // awarded once, the first time a level's practical challenge is marked Passed
 const XP_PER_LEARNER_LEVEL = 200; // XP needed per "AI LEVEL" (gamification level, distinct from skill level)

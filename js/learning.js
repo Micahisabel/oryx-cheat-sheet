@@ -932,27 +932,29 @@ function bindOverviewLevelUp(){
 // that just by clicking the tab, so people can't shortcut past levels they
 // haven't earned. `currentLevel` only ever moves forward (see
 // bindOverviewLevelUp()), so this is always "reached level, or earlier".
-function isLevelUnlocked(lv){
-  if(lv === 'expert') return true; // Expert stays browsable at any level — never locked.
-  const currentIndex = LEARNING_LEVEL_ORDER.indexOf(progress.currentLevel);
-  return LEARNING_LEVEL_ORDER.indexOf(lv) <= (currentIndex === -1 ? 0 : currentIndex);
+// Every level tab is always browsable — the "no shortcuts" gate lives on the
+// LESSONS inside a level, not the tab itself (see renderPathTab). Beginner
+// has no prerequisite; every other level (including Expert) requires the
+// one before it to be fully completed before its lessons unlock.
+function prevLevelDone(lv){
+  if(lv === 'beginner') return true;
+  const prevLevel = LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(lv) - 1];
+  return !!(progress.pathCompleted && progress.pathCompleted[prevLevel]);
 }
 
 function renderPathTab(){
   const done = progress.completedLessons || [];
-  if(!isLevelUnlocked(reviewLevel)) reviewLevel = progress.currentLevel || LEARNING_LEVEL_ORDER[0];
+  const levelReady = prevLevelDone(reviewLevel);
   return `
     <div class="lrn-level-switch">
-      ${LEARNING_LEVEL_ORDER.map(lv => {
-        const unlocked = isLevelUnlocked(lv);
-        return `<button class="lrn-level-switch-btn ${reviewLevel === lv ? 'active' : ''} ${unlocked ? '' : 'locked'}" data-lv="${lv}" ${unlocked ? '' : 'disabled title="Reach this level first — finish your current path and its practical challenge to unlock it."'}>${unlocked ? LEVEL_META[lv].emoji : '🔒'} ${LEVEL_META[lv].label}</button>`;
-      }).join('')}
+      ${LEARNING_LEVEL_ORDER.map(lv => `<button class="lrn-level-switch-btn ${reviewLevel === lv ? 'active' : ''}" data-lv="${lv}">${LEVEL_META[lv].emoji} ${LEVEL_META[lv].label}</button>`).join('')}
     </div>
+    ${!levelReady ? `<div class="lrn-level-locked-note">🔒 Finish the ${escapeHtml(LEVEL_META[LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(reviewLevel) - 1]].label)} path first to unlock these lessons.</div>` : ''}
     <div class="lrn-path-list">
       ${LEARNING_PATHS[reviewLevel].map((id, i) => {
         const lesson = LESSON_LIBRARY[id];
         const isDone = done.includes(id);
-        const prevDone = i === 0 || done.includes(LEARNING_PATHS[reviewLevel][i - 1]);
+        const prevDone = (i === 0 ? levelReady : done.includes(LEARNING_PATHS[reviewLevel][i - 1]));
         const locked = !isDone && !prevDone;
         return `
           <button class="lrn-path-item ${isDone ? 'done' : ''} ${locked ? 'locked' : ''}" data-id="${id}" ${locked ? 'disabled' : ''}>
@@ -964,7 +966,7 @@ function renderPathTab(){
 }
 
 function bindPathTab(){
-  learningRoot.querySelectorAll('.lrn-level-switch-btn:not(.locked)').forEach(btn => {
+  learningRoot.querySelectorAll('.lrn-level-switch-btn').forEach(btn => {
     btn.addEventListener('click', () => { reviewLevel = btn.dataset.lv; renderDashboard(); });
   });
   learningRoot.querySelectorAll('.lrn-path-item:not(.locked)').forEach(btn => {
