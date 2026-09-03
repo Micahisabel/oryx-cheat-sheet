@@ -929,6 +929,7 @@ function bindOverviewLevelUp(){
     if(state && state.status === 'passed'){
       const nextLevel = LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(level) + 1];
       progress.currentLevel = nextLevel;
+      awardXp(XP_PER_CHALLENGE_PASSED);
       saveProgress();
       renderDashboard();
       return;
