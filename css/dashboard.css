@@ -86,7 +86,16 @@
   .lrn-chart-gridline{ stroke:var(--line-soft); stroke-width:1; stroke-dasharray:3,3; }
   .lrn-chart-axis-label{ font-size:11px; fill:var(--label); font-family:var(--font-body); }
   .lrn-chart-cat-label{ font-size:12px; fill:var(--black); font-family:var(--font-body); }
-  .lrn-chart-value-label{ font-size:12px; font-weight:600; fill:var(--black); font-family:var(--font-body); }
+  .lrn-chart-hit{ cursor:pointer; transition:opacity 0.12s ease; }
+  .lrn-chart-hit:hover{ opacity:0.82; }
+
+  .lrn-chart-tooltip{
+    display:none; position:fixed; z-index:999; pointer-events:none;
+    background:var(--oryx-blue); color:var(--white);
+    font-family:var(--font-body); font-size:12px; font-weight:500;
+    padding:6px 10px; border-radius:6px; box-shadow:0 6px 16px rgba(2,42,58,0.25);
+    white-space:nowrap;
+  }
 
   /* ---------- Employee learning progress table (admin, AI Capability dashboard) ---------- */
   .lrn-admin-table-controls{

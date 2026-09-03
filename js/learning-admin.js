@@ -487,8 +487,42 @@ function shortWeekLabel(iso){
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-// Vertical bar chart with gridlines, axis labels, and a native hover
-// tooltip per bar (an SVG <title> — no floating-tooltip widget needed, and
+// One shared floating tooltip, lazily created and reused across every chart
+// on the page (rather than a separate element per chart) so there's only
+// ever one DOM node to position and show/hide.
+function ensureChartTooltip(){
+  let el = document.getElementById('lrnChartTooltip');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'lrnChartTooltip';
+    el.className = 'lrn-chart-tooltip';
+    document.body.appendChild(el);
+  }
+  return el;
+}
+
+// Wires hover for every [data-tooltip] element inside a freshly-rendered
+// chart container — bars/points stay visually clean (no on-chart number
+// clutter) and show their exact value only while the mouse is over them.
+function bindChartTooltips(container){
+  const tooltip = ensureChartTooltip();
+  container.querySelectorAll('.lrn-chart-hit').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      tooltip.textContent = el.dataset.tooltip;
+      tooltip.style.display = 'block';
+    });
+    el.addEventListener('mousemove', (ev) => {
+      tooltip.style.left = (ev.clientX + 14) + 'px';
+      tooltip.style.top = (ev.clientY + 14) + 'px';
+    });
+    el.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+    });
+  });
+}
+
+// Vertical bar chart with gridlines, axis labels, and a hover tooltip per
+// bar (bound after render by bindChartTooltips — keeps the chart itself
 // it's accessible for free). Same hand-built inline-SVG approach as
 // progressGraphSvg() in learning.js: no charting library, no build step.
 function levelDistributionChartSvg(byLevel, notAssessedCount){
@@ -519,8 +553,7 @@ function levelDistributionChartSvg(byLevel, notAssessedCount){
     const y = padT + plotH - barH;
     const pct = total ? Math.round((c.count / total) * 100) : 0;
     return `
-      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(barH, 0).toFixed(1)}" rx="6" fill="${c.color}"><title>${escapeHtml(c.label)}: ${c.count} (${pct}%)</title></rect>
-      <text x="${(x + barW / 2).toFixed(1)}" y="${(y - 8).toFixed(1)}" text-anchor="middle" class="lrn-chart-value-label">${c.count}</text>
+      <rect class="lrn-chart-hit" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(barH, 0).toFixed(1)}" rx="6" fill="${c.color}" data-tooltip="${escapeHtml(c.label)}: ${c.count} (${pct}%)"></rect>
       <text x="${(x + barW / 2).toFixed(1)}" y="${(h - padB + 18).toFixed(1)}" text-anchor="middle" class="lrn-chart-axis-label">${escapeHtml(c.label)}</text>`;
   }).join('');
 
@@ -554,7 +587,7 @@ function departmentProgressChartSvg(deptStats){
     const barWidth = (d.avgProgress / xMax) * plotW;
     return `
       <text x="${padL - 10}" y="${(y + barH / 2 + 4).toFixed(1)}" text-anchor="end" class="lrn-chart-cat-label">${escapeHtml(d.dept)}</text>
-      <rect x="${padL}" y="${y.toFixed(1)}" width="${Math.max(barWidth, 0).toFixed(1)}" height="${barH}" rx="6" fill="var(--oryx-blue)"><title>${escapeHtml(d.dept)}: ${d.avgProgress}% (${d.count} employee${d.count === 1 ? '' : 's'})</title></rect>`;
+      <rect class="lrn-chart-hit" x="${padL}" y="${y.toFixed(1)}" width="${Math.max(barWidth, 0).toFixed(1)}" height="${barH}" rx="6" fill="var(--oryx-blue)" data-tooltip="${escapeHtml(d.dept)}: ${d.avgProgress}% (${d.count} employee${d.count === 1 ? '' : 's'})"></rect>`;
   }).join('');
 
   return `
@@ -586,8 +619,12 @@ function activityOverTimeSvg(series){
   }).join('');
 
   const path = xs.map((x, i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
-  const points = xs.map((x, i) => `
-      <circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="4" fill="var(--oryx-blue)"><title>${escapeHtml(shortWeekLabel(series[i].weekStart))}: ${series[i].count} activit${series[i].count === 1 ? 'y' : 'ies'}</title></circle>`).join('');
+  const points = xs.map((x, i) => {
+    const tip = `${escapeHtml(shortWeekLabel(series[i].weekStart))}: ${series[i].count} activit${series[i].count === 1 ? 'y' : 'ies'}`;
+    return `
+      <circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="4" fill="var(--oryx-blue)"></circle>
+      <circle class="lrn-chart-hit" cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="10" fill="transparent" data-tooltip="${tip}"></circle>`;
+  }).join('');
 
   const labelStep = Math.max(1, Math.ceil(n / 6));
   const xLabels = series.map((p, i) => {
@@ -780,6 +817,7 @@ function renderLearningAdmin(){
   const refreshBtn = document.getElementById('learningAdminRefresh');
   if(refreshBtn) refreshBtn.addEventListener('click', () => { learningAdminDocs = null; renderLearningAdmin(); });
 
+  bindChartTooltips(learningAdminView);
   bindPendingChallenges(learningAdminView);
 
   const deptSelect = document.getElementById('learningAdminDeptSelect');
