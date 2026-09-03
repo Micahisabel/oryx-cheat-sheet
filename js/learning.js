@@ -269,7 +269,7 @@ function topbar({ showProgress = null, showBackToApp = true } = {}){
     <div class="lrn-topbar">
       ${showBackToApp ? `<button class="lrn-icon-btn" id="lrnExitBtn" aria-label="Back to Knowledge Hub">&larr;</button>` : '<span></span>'}
       ${showProgress !== null ? `<div class="lrn-progress-track"><div class="lrn-progress-fill" style="width:${showProgress}%"></div></div>` : '<div></div>'}
-      <div class="lrn-topbar-stats">${streakHtml}<span class="lrn-xp-pill" title="You earn points by finishing lessons. Every 200 points, your level goes up.">⭐ ${xp} points · Level ${lvl}</span></div>
+      <div class="lrn-topbar-stats">${streakHtml}<span class="lrn-xp-pill" title="Your Points Level goes up every 200 points you earn. It's separate from your AI Knowledge Level.">⭐ ${xp} points · Points Level ${lvl}</span></div>
     </div>`;
 }
 
@@ -1030,7 +1030,12 @@ function bindOverviewLevelUp(){
 // one before it to be fully completed before its lessons unlock.
 function prevLevelDone(lv){
   if(lv === 'beginner') return true;
-  const prevLevel = LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(lv) - 1];
+  const lvIndex = LEARNING_LEVEL_ORDER.indexOf(lv);
+  const currentIndex = LEARNING_LEVEL_ORDER.indexOf(progress.currentLevel);
+  // Placed here directly by the assessment (or already leveled up past it) — no need
+  // to have completed lower-level paths first.
+  if(currentIndex >= lvIndex) return true;
+  const prevLevel = LEARNING_LEVEL_ORDER[lvIndex - 1];
   return !!(progress.pathCompleted && progress.pathCompleted[prevLevel]);
 }
 
