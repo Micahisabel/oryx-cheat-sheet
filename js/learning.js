@@ -893,7 +893,7 @@ function renderAchievementsTab(){
 // 7. Lesson runner — Learn -> Practice -> Quiz -> Complete
 // ---------------------------------------------------------------------------
 function openLesson(levelKey, lessonId){
-  activeLesson = { levelKey, lessonId, step: 'learn', wrongAttempt: false, practiceAttempt: '', practiceRevealed: false };
+  activeLesson = { levelKey, lessonId, step: 'learn', wrongAttempt: false, practiceAttempt: '', practiceRevealed: false, quizSelected: null };
   learningScreen = 'lesson';
   renderLearning();
 }
@@ -904,14 +904,21 @@ function renderLesson(){
 
   let body = '';
   if(step === 'learn'){
+    const paragraphs = Array.isArray(lesson.learn) ? lesson.learn : [lesson.learn];
     body = `
       <div class="lrn-lesson-section">
         <h3>Learn</h3>
-        <p>${escapeHtml(lesson.learn)}</p>
+        ${lesson.whatYoullLearn ? `<div class="lrn-whatyoullearn"><span>What you'll learn</span>${escapeHtml(lesson.whatYoullLearn)}</div>` : ''}
+        ${paragraphs.map(p => `<p>${escapeHtml(p)}</p>`).join('')}
         ${lesson.example ? `
           <div class="lrn-example">
             ${lesson.example.bad ? `<div class="lrn-example-bad"><span>Bad:</span> ${escapeHtml(lesson.example.bad)}</div>` : ''}
             <div class="lrn-example-good"><span>${lesson.example.bad ? 'Better:' : escapeHtml(lesson.example.label) + ':'}</span> ${escapeHtml(lesson.example.good)}</div>
+          </div>` : ''}
+        ${lesson.keyTakeaways && lesson.keyTakeaways.length ? `
+          <div class="lrn-key-takeaways">
+            <div class="lrn-key-takeaways-label">Key takeaways</div>
+            <ul>${lesson.keyTakeaways.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul>
           </div>` : ''}
       </div>
       <button class="lrn-btn-primary" id="lrnNextStep">Continue</button>`;
@@ -922,6 +929,8 @@ function renderLesson(){
       <div class="lrn-lesson-section">
         <h3>Practice</h3>
         <p>${escapeHtml(lesson.practice)}</p>
+        ${lesson.practiceChecklist && lesson.practiceChecklist.length ? `
+          <ul class="lrn-practice-checklist">${lesson.practiceChecklist.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>` : ''}
         <textarea class="lrn-practice-input" id="lrnPracticeInput" placeholder="Type your attempt here — a prompt, a note, whatever fits this task…">${escapeHtml(activeLesson.practiceAttempt || '')}</textarea>
         ${hasExample ? `
           <button class="lrn-btn-text lrn-reveal-btn" id="lrnRevealExample" ${(activeLesson.practiceAttempt || '').trim().length < 3 ? 'disabled' : ''}>Show me a strong example</button>
@@ -934,15 +943,28 @@ function renderLesson(){
       </div>
       <button class="lrn-btn-primary" id="lrnNextStep" ${canContinue ? '' : 'disabled'}>${hasExample ? 'Continue' : 'I tried it — continue'}</button>`;
   }else if(step === 'quiz'){
+    const hasAnswered = activeLesson.quizSelected !== null && activeLesson.quizSelected !== undefined;
+    const selectedOpt = hasAnswered ? lesson.quiz.options[activeLesson.quizSelected] : null;
     body = `
       <div class="lrn-lesson-section">
-        ${activeLesson.wrongAttempt ? `<div class="lrn-quiz-retry"><img src="assets/images/mascot/cat-confused.png" alt="Ginger looking confused">Not quite — take another look at the Learn section above, then try again.</div>` : ''}
         <h3>Quick check</h3>
         <p>${escapeHtml(lesson.quiz.question)}</p>
         <div class="lrn-options">
-          ${lesson.quiz.options.map((opt, i) => `<button class="lrn-option-btn" data-i="${i}">${escapeHtml(opt.text)}</button>`).join('')}
+          ${lesson.quiz.options.map((opt, i) => {
+            let cls = 'lrn-option-btn';
+            if(hasAnswered && i === activeLesson.quizSelected) cls += opt.correct ? ' lrn-option-correct' : ' lrn-option-incorrect';
+            return `<button class="${cls}" data-i="${i}" ${hasAnswered ? 'disabled' : ''}>${escapeHtml(opt.text)}</button>`;
+          }).join('')}
         </div>
-      </div>`;
+        ${hasAnswered ? `
+          <div class="lrn-quiz-feedback ${selectedOpt.correct ? 'lrn-quiz-feedback--correct' : 'lrn-quiz-feedback--incorrect'}">
+            <span class="lrn-quiz-feedback-label">${selectedOpt.correct ? 'Correct' : 'Not quite'}</span>
+            ${escapeHtml(selectedOpt.feedback || (selectedOpt.correct ? "Well done — that's the best answer." : 'Look again at what you just read, then try again.'))}
+          </div>` : ''}
+      </div>
+      ${hasAnswered ? (selectedOpt.correct
+        ? `<button class="lrn-btn-primary" id="lrnQuizContinue">Continue</button>`
+        : `<button class="lrn-btn-primary" id="lrnQuizRetry">Try again</button>`) : ''}`;
   }else if(step === 'done'){
     body = `
       <div class="lrn-lesson-complete">
@@ -1000,9 +1022,19 @@ function renderLesson(){
   }
 
   if(step === 'quiz'){
-    learningRoot.querySelectorAll('.lrn-option-btn').forEach(btn => {
-      btn.addEventListener('click', () => answerLessonQuiz(lesson, Number(btn.dataset.i)));
-    });
+    const hasAnswered = activeLesson.quizSelected !== null && activeLesson.quizSelected !== undefined;
+    if(!hasAnswered){
+      learningRoot.querySelectorAll('.lrn-option-btn').forEach(btn => {
+        btn.addEventListener('click', () => selectQuizOption(lesson, Number(btn.dataset.i)));
+      });
+    }else if(lesson.quiz.options[activeLesson.quizSelected].correct){
+      document.getElementById('lrnQuizContinue').addEventListener('click', () => completeLesson());
+    }else{
+      document.getElementById('lrnQuizRetry').addEventListener('click', () => {
+        activeLesson.quizSelected = null;
+        renderLearning();
+      });
+    }
   }
   if(step === 'done'){
     document.getElementById('lrnBackToDashboard').addEventListener('click', () => {
@@ -1019,15 +1051,11 @@ function advanceLessonStep(){
   renderLearning();
 }
 
-function answerLessonQuiz(lesson, optionIndex){
-  const correct = lesson.quiz.options[optionIndex].correct;
-  if(!correct){
-    activeLesson.wrongAttempt = true;
-    activeLesson.step = 'learn';
-    renderLearning();
-    return;
-  }
-  completeLesson();
+function selectQuizOption(lesson, optionIndex){
+  const opt = lesson.quiz.options[optionIndex];
+  if(!opt.correct) activeLesson.wrongAttempt = true;
+  activeLesson.quizSelected = optionIndex;
+  renderLearning();
 }
 
 function completeLesson(){

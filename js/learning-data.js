@@ -250,61 +250,109 @@ const LESSON_LIBRARY = {
   // ================= BEGINNER =================
   'what-is-ai': {
     title: 'What is AI?',
-    learn: 'AI (Artificial Intelligence) tools like Claude and ChatGPT are programs trained on huge amounts of text. Instead of following a fixed script, they predict a helpful reply based on what you type — the way a very well-read colleague might. The more clearly you explain what you want, the more useful the reply.',
-    example: { label: 'Think of it like', good: 'A very fast, very well-read assistant who has read millions of documents — but who still needs clear instructions from you to do the right task.' },
-    practice: 'Open Claude or ChatGPT and ask it: "In simple terms, what can you help me with at work?" Read the reply.',
-    practiceExample: 'A typical reply: "I can help you draft emails, summarise long documents, brainstorm ideas, check tone before you send something, and answer general questions — just tell me the task and I\'ll give it a go."',
+    whatYoullLearn: 'What an AI assistant actually does, and when it\'s a good fit for a task.',
+    learn: [
+      'AI (Artificial Intelligence) tools like Claude and ChatGPT are trained on huge amounts of text. Instead of looking up a fixed answer, they predict a helpful reply based on what you type — a bit like a fast, well-read colleague.',
+      'Real-world example: a search engine points you to pages that already exist. An AI assistant writes something new for you, built from what you ask for.',
+      'At work, this means AI can draft a reply, summarise a long email, or suggest ideas for a project name — as long as you explain clearly what you need.',
+      'Common mistake: expecting AI to already know things about Oryx. It only knows what you type to it and what it learned during training — it can\'t see your inbox, your files, or company systems unless you paste the information in.'
+    ],
+    example: { label: 'Think of it like', good: 'A very fast, well-read assistant who has read millions of documents — but who still needs clear instructions from you to do the right task.' },
+    keyTakeaways: [
+      'AI predicts a helpful reply from what you type — it isn\'t searching the internet for an existing page.',
+      'The clearer your request, the more useful the reply.',
+      'AI has no automatic knowledge of Oryx or your work unless you share it.'
+    ],
+    practice: 'A colleague asks: "Can AI help me at all with my job?" Write a short reply explaining, in your own words, one real task AI could help with — and one thing it can\'t do without your help (like knowing private company details).',
+    practiceExample: '"Yes — AI can help you draft messages, summarise long documents, or brainstorm ideas quickly. It won\'t automatically know things about Oryx or see your inbox, though — you\'d need to share the details it needs to work with."',
     quiz: {
-      question: 'What is the best way to think of an AI assistant?',
+      question: 'A colleague says: "I asked AI what our new delivery policy is, and it gave me a confident answer — so it must be right." What\'s the problem with this?',
       options: [
-        { text: 'A search engine that copies web pages', correct: false },
-        { text: 'An assistant that writes helpful replies based on what you type', correct: true },
-        { text: 'A robot that only follows fixed menu options', correct: false }
+        { text: 'Nothing — AI always knows company policies', correct: false, feedback: 'AI has no automatic access to Oryx\'s policies — a confident-sounding answer isn\'t proof it saw the real policy.' },
+        { text: 'AI has no automatic access to Oryx\'s policies, so it may have guessed a plausible-sounding answer', correct: true, feedback: 'Right — AI only knows what it\'s told or trained on, so a confident answer isn\'t proof it\'s accurate.' },
+        { text: 'AI only answers questions about IT, not policy', correct: false, feedback: 'AI can be asked about any topic — the real issue is that it can\'t see Oryx\'s actual policy documents unless someone provides them.' },
+        { text: 'The colleague should have asked in a ruder tone', correct: false, feedback: 'Tone doesn\'t affect accuracy — the real issue is that AI wasn\'t given Oryx\'s actual policy to work from.' }
       ]
     }
   },
   'how-assistants-work': {
     title: 'How AI assistants work',
-    learn: 'AI assistants read your message (the "prompt"), then generate a reply word by word based on patterns learned from training. They don\'t "know" facts the way a database does — they generate the most likely helpful answer, which is why checking important facts still matters.',
+    whatYoullLearn: 'How an AI assistant turns your instruction into an answer, and why checking matters.',
+    learn: [
+      'An AI assistant reads your message (called a "prompt"), then builds a reply word by word based on patterns it learned during training. It doesn\'t "know" facts the way a filing cabinet does — it generates the most likely helpful answer.',
+      'Real-world example: ask it "How many public holidays does the UAE have in 2026?" and it will give a confident, specific-sounding list. That confidence doesn\'t guarantee accuracy.',
+      'At work, this matters most for dates, numbers, and rules — the kind of details people rely on to make decisions.',
+      'Common mistake: treating every AI answer as if it were a verified fact. Treat it as a first draft from a fast colleague, not a certified source.'
+    ],
     example: { label: 'Good habit', good: 'Treat AI like a knowledgeable colleague drafting something for you — useful, fast, but worth a quick check before it goes out.' },
-    practice: 'Ask AI a factual question about your own department, then verify the answer with a colleague or document.',
-    practiceExample: 'Example: you ask "How many public holidays does the UAE have in 2026?" AI gives a specific list — you check it against an official source before relying on it for planning.',
+    keyTakeaways: [
+      'AI generates a likely-sounding answer — it doesn\'t check a database of guaranteed facts.',
+      'Confidence in the wording is not proof of accuracy.',
+      'Always verify dates, numbers, and rules that matter before you rely on them.'
+    ],
+    practice: 'AI tells you: "Oryx\'s standard delivery time is 6 weeks." You don\'t actually know if that\'s correct. Write one sentence explaining what you\'d do next, before repeating that figure to a customer.',
+    practiceExample: '"I\'d check this against the real delivery schedule or ask a colleague before quoting it to a customer — I wouldn\'t repeat an AI answer as fact without checking it first."',
     quiz: {
-      question: 'Why should you double-check important facts from AI?',
+      question: 'You ask AI a factual question and it replies instantly and confidently. What does that confidence actually tell you?',
       options: [
-        { text: 'Because AI guesses the most likely answer, and that guess can sometimes be wrong', correct: true },
-        { text: 'Because AI never gives useful answers', correct: false },
-        { text: 'Because AI charges more for correct answers', correct: false }
+        { text: 'The answer is definitely correct', correct: false, feedback: 'Confidence in the wording doesn\'t guarantee accuracy — AI can sound sure and still be wrong.' },
+        { text: 'Nothing about accuracy — it just means AI generated a plausible-sounding reply', correct: true, feedback: 'Exactly — AI always replies in a confident, fluent way, whether or not the answer is accurate. Checking matters most for facts you\'ll rely on.' },
+        { text: 'The answer must be false', correct: false, feedback: 'Confidence doesn\'t mean the answer is wrong either — it simply isn\'t a reliable signal of accuracy either way.' },
+        { text: 'AI is guessing to entertain you', correct: false, feedback: 'AI isn\'t trying to entertain — it\'s generating the most likely helpful reply, but likely isn\'t the same as verified.' }
       ]
     }
   },
   'intro-chatgpt-claude': {
     title: 'Introduction to ChatGPT and Claude',
-    learn: 'Claude and ChatGPT are both AI assistants you chat with in plain language. They can draft text, summarise documents, answer questions, and help with everyday tasks. Both work the same basic way: you write a prompt, they generate a reply, and you can keep the conversation going to refine it.',
+    whatYoullLearn: 'What ChatGPT and Claude are, and how trying more than one can help you.',
+    learn: [
+      'Claude and ChatGPT are both AI assistants you chat with in plain language. They can draft text, summarise documents, answer questions, and help with everyday tasks.',
+      'Both work the same basic way: you write a prompt, they generate a reply, and you can keep the conversation going to refine it.',
+      'Real-world example: you could ask either one "Summarise this email in two sentences" and get a similarly useful result — though the exact wording will differ.',
+      'Common mistake: assuming the first reply is final. Both tools let you reply back and ask for changes — the conversation continues.'
+    ],
     example: { label: 'Try this prompt', good: '"Summarise this email in two sentences."' },
-    practice: 'Open the AI Knowledge Hub\'s Claude or ChatGPT tab and try one existing Instruction or Skill entry.',
-    practiceExample: 'Example: opening the "Instruction for Claude" entry, copying its text into Claude, and seeing it immediately follow the format the instruction described.',
+    keyTakeaways: [
+      'ChatGPT and Claude are both AI assistants you talk to in plain language.',
+      'They work the same basic way: prompt in, reply out, and you can keep refining it.',
+      'The first answer isn\'t final — you can always ask for changes.'
+    ],
+    practice: 'Here are rough meeting notes: "Team agreed to move launch to March. Sarah will update the client. Budget needs review by Friday. Ali to check supplier stock." Write a prompt asking AI to turn this into 3 clear action points.',
+    practiceExample: '"Turn these meeting notes into 3 clear action points, with who\'s responsible for each: [paste notes]" — this tells AI exactly what format you want and what to include.',
     quiz: {
-      question: 'What can you do if an AI reply isn\'t quite right the first time?',
+      question: 'You ask an AI assistant for a summary and the first reply is too long. What\'s the best next step?',
       options: [
-        { text: 'Start over completely — you can\'t improve on a reply', correct: false },
-        { text: 'Reply back and ask it to adjust — the conversation continues', correct: true },
-        { text: 'Nothing — the first answer is final', correct: false }
+        { text: 'Start a completely new conversation from scratch', correct: false, feedback: 'You don\'t need to start over — the current conversation already has the context, so refining it is faster.' },
+        { text: 'Reply and ask for a shorter version', correct: true, feedback: 'Right — you can keep the conversation going and ask it to adjust length, tone, or detail without losing the context you\'ve already given it.' },
+        { text: 'Accept the long reply and just skim it', correct: false, feedback: 'This wastes the chance to get exactly what you need — asking for a shorter version takes seconds.' },
+        { text: 'Assume AI can\'t do summaries', correct: false, feedback: 'AI is well suited to summarising — the first attempt just needed refining, which is normal.' }
       ]
     }
   },
   'basic-prompt': {
     title: 'How to write a basic prompt',
-    learn: 'A good prompt is specific: say what you want, who it\'s for, and the tone. Vague prompts get vague answers.',
+    whatYoullLearn: 'What makes a prompt clear enough to get a genuinely useful reply.',
+    learn: [
+      'A good prompt is specific: say what you want, who it\'s for, and the tone. Vague prompts get vague answers.',
+      'Real-world example: "Write an email" could mean almost anything. "Write a short, professional email to a customer explaining their order will be delayed by two days" tells AI exactly what to produce.',
+      'At work, the fastest way to get a useless reply is to type the bare minimum and hope AI guesses the rest.',
+      'Common mistake: writing a prompt so short that AI has to fill in every gap itself — often guessing wrong about tone, length, or audience.'
+    ],
     example: { label: 'Bad vs. better', bad: '"Write an email."', good: '"Write a short, professional email to a customer explaining their order will be delayed by two days."' },
-    practice: 'Write a prompt asking AI to draft a message to a colleague about a schedule change — include who it\'s for and the tone you want.',
-    practiceExample: 'Write a short, friendly message to Sarah letting her know Thursday\'s meeting has moved to 3pm — keep it casual, two sentences max.',
+    keyTakeaways: [
+      'Specific prompts (task + audience + tone) get specific, useful replies.',
+      'Vague prompts force AI to guess — and it often guesses wrong.',
+      'A few extra words of detail save several rounds of back-and-forth.'
+    ],
+    practice: 'Improve this weak prompt: "Write something for the team." Rewrite it so it says the task, who it\'s for, and the tone you want.',
+    practiceExample: '"Write a short, upbeat message to the team announcing that Friday\'s target was hit — keep it under 3 sentences."',
     quiz: {
-      question: 'What makes a prompt more likely to get a useful reply?',
+      question: 'Which of these prompts is most likely to get a genuinely useful reply?',
       options: [
-        { text: 'Keeping it as short and vague as possible', correct: false },
-        { text: 'Being clear about the task, who it\'s for, and how it should sound', correct: true },
-        { text: 'Only ever asking one-word questions', correct: false }
+        { text: '"Write something."', correct: false, feedback: 'This gives AI no task, no audience, and no tone — it has to guess everything.' },
+        { text: '"Email."', correct: false, feedback: 'A single word gives AI nothing to work with beyond guessing the entire task.' },
+        { text: '"Write a short, friendly thank-you email to a customer who just placed their first order."', correct: true, feedback: 'This says the task (thank-you email), the tone (friendly), the length (short), and who it\'s for — everything AI needs.' },
+        { text: '"Do the email thing we discussed."', correct: false, feedback: 'AI has no memory of a conversation you haven\'t shown it — this assumes context it doesn\'t have.' }
       ]
     }
   },
@@ -372,31 +420,55 @@ const LESSON_LIBRARY = {
   // ================= BASIC =================
   'ai-strengths-weaknesses': {
     title: "What AI Is Good At (and Not)",
-    learn: 'AI is great at drafting, summarising, brainstorming, and answering general questions. It\'s weaker at precise maths, today\'s exact news, or live company data it isn\'t connected to. Knowing this helps you pick the right task for AI.',
-    example: { label: 'Good fit vs. weak fit', good: 'Drafting a first version of an email is a good fit. Asking for exact live stock levels it has no access to is a weak fit.' },
-    practice: 'List two tasks you\'d trust AI with, and one you wouldn\'t — and why.',
-    practiceExample: 'Trust AI with: drafting a first version of a reply, brainstorming names for a project. Wouldn\'t trust it with: telling me today\'s exact stock count in a system it can\'t see.',
+    whatYoullLearn: 'Which tasks AI is naturally strong at, and which ones still need a person.',
+    learn: [
+      'AI is great at drafting, summarising, brainstorming, and answering general questions. It\'s weaker at precise maths, today\'s exact news, or live company data it isn\'t connected to.',
+      'Real-world example: asking AI to draft a first version of a customer email is a strong fit. Asking it for today\'s exact live stock count in a system it can\'t see is a weak fit — it has no way to check that.',
+      'At work, the safest approach is: use AI for the first draft or the thinking, then have a person check anything that must be exactly right.',
+      'Common mistake: asking AI to make a final decision on something with real consequences (like approving a refund) without a person checking it first.'
+    ],
+    example: { label: 'Good fit vs. weak fit', good: 'Drafting a first version of an email is a good fit.', bad: 'Asking for exact live stock levels it has no access to is a weak fit.' },
+    keyTakeaways: [
+      'AI is strong at drafting, summarising, brainstorming, and general questions.',
+      'AI is weak at exact live data, precise maths, and anything it has no access to.',
+      'Use AI for the first draft; keep a person in charge of the final, important check.'
+    ],
+    practice: 'For each task below, decide: good fit for AI, or needs a person to check/decide? 1) Drafting a first reply to a customer complaint. 2) Approving a refund over AED 5,000. 3) Brainstorming three subject lines for an email. Write your answer for each.',
+    practiceExample: '1) Good fit — AI can draft it fast, you review before sending. 2) Needs a person — this has real financial consequences and needs judgement + authority AI doesn\'t have. 3) Good fit — brainstorming ideas is exactly where AI is strong.',
     quiz: {
-      question: 'Which task is AI naturally weaker at?',
+      question: 'Your manager asks AI to confirm today\'s exact warehouse stock count for a part, and AI gives a specific number. What should you do?',
       options: [
-        { text: 'Giving today\'s exact live stock count from a system it isn\'t connected to', correct: true },
-        { text: 'Drafting a first version of an email', correct: false },
-        { text: 'Brainstorming ideas for a project name', correct: false }
+        { text: 'Trust the number completely — AI wouldn\'t make it up', correct: false, feedback: 'AI has no live connection to your warehouse system, so a specific-sounding number here is a weak fit, not a verified fact.' },
+        { text: 'Check the number against the real stock system before relying on it', correct: true, feedback: 'Right — live, exact data like current stock levels is exactly the kind of thing AI can\'t see, so it needs to be verified at the source.' },
+        { text: 'Ignore AI completely for every task', correct: false, feedback: 'That overcorrects — AI is still useful for drafting and brainstorming, just not for live data it has no access to.' },
+        { text: 'Ask AI the same question again to double-check', correct: false, feedback: 'Asking again won\'t fix the problem — AI still has no access to the real system, so it may just repeat or vary its guess.' }
       ]
     }
   },
   'everyday-prompting': {
     title: 'Everyday Prompting Habits',
-    learn: 'A few small habits make prompts far more useful day to day: say the goal first, mention who it\'s for, and ask for a specific format — bullets, a table, or a short paragraph.',
+    whatYoullLearn: 'Three small habits that make everyday prompts noticeably more useful.',
+    learn: [
+      'A few small habits make prompts far more useful day to day: say the goal first, mention who it\'s for, and ask for a specific format — bullets, a table, or a short paragraph.',
+      'Real-world example: "Turn these notes into 3 bullet points for my manager" gives the goal, the format, and the audience — all in one line.',
+      'At work, this habit takes seconds to build into a prompt and saves a full round of back-and-forth.',
+      'Common mistake: describing the topic but never saying what format you want the answer in — leaving AI to guess between a paragraph, a list, or a table.'
+    ],
     example: { label: 'Everyday prompt', good: '"Turn these notes into 3 bullet points for my manager."' },
-    practice: 'Take one task you do this week and write a one-line prompt with goal + audience + format.',
-    practiceExample: '"Summarise these notes into 3 bullet points for my manager."',
+    keyTakeaways: [
+      'Say the goal, the audience, and the format you want, ideally in one line.',
+      'Format matters — a list, table, or short paragraph all read very differently.',
+      'This habit takes seconds but avoids a full round of back-and-forth.'
+    ],
+    practice: 'You have these notes: "client called, wants price match on order 4521, said competitor quoted 10% less, needs answer by Thursday." Write a prompt asking AI to turn this into a short internal message for your manager, in a specific format.',
+    practiceExample: '"Turn these notes into a 3-line internal update for my manager, ending with what decision is needed by Thursday: [paste notes]"',
     quiz: {
-      question: 'What\'s a good everyday prompting habit?',
+      question: 'You ask AI: "Tell me about the client call notes." The reply is a long, unfocused paragraph. What\'s the most likely cause?',
       options: [
-        { text: 'Say the goal, audience, and format you want', correct: true },
-        { text: 'Keep every prompt exactly the same, regardless of the task', correct: false },
-        { text: 'Never mention who the output is for', correct: false }
+        { text: 'AI can\'t handle notes at all', correct: false, feedback: 'AI handles notes well — the issue here is the prompt, not the tool.' },
+        { text: 'The prompt didn\'t say who the reply is for or what format to use', correct: true, feedback: 'Exactly — without an audience or format, AI has to guess, and a long unfocused paragraph is a common result.' },
+        { text: 'The notes were too short', correct: false, feedback: 'Short notes aren\'t the problem — even short notes can be turned into a clear format if the prompt asks for one.' },
+        { text: 'AI only works well with typed, not handwritten notes', correct: false, feedback: 'This isn\'t about handwriting — the notes were already typed. It\'s about what the prompt asked AI to do with them.' }
       ]
     }
   },
@@ -417,31 +489,55 @@ const LESSON_LIBRARY = {
   },
   'refining-ai-answers': {
     title: 'Refining AI Answers',
-    learn: 'Your first reply from AI doesn\'t have to be your last. If it\'s too long, too formal, missing something, or off-target, just say so in plain words and ask it to adjust — that\'s normal and expected, not a failure.',
+    whatYoullLearn: 'How to improve an AI answer with a quick, specific follow-up instead of starting over.',
+    learn: [
+      'Your first reply from AI doesn\'t have to be your last. If it\'s too long, too formal, missing something, or off-target, just say so in plain words and ask it to adjust.',
+      'Real-world example: "Shorter please, and make it sound friendlier" takes an over-formal draft and fixes it in one line — no need to explain the whole task again.',
+      'At work, refining is often faster than writing a long, perfect prompt from the start — get a rough first draft, then shape it.',
+      'Common mistake: giving up on AI after one unhelpful reply, instead of just telling it what to change.'
+    ],
     example: { label: 'Refining', good: '"Shorter please, and make it sound friendlier."' },
-    practice: 'Ask AI for something, then give it one round of feedback to improve the reply.',
-    practiceExample: 'First: "Write a reply to this complaint." Then: "Shorter please, and make it sound more apologetic."',
+    keyTakeaways: [
+      'The first reply is a starting point, not the final answer.',
+      'One specific instruction (shorter, friendlier, add X) is usually enough to fix a reply.',
+      'Refining is often faster than writing one long, perfect prompt.'
+    ],
+    practice: 'AI gave you this reply to "write a reply to this complaint": a long, very formal paragraph. Write the one-line follow-up you\'d send to make it shorter and warmer.',
+    practiceExample: '"Make this shorter — under 4 sentences — and warmer in tone, like you\'re genuinely sorry for the trouble."',
     quiz: {
-      question: 'What should you do if an AI reply isn\'t quite right?',
+      question: 'An AI reply is accurate but far too formal for a quick message to a colleague. What\'s the best next step?',
       options: [
-        { text: 'Tell it what to change and ask again', correct: true },
-        { text: 'Assume it can\'t be fixed', correct: false },
-        { text: 'Never use AI for that task again', correct: false }
+        { text: 'Send it as-is since it\'s accurate', correct: false, feedback: 'Accuracy isn\'t the only thing that matters — tone fitting the audience matters too, and this is an easy fix.' },
+        { text: 'Start a brand new prompt explaining the whole task again', correct: false, feedback: 'That\'s more work than needed — the conversation already has the context, so a short follow-up is faster.' },
+        { text: 'Ask AI to make it sound more casual, in one short follow-up', correct: true, feedback: 'Right — a quick, specific follow-up like "make this more casual" fixes the tone without losing the useful content already there.' },
+        { text: 'Rewrite it completely yourself instead of using AI', correct: false, feedback: 'That throws away a useful starting draft — refining it is quicker than starting from a blank page.' }
       ]
     }
   },
   'ai-for-quick-tasks': {
     title: 'AI for Quick, Everyday Tasks',
-    learn: 'Small, quick wins build the habit: turning a messy note into a clean message, checking spelling and tone, or listing pros and cons before a decision. These take seconds and build confidence for bigger tasks later.',
+    whatYoullLearn: 'How to spot a genuinely safe, quick win for AI in your day.',
+    learn: [
+      'AI can save time on small, common tasks: drafting a message, making a list, cleaning up notes, or suggesting ideas.',
+      'Real-world example: turning short, messy meeting notes into a clear task list takes AI seconds and saves you the effort of organising it yourself.',
+      'At work, always check the result before you rely on it, and never share private customer or financial information unless your company says it\'s approved.',
+      'Common mistake: pasting sensitive information (like a customer\'s private details) into AI for a "quick" task without checking whether that\'s allowed.'
+    ],
     example: { label: 'Quick win', good: '"Clean up this message and make the tone more polite."' },
-    practice: 'Use AI for one quick task today — a message, a list, or a tone check.',
-    practiceExample: '"Clean up this message and make the tone more polite: \'need this asap cant wait any longer\'."',
+    keyTakeaways: [
+      'Small, everyday tasks — lists, tone checks, tidy-ups — are a great fit for AI.',
+      'Always check the result before using it, even for quick tasks.',
+      'Never paste private customer or financial details into AI unless it\'s approved.'
+    ],
+    practice: 'Pick one of these two quick tasks and write the prompt you\'d use: (a) turning a messy note into a clean message, or (b) checking the tone of a message before sending it.',
+    practiceExample: '"Clean up this message and make the tone more polite, keeping the same meaning: \'need this asap cant wait any longer\'"',
     quiz: {
-      question: 'What\'s a good "quick win" use of AI?',
+      question: 'A colleague wants a fast AI "quick win" and considers pasting a customer\'s full bank details into AI so it can draft a refund confirmation email. What should they do instead?',
       options: [
-        { text: 'Cleaning up a message or checking its tone', correct: true },
-        { text: 'Something that requires a whole day of setup first', correct: false },
-        { text: 'Nothing — quick tasks aren\'t worth using AI for', correct: false }
+        { text: 'Paste it anyway — it\'s just for a draft', correct: false, feedback: 'Private financial details shouldn\'t be pasted into AI tools unless your company has approved that specific use — "just a draft" doesn\'t remove the risk.' },
+        { text: 'Draft the email without including the sensitive details, and add them separately afterwards', correct: true, feedback: 'Right — AI can still help with the wording of the email without ever needing to see the customer\'s private financial details.' },
+        { text: 'Don\'t use AI for anything related to customers', correct: false, feedback: 'This overcorrects — plenty of customer-related drafting is fine, the issue is specifically sharing private financial details.' },
+        { text: 'Ask AI if it\'s safe to share the details first', correct: false, feedback: 'AI can\'t verify your company\'s own data rules — that\'s a question for your own policy, not something to ask the AI tool itself.' }
       ]
     }
   },
@@ -509,61 +605,110 @@ const LESSON_LIBRARY = {
   },
   'prompt-structure': {
     title: 'Prompt Structure',
-    learn: 'A reusable structure helps: Role ("You are helping a sales coordinator...") + Task ("...draft a follow-up email...") + Context (details specific to this case) + Format (how you want it delivered). This structure works for almost any request.',
-    example: { label: 'Structured prompt', good: '"You are helping me write for a customer. Task: follow-up email about a delayed order. Context: order #4521, delayed 2 days due to shipping. Format: short, friendly, 3 sentences max."' },
-    practice: 'Write one prompt using the Role + Task + Context + Format structure.',
-    practiceExample: '"You are helping me write for a customer. Task: follow-up email about a delayed order. Context: order #4521, delayed 2 days due to shipping. Format: short, friendly, 3 sentences max."',
+    whatYoullLearn: 'How to build a prompt from four clear parts so AI has everything it needs in one go.',
+    learn: [
+      'A strong prompt has clear parts: the task, the background/context, any rules to follow, and the form you want the answer in.',
+      'Real-world example: "Write a reply to this customer. Be warm. Use fewer than 80 words. End with the next step." gives all four parts in two short sentences.',
+      'At work, this structure matters most for anything you\'ll send externally or rely on for a decision — it removes guesswork.',
+      'Common mistake: giving AI the task but leaving out the rules (like a word limit or a required ending) — then being surprised the reply doesn\'t fit.'
+    ],
+    example: { label: 'Strong structure', good: '"Write a reply to this customer. Be warm. Use fewer than 80 words. End with the next step."' },
+    keyTakeaways: [
+      'Four parts make a prompt strong: task, background, rules, answer format.',
+      'Missing rules (length, tone, required ending) is the most common reason a reply doesn\'t fit.',
+      'This structure takes one extra sentence but saves a round of edits.'
+    ],
+    practiceChecklist: ['Task — what do you want AI to produce?', 'Background — what does it need to know?', 'Rules — any limits (length, tone, must-includes)?', 'Answer format — list, email, table, short paragraph?'],
+    practice: 'Build a full four-part prompt for this situation: a customer\'s order is delayed by 3 days and you need to tell them. Cover task, background, rules, and format.',
+    practiceExample: '"Write a reply to a customer whose order (#4521) is delayed by 3 days due to a supplier issue. Be apologetic but confident. Keep it under 100 words. End with the new expected delivery date."',
     quiz: {
-      question: 'What does adding "Context" to a prompt do?',
+      question: 'Which of these prompts has the strongest structure?',
       options: [
-        { text: 'Gives AI the specific details it needs for this exact case', correct: true },
-        { text: 'Makes the AI reply slower', correct: false },
-        { text: 'Has no real effect on the answer', correct: false }
+        { text: '"Write a short customer reply using these notes. Be warm and end with the next step."', correct: true, feedback: 'This gives a task (customer reply), a background source (the notes), a rule (be warm), and a required ending — all four parts.' },
+        { text: '"Reply."', correct: false, feedback: 'This has a task word but no background, rules, or format — AI has to guess everything else.' },
+        { text: '"Make this good."', correct: false, feedback: '"Good" isn\'t a rule AI can act on — it needs something specific like tone, length, or must-include content.' },
+        { text: '"Customer email please."', correct: false, feedback: 'This names a topic but gives no background, rules, or format — far too little for a strong reply.' }
       ]
     }
   },
   'context-and-instructions': {
     title: 'Context and Instructions',
-    learn: 'Standing instructions (like "always reply in a friendly but professional tone" or a company style guide) save you from repeating yourself every time. Many AI tools let you save custom instructions once so every future chat follows them automatically.',
-    example: { label: 'Standing instruction', good: '"Always write in UK spelling, keep emails under 150 words, sign off with \'Kind regards\'."' },
-    practice: 'Write one standing instruction you\'d want AI to always follow for your role.',
-    practiceExample: '"Always write in UK spelling, keep emails under 150 words, and sign off with \'Kind regards\'."',
+    whatYoullLearn: 'The difference between context and instructions, and why both improve AI\'s answer.',
+    learn: [
+      'Context means useful background information — who the reader is, what already happened, what matters here. Instructions tell AI what to do and what rules to follow.',
+      'Real-world example: "Write a reply" with no context forces AI to guess the situation. Adding "the customer is frustrated about a second delay" changes the tone AI should use.',
+      'At work, only give information that\'s actually needed and safe to share — more isn\'t always better if it includes something private or irrelevant.',
+      'Common mistake: giving instructions without context (AI knows what to do but not the real situation), or context without instructions (AI knows the situation but not what you want from it).'
+    ],
+    example: { label: 'Context + instruction', good: '"The customer is frustrated about a second delay (context). Write a calming, apologetic reply that offers a small goodwill gesture (instruction)."' },
+    keyTakeaways: [
+      'Context = the background AI needs. Instructions = what you want it to do with it.',
+      'Missing context makes replies generic; missing instructions makes them unfocused.',
+      'Only share context that\'s needed and safe to share — skip anything private or irrelevant.'
+    ],
+    practice: 'Add useful context to this bare prompt: "Write a reply." Say who the reader is, what happened, and what the reply needs to achieve — without including anything private that isn\'t needed.',
+    practiceExample: '"A long-standing customer\'s delivery is late for the first time in two years. Write a reply that acknowledges this is unusual for us, apologises, and confirms the new delivery date."',
     quiz: {
-      question: 'What\'s the benefit of saving standing instructions?',
+      question: 'A colleague asks AI to "write a firm reminder email" with no other information. What is this prompt missing?',
       options: [
-        { text: 'You don\'t have to repeat the same preferences every single time', correct: true },
-        { text: 'It makes every reply exactly the same length', correct: false },
-        { text: 'It stops you from being able to ask follow-up questions', correct: false }
+        { text: 'Nothing — the instruction is already clear enough', correct: false, feedback: 'The instruction (write a firm reminder) is clear, but there\'s no context — who is this to, and reminding them of what?' },
+        { text: 'Context about who the email is for and what they\'re being reminded about', correct: true, feedback: 'Right — without context, AI has to invent a scenario, which likely won\'t match the real situation.' },
+        { text: 'A funnier tone', correct: false, feedback: 'Tone isn\'t the issue here — the missing piece is the background information, not humour.' },
+        { text: 'A longer word count', correct: false, feedback: 'Length isn\'t the problem — even a short reminder needs to know who it\'s for and what it\'s about.' }
       ]
     }
   },
   'documents-intermediate': {
     title: 'Working with Documents',
-    learn: 'For longer or more complex documents, ask AI targeted questions rather than one giant "summarise everything" request — e.g. "What are the payment terms?" or "List any deadlines mentioned." Targeted questions get sharper, more useful answers.',
-    example: { label: 'Targeted question', good: '"What are the cancellation terms in this contract, and by when do we need to give notice?"' },
-    practice: 'Take a document you work with and ask AI 2-3 targeted questions instead of one broad summary.',
-    practiceExample: '"What are the payment terms in this contract, and is there a late-payment penalty?"',
+    whatYoullLearn: 'How to get reliable results from AI when working with a real document.',
+    learn: [
+      'AI can help you work with a document you provide: summarising it, finding key points, comparing sections, or turning information into a list.',
+      'Real-world example: tell AI which document to use and what to look for — "using this contract, list all the payment deadlines" — rather than a vague "what does this say?"',
+      'At work, always check the answer against the actual document, especially for dates, numbers, and rules — these are the details most likely to matter and easiest to get subtly wrong.',
+      'Common mistake: accepting a document summary without opening the source to check the key details it mentions.'
+    ],
+    example: { label: 'Try this', good: '"Using this document, list the three main points and flag any dates or numbers mentioned."' },
+    keyTakeaways: [
+      'Give AI a clear task and the actual document — don\'t ask it to guess contents it hasn\'t seen.',
+      'Always check dates, numbers, and rules against the real document.',
+      'A clear task plus a check against the source makes the result far more reliable.'
+    ],
+    practice: 'You have a supplier contract to review. Write a prompt asking AI to pull out the three most important points, plus any dates or numbers you should double-check yourself.',
+    practiceExample: '"Using this contract, list the 3 most important points for our team, and separately flag every date or amount so I can check them myself."',
     quiz: {
-      question: 'Why ask targeted questions about a document instead of one broad summary?',
+      question: 'AI summarises a contract and states a payment deadline of "30 days". What should you do before treating this as fact?',
       options: [
-        { text: 'Targeted questions usually get sharper, more useful answers', correct: true },
-        { text: 'Broad summaries are always better', correct: false },
-        { text: 'AI can only answer one question per document', correct: false }
+        { text: 'Repeat the figure immediately in your own report', correct: false, feedback: 'Numbers pulled from a document by AI can be misread or misplaced — this should be checked before it\'s repeated as fact.' },
+        { text: 'Open the actual contract and confirm the 30-day figure yourself', correct: true, feedback: 'Right — dates and numbers are exactly the details worth checking against the source document before you rely on them.' },
+        { text: 'Ask a different AI tool the same question', correct: false, feedback: 'A second AI tool has the same limitation — neither has guaranteed accuracy on a specific figure unless you check the actual document.' },
+        { text: 'Ignore the summary completely and never use AI for documents', correct: false, feedback: 'This overcorrects — AI summaries are still useful for finding key points quickly; you just verify the details that matter.' }
       ]
     }
   },
   'ai-for-productivity': {
     title: 'AI for Productivity',
-    learn: 'Use AI to speed up recurring work: turning meeting notes into action items, drafting first-pass replies to common questions, or creating checklists. Save prompts that work well so you (or your team) can reuse them.',
-    example: { label: 'Reusable prompt', good: '"Turn these meeting notes into a bullet list of action items, each with an owner if mentioned."' },
-    practice: 'Save one prompt you use often as a note so you can reuse it next time.',
-    practiceExample: '"Turn these meeting notes into a bullet list of action items, each with an owner if mentioned."',
+    whatYoullLearn: 'How to use AI to genuinely save time, not just add another step.',
+    learn: [
+      'Productivity means getting useful work done well and on time. AI can help with repeat tasks, first drafts, meeting notes, and planning.',
+      'Real-world example: turning a messy set of project notes into a clear status update is a repeat task AI can draft in seconds, leaving you to check and finish it.',
+      'At work, choose tasks that take real time but still let you check the result — that\'s where AI adds the most value with the least risk.',
+      'Common mistake: using AI for every task regardless of whether it actually saves time, or skipping your own check to save a few more seconds.'
+    ],
+    example: { label: 'Good habit', good: 'Use AI for a first draft, then check and finish it yourself.' },
+    keyTakeaways: [
+      'AI helps most with repeat tasks, first drafts, and planning.',
+      'Pick tasks where a person can still check the result — that\'s the safest productivity gain.',
+      'A good AI habit should make work clearer, not just faster.'
+    ],
+    practice: 'Pick one repeat task you do most weeks. Write down: the old way you do it, where AI could help, and what you\'d still check yourself before it\'s done.',
+    practiceExample: 'Old way: manually writing a weekly status update from scattered notes. AI could help: draft the update from my notes in seconds. I\'d still check: that figures and names are correct before sending.',
     quiz: {
-      question: 'What\'s a good productivity habit with AI prompts?',
+      question: 'Which use of AI is most likely to improve productivity safely?',
       options: [
-        { text: 'Save and reuse prompts that work well for recurring tasks', correct: true },
-        { text: 'Write a brand-new prompt from scratch every single time', correct: false },
-        { text: 'Avoid using AI for anything recurring', correct: false }
+        { text: 'Letting AI approve spending requests on its own', correct: false, feedback: 'Approving spending has real consequences and needs a person\'s judgement and authority — this isn\'t a safe use of AI.' },
+        { text: 'Using AI for a first draft, then checking and finishing it yourself', correct: true, feedback: 'Right — this captures the time saving of a fast first draft while keeping a person in control of the final, accurate result.' },
+        { text: 'Using AI for every task, even ones that already take less time to do yourself', correct: false, feedback: 'This doesn\'t add real productivity — using AI where it doesn\'t save time just adds an extra step.' },
+        { text: 'Skipping checks to finish tasks faster', correct: false, feedback: 'Skipping checks trades speed for accuracy — not a safe way to gain productivity.' }
       ]
     }
   },
@@ -616,61 +761,109 @@ const LESSON_LIBRARY = {
   // ================= ADVANCED =================
   'advanced-prompting': {
     title: 'Advanced Prompting',
-    learn: 'Advanced prompting includes giving AI examples of the style you want ("few-shot" examples), asking it to think step-by-step before answering, or asking it to critique its own draft before finalising. These techniques improve accuracy and consistency on harder tasks.',
-    example: { label: 'Advanced technique', good: '"Here are two examples of our email style: [example 1] [example 2]. Now write a new email in the same style about X."' },
-    practice: 'Give AI two examples of a style you want, then ask it to write something new in that style.',
-    practiceExample: '"Here are two examples of our email style: [example 1] [example 2]. Now write a new email in the same style about a delayed shipment."',
+    whatYoullLearn: 'How to write a prompt that reliably handles a bigger, more complex task.',
+    learn: [
+      'Advanced prompting helps AI handle a bigger task reliably. Give it a clear role, goal, steps, rules, examples, and the exact form you need.',
+      'Real-world example: ask AI to flag any missing information before it starts, rather than letting it quietly guess gaps — this surfaces problems early instead of hiding them in the output.',
+      'At work, test an advanced prompt with more than one example situation, and refine it if the output isn\'t consistent.',
+      'Common mistake: writing one long, complicated instruction and assuming it will work perfectly first time — advanced prompts usually need at least one round of testing and adjustment.'
+    ],
+    example: { label: 'Advanced structure', good: 'Role + goal + steps + rules + examples + required format, plus an instruction to flag anything missing before answering.' },
+    keyTakeaways: [
+      'Advanced prompts combine role, goal, steps, rules, examples, and format.',
+      'Ask AI to flag missing information rather than guess it silently.',
+      'Test with more than one example and refine — don\'t expect it perfect first time.'
+    ],
+    practice: 'Write a prompt for AI to act as a first-line customer support assistant: it should check what information is missing from an enquiry, follow a rule that it never promises a refund, and return its answer as a short table (issue / missing info / suggested reply).',
+    practiceExample: '"You are a first-line support assistant. For this enquiry, list: the issue, any missing information needed to resolve it, and a suggested reply. Never promise a refund — flag that as needing manager approval instead. Return this as a table with those 3 columns."',
     quiz: {
-      question: 'What does giving AI style examples ("few-shot" prompting) help with?',
+      question: 'You\'ve written a long, detailed advanced prompt and it works well on your first test case. What should you do next?',
       options: [
-        { text: 'Getting output that matches a specific style more consistently', correct: true },
-        { text: 'Making AI slower', correct: false },
-        { text: 'Preventing AI from answering at all', correct: false }
+        { text: 'Assume it\'s finished, since it worked once', correct: false, feedback: 'One successful test doesn\'t confirm reliability — different real situations can expose gaps the first test case didn\'t.' },
+        { text: 'Test it against a few different, realistic examples before relying on it', correct: true, feedback: 'Right — advanced prompts need testing across multiple situations to catch cases where the instructions don\'t hold up.' },
+        { text: 'Make the prompt even longer to be safe', correct: false, feedback: 'Length alone doesn\'t improve reliability — testing against real examples is what actually reveals problems.' },
+        { text: 'Remove the rules so it answers faster', correct: false, feedback: 'Removing rules increases risk rather than reducing it — the rules are what keep the output safe and consistent.' }
       ]
     }
   },
   'complex-workflows': {
     title: 'Complex AI Workflows',
-    learn: 'Complex workflows chain multiple AI steps together, where the output of one step becomes the input to the next — e.g. extract data → analyse it → draft a report. Checking the result at each stage prevents small errors from compounding.',
-    example: { label: 'Chained workflow', good: 'Step 1: Extract key numbers from a report. Step 2: Ask AI to spot trends in those numbers. Step 3: Draft a summary for management based on the trends.' },
-    practice: 'Design a 3-step chained workflow for a task you do that involves data and a written summary.',
-    practiceExample: 'Step 1: Extract key numbers from this report. Step 2: Spot any trends in those numbers. Step 3: Draft a one-paragraph summary for management.',
+    whatYoullLearn: 'How to break a large task into smaller steps AI can help with safely.',
+    learn: [
+      'A workflow is a set of steps used to finish a task. A complex AI workflow breaks a large task into smaller steps — for example: collect information, check it, draft an answer, review it, approve it.',
+      'Real-world example: a customer-reply process might be: read the enquiry, check the order system, draft a reply, and have a person approve it before it\'s sent.',
+      'At work, each step should have a clear input, a clear output, and a clear owner — a person or AI responsible for that step.',
+      'Common mistake: combining everything into one giant step, making it hard to tell where a mistake happened or who\'s responsible for catching it.'
+    ],
+    example: { label: 'Why break it up', good: 'Small steps make the work easier to understand, test, and check — each one has a clear input, output, and owner.' },
+    keyTakeaways: [
+      'A workflow breaks a big task into smaller, clearly owned steps.',
+      'Each step needs a clear input, output, and owner (person or AI).',
+      'Smaller steps are easier to test, check, and fix when something goes wrong.'
+    ],
+    practice: 'Break a customer-reply process into 4 clear steps. For each step, note whether AI or a person owns it.',
+    practiceExample: '1) Read enquiry — AI drafts a summary. 2) Check order details — person confirms. 3) Draft reply — AI. 4) Approve and send — person.',
     quiz: {
-      question: 'Why check output at each stage of a chained workflow?',
+      question: 'Why is it usually better to break a large AI-assisted task into smaller steps, rather than one big step?',
       options: [
-        { text: 'To stop a small early error from affecting every later step', correct: true },
-        { text: 'It\'s not necessary — only the final step matters', correct: false },
-        { text: 'To make the workflow take longer on purpose', correct: false }
+        { text: 'To make the overall work take longer', correct: false, feedback: 'Smaller steps aren\'t about adding time — they usually make problems easier and faster to catch.' },
+        { text: 'To make each part easier to guide, check, and fix if something goes wrong', correct: true, feedback: 'Right — smaller steps mean it\'s clear who owns each part and where to look if something goes wrong.' },
+        { text: 'To remove the need for anyone to check the work', correct: false, feedback: 'Breaking a task into steps doesn\'t remove the need to check — it actually makes checking easier and more targeted.' },
+        { text: 'To hide which step caused a mistake', correct: false, feedback: 'The opposite is true — smaller, clearly owned steps make it easier to trace exactly where a mistake happened.' }
       ]
     }
   },
   'ai-automation': {
     title: 'AI Automation',
-    learn: 'Real automation connects AI to a trigger (like a new form submission or email) and an action (like updating a spreadsheet or CRM record), so the task runs without someone starting it manually each time. This is where AI moves from "a tool you use" to "a system that works for you."',
-    example: { label: 'Automation shape', good: 'Trigger: new customer enquiry email arrives → AI drafts a categorised summary → Action: adds it to the CRM automatically.' },
-    practice: 'Identify a trigger and action in your own work that could plug into an automation like this.',
-    practiceExample: 'Trigger: a new enquiry email arrives. Action: AI drafts a categorised summary and adds it to the CRM automatically.',
+    whatYoullLearn: 'What makes an AI-assisted automation safe rather than risky.',
+    learn: [
+      'Automation means a system does a repeat task automatically when something happens. AI automation adds AI to read, write, sort, or decide between simple choices within that process.',
+      'Real-world example: a new customer enquiry could automatically start a draft reply for a person to review, rather than requiring someone to start from a blank page.',
+      'At work, any automation with real consequences needs limits, checks, and a clear way to pause or stop it if something looks wrong.',
+      'Common mistake: setting up an automation to take an important action (like sending a refund) with no human check and no way to stop it mid-process.'
+    ],
+    example: { label: 'Safe automation', good: 'A new enquiry starts a draft reply automatically — but a person reviews and approves it before it\'s sent.' },
+    keyTakeaways: [
+      'Automation runs a repeat task when a trigger happens; AI can help with the reading/writing/sorting inside it.',
+      'Important actions need a human check before anything with real consequences happens.',
+      'Every automation needs a clear way to pause or stop it.'
+    ],
+    practice: 'Design a simple automation idea for one repeat task in your role. Name: the trigger (what starts it), what AI does, and the point where a person checks it before anything important happens.',
+    practiceExample: 'Trigger: new supplier invoice arrives. AI does: drafts a summary and flags any mismatched amounts. Person checks: confirms the summary and approves payment — AI never approves payment itself.',
     quiz: {
-      question: 'What two things does a real automation typically need?',
+      question: 'A team wants to automate replies to customer complaints, with AI sending the reply immediately with no review. What\'s the main risk?',
       options: [
-        { text: 'A trigger and an action', correct: true },
-        { text: 'A password and a username', correct: false },
-        { text: 'Two separate AI chats running at once', correct: false }
+        { text: 'It will be too slow', correct: false, feedback: 'Speed isn\'t the concern here — sending immediately is actually the fast option, which is the problem, not the fix.' },
+        { text: 'An inaccurate or poorly-toned reply could be sent to a real customer with no chance to catch it first', correct: true, feedback: 'Right — high-impact actions like replying to complaints need a human check before anything goes out, so mistakes can be caught.' },
+        { text: 'AI can\'t draft complaint replies at all', correct: false, feedback: 'AI can draft this kind of reply well — the issue is sending it automatically without anyone reviewing it first.' },
+        { text: 'It will use too much electricity', correct: false, feedback: 'This isn\'t the relevant risk here — the real concern is sending an unchecked reply to a real customer.' }
       ]
     }
   },
   'ai-agents': {
     title: 'AI Agents',
-    learn: 'An AI agent can take multiple steps on its own to reach a goal — searching, using tools, checking its own results — rather than just replying once to a single message. Agents are useful for open-ended tasks, but need clear goals and guardrails.',
-    example: { label: 'Agent vs. chat', good: 'Chat: you ask one question, get one reply. Agent: you give a goal ("research this supplier"), and it plans and takes several steps to get there.' },
-    practice: 'Think of one open-ended task in your role you\'d trust an agent to attempt with a clear goal.',
-    practiceExample: 'Goal: "Research this supplier\'s reliability and summarise any red flags." The agent searches, reads reviews, and reports back instead of answering in one reply.',
+    whatYoullLearn: 'What an AI agent is, and what it needs to work safely.',
+    learn: [
+      'An AI agent is a system that can plan steps and use tools to reach a goal — for example, searching approved information, updating a system, or preparing a draft on its own.',
+      'Real-world example: an agent handling new enquiries might read the message, check an approved knowledge base, and prepare a draft reply — all without a person doing each step manually.',
+      'At work, an agent needs a clear goal, safe tools, limits on what it can do, and human oversight — someone who watches, checks, or approves its work.',
+      'Common mistake: giving an agent access to more tools or actions than the task actually needs, or removing human oversight to make it "fully automatic".'
+    ],
+    example: { label: 'Safe agent design', good: 'A clear goal, safe tools, limits on what it can do, and a person who checks or approves its actions.' },
+    keyTakeaways: [
+      'An agent plans steps and uses tools to reach a goal, rather than just replying once.',
+      'It needs a clear goal, safe tools, and limits on what it\'s allowed to do.',
+      'Human oversight — someone checking or approving — is essential, not optional.'
+    ],
+    practice: 'Design an agent that helps with new customer enquiries. List: one tool it may use, one limit on what it can do, and one action a person must approve before it happens.',
+    practiceExample: 'Tool: search the approved product knowledge base. Limit: it can only draft replies, never send them. Person approves: sending the final reply to the customer.',
     quiz: {
-      question: 'What makes an AI agent different from a single chat reply?',
+      question: 'A team is designing an AI agent to handle supplier orders and wants it to be "fully automatic" with no human involved at any point. What\'s the concern?',
       options: [
-        { text: 'It can take multiple steps toward a goal, not just answer once', correct: true },
-        { text: 'It only works with spreadsheets', correct: false },
-        { text: 'There is no real difference', correct: false }
+        { text: 'Agents can\'t handle orders at all', correct: false, feedback: 'Agents can be well suited to this kind of task — the concern is specifically the lack of any human oversight.' },
+        { text: 'Removing all human oversight removes the ability to catch mistakes before they affect a real order', correct: true, feedback: 'Right — even a well-designed agent needs a person watching, checking, or approving important actions, especially ones with real business consequences.' },
+        { text: 'It will make the agent too slow', correct: false, feedback: 'Oversight doesn\'t have to be slow — a quick approval step is the point, not a speed problem.' },
+        { text: 'Agents are not allowed to use any tools', correct: false, feedback: 'Agents are meant to use tools to reach a goal — the issue here is oversight, not tool use.' }
       ]
     }
   },
@@ -783,31 +976,55 @@ const LESSON_LIBRARY = {
   },
   'apis-integrations': {
     title: 'APIs and Integrations',
-    learn: 'An API is how software systems talk to each other programmatically. Understanding basic API concepts (requests, responses, authentication) helps you scope realistic integration projects and communicate clearly with developers or vendors building them.',
-    example: { label: 'Plain terms', good: 'An API request is like filling out a very specific form and getting a structured reply back — not a free-form chat.' },
-    practice: 'Look up one system your team uses and check whether it has an API or Connector already available.',
-    practiceExample: 'Checking whether our accounting system has a public API — it does, which means a Connector could likely be built to pull invoice data directly.',
+    whatYoullLearn: 'What an API does in an AI solution, and why access should be limited.',
+    learn: [
+      'An API is a safe way for two computer systems to talk to each other. An integration is the link between systems that uses this.',
+      'Real-world example: an approved integration might let AI read a customer record or create a draft task — without needing a person to manually copy information between systems.',
+      'At work, the link should only give AI the specific information and actions it actually needs — never full, unrestricted access "just in case".',
+      'Common mistake: connecting AI to a system with broader access than the task requires, increasing the impact if something goes wrong.'
+    ],
+    example: { label: 'Scoped access', good: 'An integration that lets AI read only the customer fields it needs, and create draft tasks — not full account or payment access.' },
+    keyTakeaways: [
+      'An API lets approved systems share specific information or actions.',
+      'Integrations should be scoped to only what\'s needed, not full access by default.',
+      'Broader access than necessary increases the impact of any mistake or misuse.'
+    ],
+    practice: 'Choose two Oryx systems that could usefully share information (e.g. CRM and a scheduling tool). State exactly what data should be allowed to move, and what must stay out of that link.',
+    practiceExample: 'CRM to scheduling tool: share customer name, order reference, and requested installation date. Keep out: payment details and internal notes — not needed for scheduling.',
     quiz: {
-      question: 'Why is basic API knowledge useful at an expert level?',
+      question: 'A supplier asks to connect their system directly to Oryx\'s full customer database "to make things easier", instead of a specific integration for order status only. What\'s the concern?',
       options: [
-        { text: 'It helps you scope integration projects and talk to developers clearly', correct: true },
-        { text: 'It has no practical use for non-developers', correct: false },
-        { text: 'It replaces the need for any AI knowledge', correct: false }
+        { text: 'Full access is always more convenient, so this is fine', correct: false, feedback: 'Convenience doesn\'t outweigh the risk — broader access than needed increases what could go wrong if something is misused or breached.' },
+        { text: 'The integration should be scoped to only what\'s needed (e.g. order status), not full database access', correct: true, feedback: 'Right — a good integration gives only the specific information or actions required for the task, limiting the impact of any problem.' },
+        { text: 'APIs can only share one piece of data at a time', correct: false, feedback: 'This isn\'t a technical limit of APIs — the real issue is that access should be deliberately scoped to what\'s needed, whatever that includes.' },
+        { text: 'Suppliers should never be given any system access', correct: false, feedback: 'Scoped, appropriate access for a real business need is fine — the issue is the scope being too broad, not that access exists at all.' }
       ]
     }
   },
   'advanced-automation': {
     title: 'Advanced Automation',
-    learn: 'Advanced automation includes conditional logic (different actions depending on the situation), error handling (what happens when a step fails), and monitoring (knowing when something breaks). These are what separate a fragile one-off automation from one that runs reliably for months.',
-    example: { label: 'Conditional logic', good: 'If an enquiry mentions "urgent," route it to a priority queue; otherwise, add it to the standard queue.' },
-    practice: 'Add one "if this, then that" condition to an automation idea from an earlier lesson.',
-    practiceExample: 'If an enquiry mentions "urgent," route it to a priority queue; otherwise, add it to the standard queue.',
+    whatYoullLearn: 'What makes an advanced, multi-step automation safe and resilient.',
+    learn: [
+      'Simple automation may do one task. Advanced automation joins many tasks together, using triggers, choices, checks, approvals, and error steps.',
+      'Real-world example: an enquiry arrives, AI reads it, a customer record is checked, a reply is drafted, and a person approves it before it sends — several linked steps, not one.',
+      'At work, the process must also know what to do when information is missing or something goes wrong — not just the "everything works" path.',
+      'Common mistake: designing only for the successful path and leaving no defined behaviour for errors or missing information.'
+    ],
+    example: { label: 'Complete design', good: 'Enquiry arrives → AI drafts reply → record checked → person approves → sent. Plus: a defined error step if information is missing.' },
+    keyTakeaways: [
+      'Advanced automation links multiple steps: triggers, checks, approvals, error handling.',
+      'A good design plans for what goes wrong, not just what goes right.',
+      'Checks catch problems before an important action is taken.'
+    ],
+    practice: 'Take this process: enquiry arrives → AI drafts a reply → email is sent. Add one safety check and one error step (what happens if key information is missing).',
+    practiceExample: 'Safety check: a person reviews the draft before it sends. Error step: if the customer\'s order number is missing from the enquiry, AI flags it for a person instead of guessing.',
     quiz: {
-      question: 'What helps an automation stay reliable long-term?',
+      question: 'An automation is designed for the normal, successful path only — arrival, draft, send — with nothing defined for when information is missing. What\'s the risk?',
       options: [
-        { text: 'Error handling and monitoring for when something breaks', correct: true },
-        { text: 'Assuming it will never fail', correct: false },
-        { text: 'Running it once and never checking again', correct: false }
+        { text: 'The automation will simply run slower', correct: false, feedback: 'Speed isn\'t the issue — the real risk is what happens when the unplanned case (missing information) actually occurs.' },
+        { text: 'When information is missing, the system has no defined safe behaviour and may send an incorrect or incomplete result', correct: true, feedback: 'Right — advanced automations need a defined error path, not just a plan for when everything goes smoothly.' },
+        { text: 'AI cannot be used in automations at all', correct: false, feedback: 'AI is well suited to automations — the issue is the design missing an error path, not AI\'s suitability.' },
+        { text: 'The automation will stop working entirely', correct: false, feedback: 'The bigger risk usually isn\'t a stoppage — it\'s the system pushing ahead with an incorrect or incomplete result when something doesn\'t fit the expected path.' }
       ]
     }
   },
@@ -828,31 +1045,55 @@ const LESSON_LIBRARY = {
   },
   'ai-implementation': {
     title: 'AI Implementation for Business',
-    learn: 'Rolling out AI across a business involves more than picking a tool: it needs a clear use case, staff training, a review process, and a way to measure whether it\'s actually helping. Expert-level thinking means planning the rollout, not just the prompt.',
-    example: { label: 'Rollout checklist', good: 'Use case defined → staff trained → review process in place → success measured after 30 days.' },
-    practice: 'Pick one AI use case from this course and sketch a simple 4-step rollout plan for your team.',
-    practiceExample: '1) Define the use case (drafting customer replies). 2) Train the team on the prompt structure. 3) Set a review process for the first month. 4) Measure reply time and satisfaction after 30 days.',
+    whatYoullLearn: 'Where to start when planning a real business AI solution.',
+    learn: [
+      'Implementation means putting an idea into real use. Start with the business problem, not the AI tool — pick the problem first, then decide if and how AI helps.',
+      'Real-world example: a team spending two hours a day sorting simple enquiries is a real, measurable problem — the starting point, not "let\'s use AI somewhere".',
+      'At work, ask what information AI will use, who will check its work, and how you\'ll know it\'s actually working before rolling it out widely.',
+      'Common mistake: buying or building an AI tool first, then trying to find a problem for it to solve, instead of starting from a real need.'
+    ],
+    example: { label: 'Right starting point', good: 'Start with: what business problem are we solving? Then: what information is needed, who checks it, how do we measure success?' },
+    keyTakeaways: [
+      'Start with the business problem, not the AI tool.',
+      'Plan who checks the AI\'s work and what information it needs, before building anything.',
+      'Test with a small, safe group first, and define how you\'ll measure success.'
+    ],
+    practice: 'Your team spends two hours a day sorting simple customer enquiries by type. Write: what AI could do here, what a person should still check, and how you\'d measure whether it worked.',
+    practiceExample: 'AI could: read each enquiry and suggest a category and a draft reply. A person still checks: the category and reply before sending. Measure success: time saved per day, and how often the person needed to change AI\'s suggestion.',
     quiz: {
-      question: 'What does a proper AI rollout need beyond picking a tool?',
+      question: 'A manager is excited about a new AI tool and wants to "find a use for it" across the department immediately. What should happen first?',
       options: [
-        { text: 'A clear use case, training, review process, and a way to measure success', correct: true },
-        { text: 'Nothing else — the tool does all the work', correct: false },
-        { text: 'Just a bigger budget', correct: false }
+        { text: 'Roll it out to the whole department straight away, since it\'s ready', correct: false, feedback: 'Starting with a wide rollout, before a real problem and a small test, skips the steps that catch issues early and cheaply.' },
+        { text: 'Identify a specific business problem it would solve, and test it with a small, safe group first', correct: true, feedback: 'Right — starting from a real problem, and testing small before scaling, is what makes an implementation more likely to actually work.' },
+        { text: 'Buy more AI tools to see which one fits best', correct: false, feedback: 'Buying more tools doesn\'t replace defining the actual problem first — that step has to come before choosing (or testing) any tool.' },
+        { text: 'Ask AI itself whether it should be implemented', correct: false, feedback: 'This isn\'t a decision AI can make for the business — it requires understanding the real problem, the risks, and how success will be measured.' }
       ]
     }
   },
   'designing-ai-systems': {
     title: 'Designing AI Systems',
-    learn: 'Designing a full AI system means combining everything: the right model, retrieval where needed, tools/integrations, guardrails, and a feedback loop so the system improves over time. This is the capstone skill — thinking in systems, not single prompts.',
-    example: { label: 'Systems thinking', good: 'Instead of "write me a good prompt," ask "what\'s the full system — data in, AI processing, human check, action out — that solves this problem end to end?"' },
-    practice: 'Sketch the full system (data in → AI steps → human check → action out) for one real problem at Oryx.',
-    practiceExample: 'Data in: new enquiry email. AI steps: categorise, draft a reply. Human check: staff review before sending. Action out: reply sent, enquiry logged in the CRM.',
+    whatYoullLearn: 'What makes an AI system reliable and safe, not just impressive.',
+    learn: [
+      'An AI system can have several parts working together: a user request, approved information, AI itself, tools, and human checks.',
+      'Retrieval means finding the right information before AI answers — for example, checking the correct company policy document instead of letting AI guess from general knowledge.',
+      'Real-world example: an assistant answering company policy questions should look up the actual current policy, not generate a plausible-sounding answer from general training.',
+      'A good AI system should be useful, safe, easy to check, and clear when it doesn\'t know something — rather than confidently guessing.'
+    ],
+    example: { label: 'Safer design', good: 'Let the system find the right policy document and answer from it — and say clearly when no matching policy is found.', bad: 'Letting AI guess an answer about company policy from general knowledge.' },
+    keyTakeaways: [
+      'A full AI system includes the request, approved information, AI, tools, and human checks — not just AI alone.',
+      'Retrieval means finding the right real information before answering, rather than guessing.',
+      'A good system says clearly when it doesn\'t know, instead of confidently guessing.'
+    ],
+    practice: 'Design a company-policy assistant. Choose the safer design and explain why: (a) let it guess from general knowledge, or (b) make it find the right policy document and say clearly when no answer is found.',
+    practiceExample: 'Option (b) is safer: the assistant should search real, approved policy documents first, answer from what it finds, and say plainly "I couldn\'t find a matching policy — please check with HR" when nothing matches, rather than guessing.',
     quiz: {
-      question: 'What\'s the shift expert-level AI thinking makes?',
+      question: 'A company policy assistant is asked a question with no matching policy on file. What should a well-designed system do?',
       options: [
-        { text: 'From writing single prompts to designing a full system, start to finish', correct: true },
-        { text: 'From using AI to never using AI', correct: false },
-        { text: 'From written prompts to only spoken prompts', correct: false }
+        { text: 'Generate its best guess so the user always gets an answer', correct: false, feedback: 'A confident guess with no real policy behind it can mislead someone into relying on incorrect information.' },
+        { text: 'Clearly say no matching policy was found, and suggest checking with a person', correct: true, feedback: 'Right — a well-designed system is clear about the limits of what it actually knows, rather than filling the gap with a guess.' },
+        { text: 'Refuse to answer any further questions at all', correct: false, feedback: 'This overcorrects — the system should still help with questions it can answer from real policy, just be honest when it can\'t.' },
+        { text: 'Make up a plausible-sounding policy so the process keeps moving', correct: false, feedback: 'This is the exact risk a good system design avoids — inventing an answer that sounds real but isn\'t.' }
       ]
     }
   }
