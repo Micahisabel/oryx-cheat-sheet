@@ -74,7 +74,8 @@ const ASSESSMENT_QUESTIONS = [
       { id: 'claude', text: 'Claude', isTool: true },
       { id: 'copilot', text: 'Microsoft Copilot', isTool: true },
       { id: 'gemini', text: 'Gemini', isTool: true },
-      { id: 'other-tool', text: 'Other', isTool: true },
+      { id: 'all-tools', text: 'All of the above', isTool: false, selectAll: true },
+      { id: 'other-tool', text: 'Other', isTool: true, requiresDetail: true },
       { id: 'none', text: 'None', isTool: false, exclusive: true }
     ]
   },

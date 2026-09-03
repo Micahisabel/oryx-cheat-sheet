@@ -364,6 +364,9 @@ function renderAssessment(){
   if(assessment.index >= total){ return finishAssessment(); }
   const question = ASSESSMENT_QUESTIONS[assessment.index];
   assessment.selected = []; // reset per-question selection state
+  assessment.otherDetail = '';
+
+  const detailOpt = question.options.find(o => o.requiresDetail);
 
   learningRoot.innerHTML = `
     <div class="lrn-screen lrn-assessment">
@@ -381,6 +384,11 @@ function renderAssessment(){
           <button class="lrn-option-btn" data-i="${i}">${escapeHtml(opt.text)}</button>
         `).join('')}
       </div>
+      ${detailOpt ? `
+        <div class="lrn-other-detail" id="lrnOtherDetail" style="display:none;">
+          <label for="lrnOtherDetailInput">Please specify</label>
+          <input type="text" id="lrnOtherDetailInput" class="lrn-other-detail-input" placeholder="e.g. Perplexity, Grok…">
+        </div>` : ''}
       ${question.multi ? `<button class="lrn-btn-primary" id="lrnMultiContinue" disabled>Continue</button>` : ''}
     </div>`;
   bindTopbar();
@@ -388,8 +396,15 @@ function renderAssessment(){
   if(question.multi){
     const continueBtn = document.getElementById('lrnMultiContinue');
     learningRoot.querySelectorAll('.lrn-option-btn').forEach(btn => {
-      btn.addEventListener('click', () => toggleMultiOption(question, Number(btn.dataset.i), btn, continueBtn));
+      btn.addEventListener('click', () => toggleMultiOption(question, Number(btn.dataset.i), continueBtn));
     });
+    const detailInput = document.getElementById('lrnOtherDetailInput');
+    if(detailInput){
+      detailInput.addEventListener('input', () => {
+        assessment.otherDetail = detailInput.value;
+        updateMultiContinueState(question, continueBtn);
+      });
+    }
     continueBtn.addEventListener('click', () => answerAssessmentQuestion(question, assessment.selected));
   }else{
     learningRoot.querySelectorAll('.lrn-option-btn').forEach(btn => {
@@ -398,27 +413,69 @@ function renderAssessment(){
   }
 }
 
-function toggleMultiOption(question, i, btn, continueBtn){
+function toggleMultiOption(question, i, continueBtn){
   const opt = question.options[i];
   const isSelected = assessment.selected.includes(i);
 
-  if(opt.exclusive){
+  if(opt.selectAll){
+    // "All of the above" is a shortcut that selects every real, named option
+    // (not "Other" — that still needs its own detail — and not "None").
+    const realIndexes = question.options
+      .map((o, idx) => idx)
+      .filter(idx => question.options[idx].isTool && !question.options[idx].requiresDetail);
+    assessment.selected = isSelected ? [] : realIndexes.concat([i]);
+  }else if(opt.exclusive){
     // Selecting an exclusive option (e.g. "None" / "I'm not sure yet") clears everything else.
     assessment.selected = isSelected ? [] : [i];
   }else{
     assessment.selected = assessment.selected.filter(idx => !question.options[idx].exclusive);
     if(isSelected) assessment.selected = assessment.selected.filter(idx => idx !== i);
     else assessment.selected.push(i);
+
+    // Keep "All of the above" in sync: checked only while every real, named
+    // option it represents is still individually selected.
+    const selectAllIndex = question.options.findIndex(o => o.selectAll);
+    if(selectAllIndex !== -1){
+      const realIndexes = question.options
+        .map((o, idx) => idx)
+        .filter(idx => question.options[idx].isTool && !question.options[idx].requiresDetail);
+      const allStillSelected = realIndexes.every(idx => assessment.selected.includes(idx));
+      assessment.selected = assessment.selected.filter(idx => idx !== selectAllIndex);
+      if(allStillSelected) assessment.selected.push(selectAllIndex);
+    }
   }
 
   learningRoot.querySelectorAll('.lrn-option-btn').forEach((b, idx) => {
     b.classList.toggle('selected', assessment.selected.includes(idx));
   });
-  continueBtn.disabled = assessment.selected.length === 0;
+
+  const detailOpt = question.options.find(o => o.requiresDetail);
+  if(detailOpt){
+    const detailIndex = question.options.indexOf(detailOpt);
+    const detailBlock = document.getElementById('lrnOtherDetail');
+    if(detailBlock) detailBlock.style.display = assessment.selected.includes(detailIndex) ? 'block' : 'none';
+  }
+
+  updateMultiContinueState(question, continueBtn);
+}
+
+// Continue is blocked until at least one option is picked, and — if "Other"
+// is one of them — until the learner has actually typed what it is.
+function updateMultiContinueState(question, continueBtn){
+  const detailOpt = question.options.find(o => o.requiresDetail);
+  const detailIndex = detailOpt ? question.options.indexOf(detailOpt) : -1;
+  const needsDetail = detailIndex !== -1 && assessment.selected.includes(detailIndex);
+  const detailFilled = !needsDetail || (assessment.otherDetail || '').trim().length > 0;
+  continueBtn.disabled = assessment.selected.length === 0 || !detailFilled;
 }
 
 function answerAssessmentQuestion(question, optionIndexes){
-  assessment.answers.push({ questionId: question.id, kind: question.kind || 'single', optionIndexes });
+  const detailOpt = question.options.find(o => o.requiresDetail);
+  const answer = { questionId: question.id, kind: question.kind || 'single', optionIndexes };
+  if(detailOpt && optionIndexes.includes(question.options.indexOf(detailOpt))){
+    answer.otherDetail = (assessment.otherDetail || '').trim();
+  }
+  assessment.answers.push(answer);
   assessment.index += 1;
   renderLearning();
 }
@@ -483,11 +540,13 @@ function finishAssessment(){
     });
   }
 
+  const toolsAnswer = byId['tools-used'];
   progress.assessmentResult = {
     level, score,
     known: known.length ? known : ['Just getting started — no worries, that\'s what this path is for'],
     gaps: gapOptions.slice(0, 3).map(o => o.gapLabel),
-    gapCategories: gapOptions.slice(0, 3).map(o => o.gapCategory).filter(Boolean)
+    gapCategories: gapOptions.slice(0, 3).map(o => o.gapCategory).filter(Boolean),
+    otherToolDetail: (toolsAnswer && toolsAnswer.otherDetail) || null
   };
   progress.currentLevel = level;
   progress.assessmentDate = new Date().toISOString();
@@ -845,11 +904,25 @@ function bindOverviewLevelUp(){
   });
 }
 
+// A level is unlocked once the learner has actually reached it (via the
+// assessment or a passed practical challenge) — it can't be browsed ahead of
+// that just by clicking the tab, so people can't shortcut past levels they
+// haven't earned. `currentLevel` only ever moves forward (see
+// bindOverviewLevelUp()), so this is always "reached level, or earlier".
+function isLevelUnlocked(lv){
+  const currentIndex = LEARNING_LEVEL_ORDER.indexOf(progress.currentLevel);
+  return LEARNING_LEVEL_ORDER.indexOf(lv) <= (currentIndex === -1 ? 0 : currentIndex);
+}
+
 function renderPathTab(){
   const done = progress.completedLessons || [];
+  if(!isLevelUnlocked(reviewLevel)) reviewLevel = progress.currentLevel || LEARNING_LEVEL_ORDER[0];
   return `
     <div class="lrn-level-switch">
-      ${LEARNING_LEVEL_ORDER.map(lv => `<button class="lrn-level-switch-btn ${reviewLevel === lv ? 'active' : ''}" data-lv="${lv}">${LEVEL_META[lv].emoji} ${LEVEL_META[lv].label}</button>`).join('')}
+      ${LEARNING_LEVEL_ORDER.map(lv => {
+        const unlocked = isLevelUnlocked(lv);
+        return `<button class="lrn-level-switch-btn ${reviewLevel === lv ? 'active' : ''} ${unlocked ? '' : 'locked'}" data-lv="${lv}" ${unlocked ? '' : 'disabled title="Reach this level first — finish your current path and its practical challenge to unlock it."'}>${unlocked ? LEVEL_META[lv].emoji : '🔒'} ${LEVEL_META[lv].label}</button>`;
+      }).join('')}
     </div>
     <div class="lrn-path-list">
       ${LEARNING_PATHS[reviewLevel].map((id, i) => {
@@ -867,7 +940,7 @@ function renderPathTab(){
 }
 
 function bindPathTab(){
-  learningRoot.querySelectorAll('.lrn-level-switch-btn').forEach(btn => {
+  learningRoot.querySelectorAll('.lrn-level-switch-btn:not(.locked)').forEach(btn => {
     btn.addEventListener('click', () => { reviewLevel = btn.dataset.lv; renderDashboard(); });
   });
   learningRoot.querySelectorAll('.lrn-path-item:not(.locked)').forEach(btn => {

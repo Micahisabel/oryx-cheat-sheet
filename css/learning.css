@@ -225,6 +225,18 @@
 }
 .lrn-btn-primary:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; }
 .lrn-btn-primary:disabled:hover{ transform:none; filter:none; box-shadow:none; }
+
+.lrn-other-detail{ display:flex; flex-direction:column; gap:6px; margin-top:-6px; animation:lrnFadeUp .25s var(--lrn-ease) both; }
+.lrn-other-detail label{
+  font-family:var(--font-display); font-weight:700; font-size:11.5px; text-transform:uppercase;
+  letter-spacing:.05em; color:var(--label);
+}
+.lrn-other-detail-input{
+  width:100%; font-family:var(--font-body); font-size:14px; color:var(--black); background:var(--white);
+  border:1.5px solid var(--line); border-radius:var(--lrn-radius-sm); padding:12px 15px; box-shadow:var(--lrn-shadow-sm);
+  transition:border-color .18s var(--lrn-ease), box-shadow .18s var(--lrn-ease);
+}
+.lrn-other-detail-input:focus{ outline:none; border-color:var(--oryx-blue); box-shadow:var(--lrn-shadow); }
 .lrn-btn-primary:disabled::after{ transform:none; }
 
 /* ---------- Results ---------- */
@@ -342,6 +354,8 @@
 }
 .lrn-level-switch-btn:hover{ transform:translateY(-1px); border-color:var(--oryx-blue); }
 .lrn-level-switch-btn.active{ background:var(--oryx-blue); color:var(--white); border-color:var(--oryx-blue); }
+.lrn-level-switch-btn.locked{ opacity:.5; cursor:not-allowed; color:var(--label); }
+.lrn-level-switch-btn.locked:hover{ transform:none; border-color:var(--line); }
 
 .lrn-path-list{ display:flex; flex-direction:column; gap:9px; }
 .lrn-path-item{
