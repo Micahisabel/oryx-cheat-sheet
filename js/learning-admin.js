@@ -476,57 +476,133 @@ function bindPendingChallenges(container){
   });
 }
 
-function levelBarRowsHtml(byLevel, total, notAssessedCount){
-  const grandTotal = total + notAssessedCount;
-  const max = Math.max(1, ...LEARNING_LEVEL_ORDER.map(lv => byLevel[lv] || 0), notAssessedCount);
-  const rows = LEARNING_LEVEL_ORDER.map(lv => {
-    const meta = LEVEL_META[lv];
-    const count = byLevel[lv] || 0;
-    const pct = grandTotal ? Math.round((count / grandTotal) * 100) : 0;
+// Rounds a chart's y-axis ceiling up to a clean multiple of 4, so gridlines
+// land on whole, readable numbers instead of the raw data max.
+function niceAxisMax(max){
+  if(max <= 4) return 4;
+  return Math.ceil(max / 4) * 4;
+}
+
+function shortWeekLabel(iso){
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+// Vertical bar chart with gridlines, axis labels, and a native hover
+// tooltip per bar (an SVG <title> — no floating-tooltip widget needed, and
+// it's accessible for free). Same hand-built inline-SVG approach as
+// progressGraphSvg() in learning.js: no charting library, no build step.
+function levelDistributionChartSvg(byLevel, notAssessedCount){
+  const cats = LEARNING_LEVEL_ORDER.map(lv => ({
+    label: LEVEL_META[lv].label, color: LEVEL_META[lv].color, count: byLevel[lv] || 0
+  }));
+  cats.push({ label: 'Not Assessed', color: 'var(--silver)', count: notAssessedCount });
+  const total = cats.reduce((s, c) => s + c.count, 0);
+
+  const w = 720, h = 300, padL = 34, padR = 10, padT = 14, padB = 40;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
+  const yMax = niceAxisMax(Math.max(...cats.map(c => c.count), 1));
+  const steps = 4;
+  const gap = 18;
+  const barW = (plotW - gap * (cats.length - 1)) / cats.length;
+
+  const gridlines = Array.from({ length: steps + 1 }, (_, i) => {
+    const val = Math.round((yMax / steps) * i);
+    const y = padT + plotH - (i / steps) * plotH;
     return `
-      <div class="analytics-cat-row">
-        <div class="analytics-cat-top"><span>${meta.emoji} ${escapeHtml(meta.label)}</span><span>${count} (${pct}%)</span></div>
-        <div class="analytics-bar-track"><div class="analytics-bar-fill" style="width:${Math.round((count / max) * 100)}%;background:${meta.color};"></div></div>
-      </div>`;
+      <line x1="${padL}" y1="${y.toFixed(1)}" x2="${w - padR}" y2="${y.toFixed(1)}" class="lrn-chart-gridline"></line>
+      <text x="${padL - 8}" y="${(y + 4).toFixed(1)}" text-anchor="end" class="lrn-chart-axis-label">${val}</text>`;
   }).join('');
-  const notAssessedPct = grandTotal ? Math.round((notAssessedCount / grandTotal) * 100) : 0;
-  const notAssessedRow = `
-    <div class="analytics-cat-row">
-      <div class="analytics-cat-top"><span>⚪ Not Assessed</span><span>${notAssessedCount} (${notAssessedPct}%)</span></div>
-      <div class="analytics-bar-track"><div class="analytics-bar-fill" style="width:${Math.round((notAssessedCount / max) * 100)}%;background:var(--silver);"></div></div>
+
+  const bars = cats.map((c, i) => {
+    const x = padL + i * (barW + gap);
+    const barH = (c.count / yMax) * plotH;
+    const y = padT + plotH - barH;
+    const pct = total ? Math.round((c.count / total) * 100) : 0;
+    return `
+      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(barH, 0).toFixed(1)}" rx="6" fill="${c.color}"><title>${escapeHtml(c.label)}: ${c.count} (${pct}%)</title></rect>
+      <text x="${(x + barW / 2).toFixed(1)}" y="${(h - padB + 18).toFixed(1)}" text-anchor="middle" class="lrn-chart-axis-label">${escapeHtml(c.label)}</text>`;
+  }).join('');
+
+  return `
+    <div class="lrn-chart-wrap">
+      <svg viewBox="0 0 ${w} ${h}" class="lrn-chart-svg">${gridlines}${bars}</svg>
     </div>`;
-  return rows + notAssessedRow;
 }
 
-function departmentProgressBarsHtml(deptStats){
+// Horizontal bar chart, same gridline/tooltip approach as above.
+function departmentProgressChartSvg(deptStats){
   if(!deptStats.length) return '<div class="s-empty">No department data yet.</div>';
-  return deptStats.map(d => `
-    <div class="analytics-cat-row">
-      <div class="analytics-cat-top"><span>${escapeHtml(d.dept)}</span><span>${d.avgProgress}% <span class="lrn-admin-table-dim">(${d.count})</span></span></div>
-      <div class="analytics-bar-track"><div class="analytics-bar-fill" style="width:${d.avgProgress}%;"></div></div>
-    </div>`).join('');
+  const w = 760, padL = 132, padR = 46, padT = 10, padB = 30;
+  const barH = 26, gap = 14;
+  const n = deptStats.length;
+  const plotH = n * barH + (n - 1) * gap;
+  const h = padT + plotH + padB;
+  const plotW = w - padL - padR;
+  const xMax = 100, steps = 4;
+
+  const gridlines = Array.from({ length: steps + 1 }, (_, i) => {
+    const val = Math.round((xMax / steps) * i);
+    const x = padL + (i / steps) * plotW;
+    return `
+      <line x1="${x.toFixed(1)}" y1="${padT}" x2="${x.toFixed(1)}" y2="${padT + plotH}" class="lrn-chart-gridline"></line>
+      <text x="${x.toFixed(1)}" y="${(padT + plotH + 20).toFixed(1)}" text-anchor="middle" class="lrn-chart-axis-label">${val}%</text>`;
+  }).join('');
+
+  const bars = deptStats.map((d, i) => {
+    const y = padT + i * (barH + gap);
+    const barWidth = (d.avgProgress / xMax) * plotW;
+    return `
+      <text x="${padL - 10}" y="${(y + barH / 2 + 4).toFixed(1)}" text-anchor="end" class="lrn-chart-cat-label">${escapeHtml(d.dept)}</text>
+      <rect x="${padL}" y="${y.toFixed(1)}" width="${Math.max(barWidth, 0).toFixed(1)}" height="${barH}" rx="6" fill="var(--oryx-blue)"><title>${escapeHtml(d.dept)}: ${d.avgProgress}% (${d.count} employee${d.count === 1 ? '' : 's'})</title></rect>`;
+  }).join('');
+
+  return `
+    <div class="lrn-chart-wrap">
+      <svg viewBox="0 0 ${w} ${h}" class="lrn-chart-svg">${gridlines}${bars}</svg>
+    </div>`;
 }
 
-// Same hand-built inline-SVG approach as progressGraphSvg() in learning.js —
-// no charting library, no build step. Plots weekly activity-event counts;
-// empty state when there isn't enough real history yet.
+// Line chart with gridlines, axis labels, and a per-point marker/tooltip
+// (not just the last point) — same no-library inline-SVG approach.
 function activityOverTimeSvg(series){
   if(!series){
     return '<div class="s-empty">Not enough activity data yet.</div>';
   }
-  const w = 900, h = 160, pad = 16;
+  const w = 900, h = 220, padL = 34, padR = 14, padT = 14, padB = 34;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
   const n = series.length;
-  const xs = series.map((_, i) => pad + (n === 1 ? 0 : (i / (n - 1)) * (w - pad * 2)));
-  const maxCount = Math.max(...series.map(p => p.count), 1);
-  const ys = series.map(p => h - pad - (p.count / maxCount) * (h - pad * 2));
+  const xs = series.map((_, i) => padL + (n === 1 ? plotW / 2 : (i / (n - 1)) * plotW));
+  const maxCount = niceAxisMax(Math.max(...series.map(p => p.count), 1));
+  const ys = series.map(p => padT + plotH - (p.count / maxCount) * plotH);
+  const steps = 4;
+
+  const gridlines = Array.from({ length: steps + 1 }, (_, i) => {
+    const val = Math.round((maxCount / steps) * i);
+    const y = padT + plotH - (i / steps) * plotH;
+    return `
+      <line x1="${padL}" y1="${y.toFixed(1)}" x2="${w - padR}" y2="${y.toFixed(1)}" class="lrn-chart-gridline"></line>
+      <text x="${padL - 8}" y="${(y + 4).toFixed(1)}" text-anchor="end" class="lrn-chart-axis-label">${val}</text>`;
+  }).join('');
+
   const path = xs.map((x, i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
-  const lastX = xs[xs.length - 1], lastY = ys[ys.length - 1];
+  const points = xs.map((x, i) => `
+      <circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="4" fill="var(--oryx-blue)"><title>${escapeHtml(shortWeekLabel(series[i].weekStart))}: ${series[i].count} activit${series[i].count === 1 ? 'y' : 'ies'}</title></circle>`).join('');
+
+  const labelStep = Math.max(1, Math.ceil(n / 6));
+  const xLabels = series.map((p, i) => {
+    if(i !== 0 && i !== n - 1 && i % labelStep !== 0) return '';
+    return `<text x="${xs[i].toFixed(1)}" y="${(h - padB + 20).toFixed(1)}" text-anchor="middle" class="lrn-chart-axis-label">${escapeHtml(shortWeekLabel(p.weekStart))}</text>`;
+  }).join('');
+
   return `
-    <svg viewBox="0 0 ${w} ${h}" class="lrn-progress-graph-svg lrn-admin-activity-svg" preserveAspectRatio="none">
-      <path d="${path}" fill="none" stroke="var(--oryx-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-      <circle cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="4" fill="var(--oryx-blue)"></circle>
-    </svg>
-    <div class="lrn-admin-activity-caption">${escapeHtml(series[0].weekStart)} – ${escapeHtml(series[series.length - 1].weekStart)}</div>`;
+    <div class="lrn-chart-wrap">
+      <svg viewBox="0 0 ${w} ${h}" class="lrn-chart-svg">
+        ${gridlines}
+        <path d="${path}" fill="none" stroke="var(--oryx-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        ${points}
+        ${xLabels}
+      </svg>
+    </div>`;
 }
 
 // Mirrors progressGraphSvg()/recentActivityHtml() in learning.js, but reads
@@ -646,17 +722,17 @@ function renderLearningAdmin(){
     </div>
 
     <h4 class="analytics-section-head" style="margin-top:24px;">AI Level Distribution</h4>
-    <div class="analytics-cats">${levelBarRowsHtml(stats.byLevel, stats.total, stats.notAssessedCount)}</div>
+    ${levelDistributionChartSvg(stats.byLevel, stats.notAssessedCount)}
 
     ${learningAdminDept === 'all' ? `
       <h4 class="analytics-section-head" style="margin-top:24px;">Progress by Department</h4>
-      <div class="analytics-cats">${departmentProgressBarsHtml(deptStats)}</div>
+      ${departmentProgressChartSvg(deptStats)}
     ` : `
       <p class="analytics-footnote" style="text-align:left;margin-top:16px;">Showing a single department — switch to "All Departments" to compare progress across departments.</p>
     `}
 
     <h4 class="analytics-section-head" style="margin-top:24px;">Learning Activity Over Time</h4>
-    <div class="lrn-profile-graph lrn-admin-activity-graph">${activityOverTimeSvg(activitySeries)}</div>
+    ${activityOverTimeSvg(activitySeries)}
 
     <h3 class="analytics-section-head" style="margin-top:32px;">Employee Learning Progress</h3>
     <div class="lrn-admin-table-controls">
