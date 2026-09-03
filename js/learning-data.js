@@ -252,12 +252,12 @@ const LESSON_LIBRARY = {
     practice: 'A colleague asks: "Can AI help me at all with my job?" Write a short reply explaining, in your own words, one real task AI could help with — and one thing it can\'t do without your help (like knowing private company details).',
     practiceExample: '"Yes — AI can help you draft messages, summarise long documents, or brainstorm ideas quickly. It won\'t automatically know things about Oryx or see your inbox, though — you\'d need to share the details it needs to work with."',
     quiz: {
-      question: 'A colleague says: "I asked AI what our new delivery policy is, and it gave me a confident answer — so it must be right." What\'s the problem with this?',
+      question: 'AI gives a confident answer about Oryx\'s policy. Why might it still be wrong?',
       options: [
-        { text: 'Nothing — AI always knows company policies', correct: false, feedback: 'AI has no automatic access to Oryx\'s policies — a confident-sounding answer isn\'t proof it saw the real policy.' },
-        { text: 'AI has no automatic access to Oryx\'s policies, so it may have guessed a plausible-sounding answer', correct: true, feedback: 'Right — AI only knows what it\'s told or trained on, so a confident answer isn\'t proof it\'s accurate.' },
-        { text: 'AI only answers questions about IT, not policy', correct: false, feedback: 'AI can be asked about any topic — the real issue is that it can\'t see Oryx\'s actual policy documents unless someone provides them.' },
-        { text: 'The colleague should have asked in a ruder tone', correct: false, feedback: 'Tone doesn\'t affect accuracy — the real issue is that AI wasn\'t given Oryx\'s actual policy to work from.' }
+        { text: 'AI always knows our company policies', correct: false, feedback: 'AI has no automatic access to Oryx\'s real policies.' },
+        { text: 'It has no access to real policies unless it\'s told them', correct: true, feedback: 'Right — a confident answer isn\'t proof it saw the real policy.' },
+        { text: 'AI only knows about IT topics', correct: false, feedback: 'AI can be asked about anything — the issue is it wasn\'t given the real policy.' },
+        { text: 'The question was asked rudely', correct: false, feedback: 'Tone doesn\'t affect accuracy — missing information does.' }
       ]
     }
   },
@@ -279,12 +279,12 @@ const LESSON_LIBRARY = {
     practice: 'AI tells you: "Oryx\'s standard delivery time is 6 weeks." You don\'t actually know if that\'s correct. Write one sentence explaining what you\'d do next, before repeating that figure to a customer.',
     practiceExample: '"I\'d check this against the real delivery schedule or ask a colleague before quoting it to a customer — I wouldn\'t repeat an AI answer as fact without checking it first."',
     quiz: {
-      question: 'You ask AI a factual question and it replies instantly and confidently. What does that confidence actually tell you?',
+      question: 'AI answers instantly and confidently. What does that tell you?',
       options: [
-        { text: 'The answer is definitely correct', correct: false, feedback: 'Confidence in the wording doesn\'t guarantee accuracy — AI can sound sure and still be wrong.' },
-        { text: 'Nothing about accuracy — it just means AI generated a plausible-sounding reply', correct: true, feedback: 'Exactly — AI always replies in a confident, fluent way, whether or not the answer is accurate. Checking matters most for facts you\'ll rely on.' },
-        { text: 'The answer must be false', correct: false, feedback: 'Confidence doesn\'t mean the answer is wrong either — it simply isn\'t a reliable signal of accuracy either way.' },
-        { text: 'AI is guessing to entertain you', correct: false, feedback: 'AI isn\'t trying to entertain — it\'s generating the most likely helpful reply, but likely isn\'t the same as verified.' }
+        { text: 'The answer is definitely correct', correct: false, feedback: 'Confident wording doesn\'t guarantee accuracy.' },
+        { text: 'Nothing about accuracy — it\'s just a fluent-sounding reply', correct: true, feedback: 'Right — checking still matters for facts you\'ll rely on.' },
+        { text: 'The answer must be false', correct: false, feedback: 'Confidence isn\'t proof either way.' },
+        { text: 'AI is joking with you', correct: false, feedback: 'AI is trying to help, not joke — but that doesn\'t mean it\'s accurate.' }
       ]
     }
   },
@@ -306,12 +306,12 @@ const LESSON_LIBRARY = {
     practice: 'Here are rough meeting notes: "Team agreed to move launch to March. Sarah will update the client. Budget needs review by Friday. Ali to check supplier stock." Write a prompt asking AI to turn this into 3 clear action points.',
     practiceExample: '"Turn these meeting notes into 3 clear action points, with who\'s responsible for each: [paste notes]" — this tells AI exactly what format you want and what to include.',
     quiz: {
-      question: 'You ask an AI assistant for a summary and the first reply is too long. What\'s the best next step?',
+      question: 'AI\'s first reply is too long. What\'s the best next step?',
       options: [
-        { text: 'Start a completely new conversation from scratch', correct: false, feedback: 'You don\'t need to start over — the current conversation already has the context, so refining it is faster.' },
-        { text: 'Reply and ask for a shorter version', correct: true, feedback: 'Right — you can keep the conversation going and ask it to adjust length, tone, or detail without losing the context you\'ve already given it.' },
-        { text: 'Accept the long reply and just skim it', correct: false, feedback: 'This wastes the chance to get exactly what you need — asking for a shorter version takes seconds.' },
-        { text: 'Assume AI can\'t do summaries', correct: false, feedback: 'AI is well suited to summarising — the first attempt just needed refining, which is normal.' }
+        { text: 'Start a brand new conversation', correct: false, feedback: 'The current chat already has the context — no need to restart.' },
+        { text: 'Reply and ask for a shorter version', correct: true, feedback: 'Right — you can keep refining the same conversation.' },
+        { text: 'Accept it and just skim it', correct: false, feedback: 'Asking for a shorter version takes seconds and gets you what you need.' },
+        { text: 'Assume AI can\'t do summaries', correct: false, feedback: 'AI handles summaries well — it just needed a follow-up.' }
       ]
     }
   },
@@ -333,12 +333,12 @@ const LESSON_LIBRARY = {
     practice: 'Improve this weak prompt: "Write something for the team." Rewrite it so it says the task, who it\'s for, and the tone you want.',
     practiceExample: '"Write a short, upbeat message to the team announcing that Friday\'s target was hit — keep it under 3 sentences."',
     quiz: {
-      question: 'Which of these prompts is most likely to get a genuinely useful reply?',
+      question: 'Which prompt is most likely to get a useful reply?',
       options: [
-        { text: '"Write something."', correct: false, feedback: 'This gives AI no task, no audience, and no tone — it has to guess everything.' },
-        { text: '"Email."', correct: false, feedback: 'A single word gives AI nothing to work with beyond guessing the entire task.' },
-        { text: '"Write a short, friendly thank-you email to a customer who just placed their first order."', correct: true, feedback: 'This says the task (thank-you email), the tone (friendly), the length (short), and who it\'s for — everything AI needs.' },
-        { text: '"Do the email thing we discussed."', correct: false, feedback: 'AI has no memory of a conversation you haven\'t shown it — this assumes context it doesn\'t have.' }
+        { text: '"Write something."', correct: false, feedback: 'No task, audience, or tone — AI has to guess everything.' },
+        { text: '"Email."', correct: false, feedback: 'One word gives AI nothing to work with.' },
+        { text: '"Write a short, friendly thank-you email to a first-time customer."', correct: true, feedback: 'This gives the task, tone, length, and audience.' },
+        { text: '"Do the email thing we discussed."', correct: false, feedback: 'AI has no memory of a chat you haven\'t shown it.' }
       ]
     }
   },
@@ -360,12 +360,12 @@ const LESSON_LIBRARY = {
     practice: 'For each task below, decide: good fit for AI, or needs a person to check/decide? 1) Drafting a first reply to a customer complaint. 2) Approving a refund over AED 5,000. 3) Brainstorming three subject lines for an email. Write your answer for each.',
     practiceExample: '1) Good fit — AI can draft it fast, you review before sending. 2) Needs a person — this has real financial consequences and needs judgement + authority AI doesn\'t have. 3) Good fit — brainstorming ideas is exactly where AI is strong.',
     quiz: {
-      question: 'Your manager asks AI to confirm today\'s exact warehouse stock count for a part, and AI gives a specific number. What should you do?',
+      question: 'AI gives an exact live warehouse stock count. What should you do?',
       options: [
-        { text: 'Trust the number completely — AI wouldn\'t make it up', correct: false, feedback: 'AI has no live connection to your warehouse system, so a specific-sounding number here is a weak fit, not a verified fact.' },
-        { text: 'Check the number against the real stock system before relying on it', correct: true, feedback: 'Right — live, exact data like current stock levels is exactly the kind of thing AI can\'t see, so it needs to be verified at the source.' },
-        { text: 'Ignore AI completely for every task', correct: false, feedback: 'That overcorrects — AI is still useful for drafting and brainstorming, just not for live data it has no access to.' },
-        { text: 'Ask AI the same question again to double-check', correct: false, feedback: 'Asking again won\'t fix the problem — AI still has no access to the real system, so it may just repeat or vary its guess.' }
+        { text: 'Trust it completely', correct: false, feedback: 'AI has no live connection to your stock system.' },
+        { text: 'Check it against the real stock system first', correct: true, feedback: 'Right — live, exact data needs verifying at the source.' },
+        { text: 'Never use AI for anything again', correct: false, feedback: 'That overcorrects — AI is still great for drafting and brainstorming.' },
+        { text: 'Ask AI the same question again', correct: false, feedback: 'Asking again won\'t fix it — AI still can\'t see the real system.' }
       ]
     }
   },
@@ -387,12 +387,12 @@ const LESSON_LIBRARY = {
     practice: 'You have these notes: "client called, wants price match on order 4521, said competitor quoted 10% less, needs answer by Thursday." Write a prompt asking AI to turn this into a short internal message for your manager, in a specific format.',
     practiceExample: '"Turn these notes into a 3-line internal update for my manager, ending with what decision is needed by Thursday: [paste notes]"',
     quiz: {
-      question: 'You ask AI: "Tell me about the client call notes." The reply is a long, unfocused paragraph. What\'s the most likely cause?',
+      question: 'You ask AI about some notes and get a long, unfocused reply. Why?',
       options: [
-        { text: 'AI can\'t handle notes at all', correct: false, feedback: 'AI handles notes well — the issue here is the prompt, not the tool.' },
-        { text: 'The prompt didn\'t say who the reply is for or what format to use', correct: true, feedback: 'Exactly — without an audience or format, AI has to guess, and a long unfocused paragraph is a common result.' },
-        { text: 'The notes were too short', correct: false, feedback: 'Short notes aren\'t the problem — even short notes can be turned into a clear format if the prompt asks for one.' },
-        { text: 'AI only works well with typed, not handwritten notes', correct: false, feedback: 'This isn\'t about handwriting — the notes were already typed. It\'s about what the prompt asked AI to do with them.' }
+        { text: 'AI can\'t handle notes at all', correct: false, feedback: 'AI handles notes well — this is a prompting issue.' },
+        { text: 'No audience or format was given', correct: true, feedback: 'Right — without that, AI has to guess and often over-explains.' },
+        { text: 'The notes were too short', correct: false, feedback: 'Short notes can still get a clear answer with the right prompt.' },
+        { text: 'The notes were handwritten', correct: false, feedback: 'That\'s not the issue — the notes were already typed.' }
       ]
     }
   },
@@ -414,12 +414,12 @@ const LESSON_LIBRARY = {
     practice: 'AI gave you this reply to "write a reply to this complaint": a long, very formal paragraph. Write the one-line follow-up you\'d send to make it shorter and warmer.',
     practiceExample: '"Make this shorter — under 4 sentences — and warmer in tone, like you\'re genuinely sorry for the trouble."',
     quiz: {
-      question: 'An AI reply is accurate but far too formal for a quick message to a colleague. What\'s the best next step?',
+      question: 'AI\'s reply is accurate but too formal for a quick message. What\'s best?',
       options: [
-        { text: 'Send it as-is since it\'s accurate', correct: false, feedback: 'Accuracy isn\'t the only thing that matters — tone fitting the audience matters too, and this is an easy fix.' },
-        { text: 'Start a brand new prompt explaining the whole task again', correct: false, feedback: 'That\'s more work than needed — the conversation already has the context, so a short follow-up is faster.' },
-        { text: 'Ask AI to make it sound more casual, in one short follow-up', correct: true, feedback: 'Right — a quick, specific follow-up like "make this more casual" fixes the tone without losing the useful content already there.' },
-        { text: 'Rewrite it completely yourself instead of using AI', correct: false, feedback: 'That throws away a useful starting draft — refining it is quicker than starting from a blank page.' }
+        { text: 'Send it as-is', correct: false, feedback: 'Tone matters too, and this is an easy fix.' },
+        { text: 'Start a brand new prompt from scratch', correct: false, feedback: 'The conversation already has the context — a quick follow-up is faster.' },
+        { text: 'Ask AI to make it more casual', correct: true, feedback: 'Right — one short follow-up fixes the tone.' },
+        { text: 'Rewrite it yourself instead', correct: false, feedback: 'That throws away a useful draft — refining it is quicker.' }
       ]
     }
   },
@@ -441,12 +441,12 @@ const LESSON_LIBRARY = {
     practice: 'Pick one of these two quick tasks and write the prompt you\'d use: (a) turning a messy note into a clean message, or (b) checking the tone of a message before sending it.',
     practiceExample: '"Clean up this message and make the tone more polite, keeping the same meaning: \'need this asap cant wait any longer\'"',
     quiz: {
-      question: 'A colleague wants a fast AI "quick win" and considers pasting a customer\'s full bank details into AI so it can draft a refund confirmation email. What should they do instead?',
+      question: 'A colleague wants to paste a customer\'s bank details into AI for a quick draft. What should they do?',
       options: [
-        { text: 'Paste it anyway — it\'s just for a draft', correct: false, feedback: 'Private financial details shouldn\'t be pasted into AI tools unless your company has approved that specific use — "just a draft" doesn\'t remove the risk.' },
-        { text: 'Draft the email without including the sensitive details, and add them separately afterwards', correct: true, feedback: 'Right — AI can still help with the wording of the email without ever needing to see the customer\'s private financial details.' },
-        { text: 'Don\'t use AI for anything related to customers', correct: false, feedback: 'This overcorrects — plenty of customer-related drafting is fine, the issue is specifically sharing private financial details.' },
-        { text: 'Ask AI if it\'s safe to share the details first', correct: false, feedback: 'AI can\'t verify your company\'s own data rules — that\'s a question for your own policy, not something to ask the AI tool itself.' }
+        { text: 'Paste it anyway — it\'s just a draft', correct: false, feedback: 'Private financial details need approval first, draft or not.' },
+        { text: 'Draft the email without the sensitive details', correct: true, feedback: 'Right — AI can help with the wording without seeing private data.' },
+        { text: 'Never use AI for anything customer-related', correct: false, feedback: 'That overcorrects — the issue is specifically private financial details.' },
+        { text: 'Ask AI if it\'s safe to share', correct: false, feedback: 'AI can\'t confirm your company\'s own data rules.' }
       ]
     }
   },
@@ -469,12 +469,12 @@ const LESSON_LIBRARY = {
     practice: 'Build a full four-part prompt for this situation: a customer\'s order is delayed by 3 days and you need to tell them. Cover task, background, rules, and format.',
     practiceExample: '"Write a reply to a customer whose order (#4521) is delayed by 3 days due to a supplier issue. Be apologetic but confident. Keep it under 100 words. End with the new expected delivery date."',
     quiz: {
-      question: 'Which of these prompts has the strongest structure?',
+      question: 'Which prompt has the strongest structure?',
       options: [
-        { text: '"Write a short customer reply using these notes. Be warm and end with the next step."', correct: true, feedback: 'This gives a task (customer reply), a background source (the notes), a rule (be warm), and a required ending — all four parts.' },
-        { text: '"Reply."', correct: false, feedback: 'This has a task word but no background, rules, or format — AI has to guess everything else.' },
-        { text: '"Make this good."', correct: false, feedback: '"Good" isn\'t a rule AI can act on — it needs something specific like tone, length, or must-include content.' },
-        { text: '"Customer email please."', correct: false, feedback: 'This names a topic but gives no background, rules, or format — far too little for a strong reply.' }
+        { text: '"Write a short customer reply using these notes. Be warm and end with the next step."', correct: true, feedback: 'This covers task, background, rules, and format.' },
+        { text: '"Reply."', correct: false, feedback: 'No background, rules, or format — AI has to guess.' },
+        { text: '"Make this good."', correct: false, feedback: '"Good" isn\'t a rule AI can act on.' },
+        { text: '"Customer email please."', correct: false, feedback: 'Names a topic only — far too little to work with.' }
       ]
     }
   },
@@ -496,12 +496,12 @@ const LESSON_LIBRARY = {
     practice: 'Add useful context to this bare prompt: "Write a reply." Say who the reader is, what happened, and what the reply needs to achieve — without including anything private that isn\'t needed.',
     practiceExample: '"A long-standing customer\'s delivery is late for the first time in two years. Write a reply that acknowledges this is unusual for us, apologises, and confirms the new delivery date."',
     quiz: {
-      question: 'A colleague asks AI to "write a firm reminder email" with no other information. What is this prompt missing?',
+      question: 'A colleague asks AI to "write a firm reminder email" with no other details. What\'s missing?',
       options: [
-        { text: 'Nothing — the instruction is already clear enough', correct: false, feedback: 'The instruction (write a firm reminder) is clear, but there\'s no context — who is this to, and reminding them of what?' },
-        { text: 'Context about who the email is for and what they\'re being reminded about', correct: true, feedback: 'Right — without context, AI has to invent a scenario, which likely won\'t match the real situation.' },
-        { text: 'A funnier tone', correct: false, feedback: 'Tone isn\'t the issue here — the missing piece is the background information, not humour.' },
-        { text: 'A longer word count', correct: false, feedback: 'Length isn\'t the problem — even a short reminder needs to know who it\'s for and what it\'s about.' }
+        { text: 'Nothing — it\'s already clear', correct: false, feedback: 'The instruction is clear, but there\'s no context about who or what.' },
+        { text: 'Who it\'s for and what they\'re being reminded about', correct: true, feedback: 'Right — without that, AI has to invent a scenario.' },
+        { text: 'A funnier tone', correct: false, feedback: 'Tone isn\'t the issue — background information is.' },
+        { text: 'A longer word count', correct: false, feedback: 'Length isn\'t the problem — the missing background is.' }
       ]
     }
   },
@@ -523,12 +523,12 @@ const LESSON_LIBRARY = {
     practice: 'You have a supplier contract to review. Write a prompt asking AI to pull out the three most important points, plus any dates or numbers you should double-check yourself.',
     practiceExample: '"Using this contract, list the 3 most important points for our team, and separately flag every date or amount so I can check them myself."',
     quiz: {
-      question: 'AI summarises a contract and states a payment deadline of "30 days". What should you do before treating this as fact?',
+      question: 'AI says a contract\'s payment deadline is "30 days." What should you do first?',
       options: [
-        { text: 'Repeat the figure immediately in your own report', correct: false, feedback: 'Numbers pulled from a document by AI can be misread or misplaced — this should be checked before it\'s repeated as fact.' },
-        { text: 'Open the actual contract and confirm the 30-day figure yourself', correct: true, feedback: 'Right — dates and numbers are exactly the details worth checking against the source document before you rely on them.' },
-        { text: 'Ask a different AI tool the same question', correct: false, feedback: 'A second AI tool has the same limitation — neither has guaranteed accuracy on a specific figure unless you check the actual document.' },
-        { text: 'Ignore the summary completely and never use AI for documents', correct: false, feedback: 'This overcorrects — AI summaries are still useful for finding key points quickly; you just verify the details that matter.' }
+        { text: 'Repeat it as fact straight away', correct: false, feedback: 'Numbers pulled by AI can be misread — check first.' },
+        { text: 'Open the contract and confirm it yourself', correct: true, feedback: 'Right — always verify dates and numbers against the source.' },
+        { text: 'Ask a different AI tool the same thing', correct: false, feedback: 'A second AI tool has the same limitation.' },
+        { text: 'Ignore the summary and never use AI for documents', correct: false, feedback: 'That overcorrects — just verify the details that matter.' }
       ]
     }
   },
@@ -552,10 +552,10 @@ const LESSON_LIBRARY = {
     quiz: {
       question: 'Which use of AI is most likely to improve productivity safely?',
       options: [
-        { text: 'Letting AI approve spending requests on its own', correct: false, feedback: 'Approving spending has real consequences and needs a person\'s judgement and authority — this isn\'t a safe use of AI.' },
-        { text: 'Using AI for a first draft, then checking and finishing it yourself', correct: true, feedback: 'Right — this captures the time saving of a fast first draft while keeping a person in control of the final, accurate result.' },
-        { text: 'Using AI for every task, even ones that already take less time to do yourself', correct: false, feedback: 'This doesn\'t add real productivity — using AI where it doesn\'t save time just adds an extra step.' },
-        { text: 'Skipping checks to finish tasks faster', correct: false, feedback: 'Skipping checks trades speed for accuracy — not a safe way to gain productivity.' }
+        { text: 'Letting AI approve spending on its own', correct: false, feedback: 'Spending decisions need a person\'s judgement and authority.' },
+        { text: 'Using AI for a first draft, then checking it yourself', correct: true, feedback: 'Right — fast draft, person stays in control of the result.' },
+        { text: 'Using AI for every task, even quick ones', correct: false, feedback: 'That adds a step rather than saving time.' },
+        { text: 'Skipping checks to finish faster', correct: false, feedback: 'That trades accuracy for speed — not a safe trade.' }
       ]
     }
   },
@@ -577,12 +577,12 @@ const LESSON_LIBRARY = {
     practice: 'Write a prompt for AI to act as a first-line customer support assistant: it should check what information is missing from an enquiry, follow a rule that it never promises a refund, and return its answer as a short table (issue / missing info / suggested reply).',
     practiceExample: '"You are a first-line support assistant. For this enquiry, list: the issue, any missing information needed to resolve it, and a suggested reply. Never promise a refund — flag that as needing manager approval instead. Return this as a table with those 3 columns."',
     quiz: {
-      question: 'You\'ve written a long, detailed advanced prompt and it works well on your first test case. What should you do next?',
+      question: 'Your advanced prompt worked on the first test. What should you do next?',
       options: [
-        { text: 'Assume it\'s finished, since it worked once', correct: false, feedback: 'One successful test doesn\'t confirm reliability — different real situations can expose gaps the first test case didn\'t.' },
-        { text: 'Test it against a few different, realistic examples before relying on it', correct: true, feedback: 'Right — advanced prompts need testing across multiple situations to catch cases where the instructions don\'t hold up.' },
-        { text: 'Make the prompt even longer to be safe', correct: false, feedback: 'Length alone doesn\'t improve reliability — testing against real examples is what actually reveals problems.' },
-        { text: 'Remove the rules so it answers faster', correct: false, feedback: 'Removing rules increases risk rather than reducing it — the rules are what keep the output safe and consistent.' }
+        { text: 'Assume it\'s finished', correct: false, feedback: 'One successful test doesn\'t confirm it\'s reliable.' },
+        { text: 'Test it against a few more real examples', correct: true, feedback: 'Right — testing across situations catches hidden gaps.' },
+        { text: 'Make the prompt even longer', correct: false, feedback: 'Length alone doesn\'t improve reliability.' },
+        { text: 'Remove the rules so it answers faster', correct: false, feedback: 'The rules are what keep the output safe and consistent.' }
       ]
     }
   },
@@ -604,12 +604,12 @@ const LESSON_LIBRARY = {
     practice: 'Break a customer-reply process into 4 clear steps. For each step, note whether AI or a person owns it.',
     practiceExample: '1) Read enquiry — AI drafts a summary. 2) Check order details — person confirms. 3) Draft reply — AI. 4) Approve and send — person.',
     quiz: {
-      question: 'Why is it usually better to break a large AI-assisted task into smaller steps, rather than one big step?',
+      question: 'Why break a large AI task into smaller steps?',
       options: [
-        { text: 'To make the overall work take longer', correct: false, feedback: 'Smaller steps aren\'t about adding time — they usually make problems easier and faster to catch.' },
-        { text: 'To make each part easier to guide, check, and fix if something goes wrong', correct: true, feedback: 'Right — smaller steps mean it\'s clear who owns each part and where to look if something goes wrong.' },
-        { text: 'To remove the need for anyone to check the work', correct: false, feedback: 'Breaking a task into steps doesn\'t remove the need to check — it actually makes checking easier and more targeted.' },
-        { text: 'To hide which step caused a mistake', correct: false, feedback: 'The opposite is true — smaller, clearly owned steps make it easier to trace exactly where a mistake happened.' }
+        { text: 'To make the work take longer', correct: false, feedback: 'Smaller steps usually make problems faster to catch, not slower.' },
+        { text: 'Each part is easier to guide, check, and fix', correct: true, feedback: 'Right — it\'s clear who owns each part and where to look.' },
+        { text: 'To remove the need to check anything', correct: false, feedback: 'It actually makes checking easier and more targeted.' },
+        { text: 'To hide which step caused a mistake', correct: false, feedback: 'The opposite — it makes mistakes easier to trace.' }
       ]
     }
   },
@@ -631,12 +631,12 @@ const LESSON_LIBRARY = {
     practice: 'Design a simple automation idea for one repeat task in your role. Name: the trigger (what starts it), what AI does, and the point where a person checks it before anything important happens.',
     practiceExample: 'Trigger: new supplier invoice arrives. AI does: drafts a summary and flags any mismatched amounts. Person checks: confirms the summary and approves payment — AI never approves payment itself.',
     quiz: {
-      question: 'A team wants to automate replies to customer complaints, with AI sending the reply immediately with no review. What\'s the main risk?',
+      question: 'AI sends complaint replies automatically with no review. What\'s the main risk?',
       options: [
-        { text: 'It will be too slow', correct: false, feedback: 'Speed isn\'t the concern here — sending immediately is actually the fast option, which is the problem, not the fix.' },
-        { text: 'An inaccurate or poorly-toned reply could be sent to a real customer with no chance to catch it first', correct: true, feedback: 'Right — high-impact actions like replying to complaints need a human check before anything goes out, so mistakes can be caught.' },
-        { text: 'AI can\'t draft complaint replies at all', correct: false, feedback: 'AI can draft this kind of reply well — the issue is sending it automatically without anyone reviewing it first.' },
-        { text: 'It will use too much electricity', correct: false, feedback: 'This isn\'t the relevant risk here — the real concern is sending an unchecked reply to a real customer.' }
+        { text: 'It will be too slow', correct: false, feedback: 'Sending immediately is fast — that\'s actually the problem.' },
+        { text: 'A bad reply could reach a customer with no chance to catch it', correct: true, feedback: 'Right — high-impact actions need a human check first.' },
+        { text: 'AI can\'t draft complaint replies at all', correct: false, feedback: 'AI drafts these well — the issue is skipping review.' },
+        { text: 'It will use too much electricity', correct: false, feedback: 'That\'s not the relevant risk here.' }
       ]
     }
   },
@@ -658,12 +658,12 @@ const LESSON_LIBRARY = {
     practice: 'Design an agent that helps with new customer enquiries. List: one tool it may use, one limit on what it can do, and one action a person must approve before it happens.',
     practiceExample: 'Tool: search the approved product knowledge base. Limit: it can only draft replies, never send them. Person approves: sending the final reply to the customer.',
     quiz: {
-      question: 'A team is designing an AI agent to handle supplier orders and wants it to be "fully automatic" with no human involved at any point. What\'s the concern?',
+      question: 'A team wants an AI agent that\'s "fully automatic" with no human involved. What\'s the concern?',
       options: [
-        { text: 'Agents can\'t handle orders at all', correct: false, feedback: 'Agents can be well suited to this kind of task — the concern is specifically the lack of any human oversight.' },
-        { text: 'Removing all human oversight removes the ability to catch mistakes before they affect a real order', correct: true, feedback: 'Right — even a well-designed agent needs a person watching, checking, or approving important actions, especially ones with real business consequences.' },
-        { text: 'It will make the agent too slow', correct: false, feedback: 'Oversight doesn\'t have to be slow — a quick approval step is the point, not a speed problem.' },
-        { text: 'Agents are not allowed to use any tools', correct: false, feedback: 'Agents are meant to use tools to reach a goal — the issue here is oversight, not tool use.' }
+        { text: 'Agents can\'t handle orders at all', correct: false, feedback: 'Agents can handle this well — the concern is oversight.' },
+        { text: 'No one can catch mistakes before they affect a real order', correct: true, feedback: 'Right — even a good agent needs a person checking important actions.' },
+        { text: 'It will make the agent too slow', correct: false, feedback: 'A quick approval step isn\'t a speed problem.' },
+        { text: 'Agents aren\'t allowed to use tools', correct: false, feedback: 'Using tools is the point — the issue is oversight.' }
       ]
     }
   },
@@ -685,12 +685,12 @@ const LESSON_LIBRARY = {
     practice: 'Choose two Oryx systems that could usefully share information (e.g. CRM and a scheduling tool). State exactly what data should be allowed to move, and what must stay out of that link.',
     practiceExample: 'CRM to scheduling tool: share customer name, order reference, and requested installation date. Keep out: payment details and internal notes — not needed for scheduling.',
     quiz: {
-      question: 'A supplier asks to connect their system directly to Oryx\'s full customer database "to make things easier", instead of a specific integration for order status only. What\'s the concern?',
+      question: 'A supplier wants full access to Oryx\'s customer database "to make things easier." What\'s the concern?',
       options: [
-        { text: 'Full access is always more convenient, so this is fine', correct: false, feedback: 'Convenience doesn\'t outweigh the risk — broader access than needed increases what could go wrong if something is misused or breached.' },
-        { text: 'The integration should be scoped to only what\'s needed (e.g. order status), not full database access', correct: true, feedback: 'Right — a good integration gives only the specific information or actions required for the task, limiting the impact of any problem.' },
-        { text: 'APIs can only share one piece of data at a time', correct: false, feedback: 'This isn\'t a technical limit of APIs — the real issue is that access should be deliberately scoped to what\'s needed, whatever that includes.' },
-        { text: 'Suppliers should never be given any system access', correct: false, feedback: 'Scoped, appropriate access for a real business need is fine — the issue is the scope being too broad, not that access exists at all.' }
+        { text: 'Full access is always fine if it\'s convenient', correct: false, feedback: 'Convenience doesn\'t outweigh the risk of broader access.' },
+        { text: 'Access should be scoped to only what\'s needed', correct: true, feedback: 'Right — limiting scope limits the impact of any problem.' },
+        { text: 'APIs can only share one thing at a time', correct: false, feedback: 'That\'s not a real limit — scoping access is the real issue.' },
+        { text: 'Suppliers should never get any access', correct: false, feedback: 'Scoped, appropriate access for a real need is fine.' }
       ]
     }
   },
@@ -712,12 +712,12 @@ const LESSON_LIBRARY = {
     practice: 'Take this process: enquiry arrives → AI drafts a reply → email is sent. Add one safety check and one error step (what happens if key information is missing).',
     practiceExample: 'Safety check: a person reviews the draft before it sends. Error step: if the customer\'s order number is missing from the enquiry, AI flags it for a person instead of guessing.',
     quiz: {
-      question: 'An automation is designed for the normal, successful path only — arrival, draft, send — with nothing defined for when information is missing. What\'s the risk?',
+      question: 'An automation only plans for the normal path, not missing information. What\'s the risk?',
       options: [
-        { text: 'The automation will simply run slower', correct: false, feedback: 'Speed isn\'t the issue — the real risk is what happens when the unplanned case (missing information) actually occurs.' },
-        { text: 'When information is missing, the system has no defined safe behaviour and may send an incorrect or incomplete result', correct: true, feedback: 'Right — advanced automations need a defined error path, not just a plan for when everything goes smoothly.' },
-        { text: 'AI cannot be used in automations at all', correct: false, feedback: 'AI is well suited to automations — the issue is the design missing an error path, not AI\'s suitability.' },
-        { text: 'The automation will stop working entirely', correct: false, feedback: 'The bigger risk usually isn\'t a stoppage — it\'s the system pushing ahead with an incorrect or incomplete result when something doesn\'t fit the expected path.' }
+        { text: 'It will simply run slower', correct: false, feedback: 'Speed isn\'t the issue — the missing case is.' },
+        { text: 'It may send an incorrect result when information is missing', correct: true, feedback: 'Right — a defined error path matters, not just the happy path.' },
+        { text: 'AI can\'t be used in automations at all', correct: false, feedback: 'AI suits automations well — the design is missing an error path.' },
+        { text: 'The automation will stop working entirely', correct: false, feedback: 'The bigger risk is pushing ahead with a wrong result, not stopping.' }
       ]
     }
   },
@@ -739,12 +739,12 @@ const LESSON_LIBRARY = {
     practice: 'Your team spends two hours a day sorting simple customer enquiries by type. Write: what AI could do here, what a person should still check, and how you\'d measure whether it worked.',
     practiceExample: 'AI could: read each enquiry and suggest a category and a draft reply. A person still checks: the category and reply before sending. Measure success: time saved per day, and how often the person needed to change AI\'s suggestion.',
     quiz: {
-      question: 'A manager is excited about a new AI tool and wants to "find a use for it" across the department immediately. What should happen first?',
+      question: 'A manager wants to "find a use" for a new AI tool across the department right away. What should happen first?',
       options: [
-        { text: 'Roll it out to the whole department straight away, since it\'s ready', correct: false, feedback: 'Starting with a wide rollout, before a real problem and a small test, skips the steps that catch issues early and cheaply.' },
-        { text: 'Identify a specific business problem it would solve, and test it with a small, safe group first', correct: true, feedback: 'Right — starting from a real problem, and testing small before scaling, is what makes an implementation more likely to actually work.' },
-        { text: 'Buy more AI tools to see which one fits best', correct: false, feedback: 'Buying more tools doesn\'t replace defining the actual problem first — that step has to come before choosing (or testing) any tool.' },
-        { text: 'Ask AI itself whether it should be implemented', correct: false, feedback: 'This isn\'t a decision AI can make for the business — it requires understanding the real problem, the risks, and how success will be measured.' }
+        { text: 'Roll it out to everyone immediately', correct: false, feedback: 'That skips the steps that catch issues early and cheaply.' },
+        { text: 'Find a real problem it solves and test with a small group', correct: true, feedback: 'Right — start from a real need, then test small before scaling.' },
+        { text: 'Buy more AI tools to compare', correct: false, feedback: 'That doesn\'t replace defining the actual problem first.' },
+        { text: 'Ask AI whether it should be implemented', correct: false, feedback: 'That\'s a business decision, not one AI can make for you.' }
       ]
     }
   },
@@ -766,12 +766,12 @@ const LESSON_LIBRARY = {
     practice: 'Design a company-policy assistant. Choose the safer design and explain why: (a) let it guess from general knowledge, or (b) make it find the right policy document and say clearly when no answer is found.',
     practiceExample: 'Option (b) is safer: the assistant should search real, approved policy documents first, answer from what it finds, and say plainly "I couldn\'t find a matching policy — please check with HR" when nothing matches, rather than guessing.',
     quiz: {
-      question: 'A company policy assistant is asked a question with no matching policy on file. What should a well-designed system do?',
+      question: 'A policy assistant is asked a question with no matching policy on file. What should it do?',
       options: [
-        { text: 'Generate its best guess so the user always gets an answer', correct: false, feedback: 'A confident guess with no real policy behind it can mislead someone into relying on incorrect information.' },
-        { text: 'Clearly say no matching policy was found, and suggest checking with a person', correct: true, feedback: 'Right — a well-designed system is clear about the limits of what it actually knows, rather than filling the gap with a guess.' },
-        { text: 'Refuse to answer any further questions at all', correct: false, feedback: 'This overcorrects — the system should still help with questions it can answer from real policy, just be honest when it can\'t.' },
-        { text: 'Make up a plausible-sounding policy so the process keeps moving', correct: false, feedback: 'This is the exact risk a good system design avoids — inventing an answer that sounds real but isn\'t.' }
+        { text: 'Guess an answer so the user gets something', correct: false, feedback: 'A confident guess with no real policy behind it can mislead people.' },
+        { text: 'Say no match was found and suggest checking with a person', correct: true, feedback: 'Right — a good system is honest about what it doesn\'t know.' },
+        { text: 'Refuse to answer any more questions', correct: false, feedback: 'That overcorrects — it should still help where it can.' },
+        { text: 'Make up a plausible-sounding policy', correct: false, feedback: 'This is exactly the risk a good design avoids.' }
       ]
     }
   }
