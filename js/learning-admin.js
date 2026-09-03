@@ -520,6 +520,7 @@ function levelDistributionChartSvg(byLevel, notAssessedCount){
     const pct = total ? Math.round((c.count / total) * 100) : 0;
     return `
       <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(barH, 0).toFixed(1)}" rx="6" fill="${c.color}"><title>${escapeHtml(c.label)}: ${c.count} (${pct}%)</title></rect>
+      <text x="${(x + barW / 2).toFixed(1)}" y="${(y - 8).toFixed(1)}" text-anchor="middle" class="lrn-chart-value-label">${c.count}</text>
       <text x="${(x + barW / 2).toFixed(1)}" y="${(h - padB + 18).toFixed(1)}" text-anchor="middle" class="lrn-chart-axis-label">${escapeHtml(c.label)}</text>`;
   }).join('');
 

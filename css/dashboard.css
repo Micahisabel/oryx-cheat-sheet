@@ -86,6 +86,7 @@
   .lrn-chart-gridline{ stroke:var(--line-soft); stroke-width:1; stroke-dasharray:3,3; }
   .lrn-chart-axis-label{ font-size:11px; fill:var(--label); font-family:var(--font-body); }
   .lrn-chart-cat-label{ font-size:12px; fill:var(--black); font-family:var(--font-body); }
+  .lrn-chart-value-label{ font-size:12px; font-weight:600; fill:var(--black); font-family:var(--font-body); }
 
   /* ---------- Employee learning progress table (admin, AI Capability dashboard) ---------- */
   .lrn-admin-table-controls{
