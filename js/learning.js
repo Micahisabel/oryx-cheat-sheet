@@ -933,6 +933,7 @@ function bindOverviewLevelUp(){
 // haven't earned. `currentLevel` only ever moves forward (see
 // bindOverviewLevelUp()), so this is always "reached level, or earlier".
 function isLevelUnlocked(lv){
+  if(lv === 'expert') return true; // Expert stays browsable at any level — never locked.
   const currentIndex = LEARNING_LEVEL_ORDER.indexOf(progress.currentLevel);
   return LEARNING_LEVEL_ORDER.indexOf(lv) <= (currentIndex === -1 ? 0 : currentIndex);
 }
