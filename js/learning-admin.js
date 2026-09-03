@@ -448,13 +448,6 @@ function renderLearningAdmin(){
     });
     return;
   }
-  if(!learningReportSettings){
-    loadLearningReportSettings().then(renderLearningAdmin).catch(() => {
-      learningReportSettings = Object.assign({}, LEARNING_REPORT_SETTINGS_DEFAULTS);
-      renderLearningAdmin();
-    });
-  }
-
   const scopedDocs = learningAdminDept === 'all'
     ? learningAdminDocs
     : learningAdminDocs.filter(d => (d.department || 'Unassigned') === learningAdminDept);
@@ -530,9 +523,6 @@ function renderLearningAdmin(){
       `).join('') : '<div class="s-empty">No resources completed yet.</div>'}
     </div>
 
-    <h3 class="analytics-section-head" style="margin-top:28px;">Report &amp; Reminder Settings</h3>
-    ${reportSettingsHtml()}
-
     <p class="analytics-footnote">
       <button class="lrn-btn-text" id="learningAdminRefresh">Refresh data</button>
     </p>
@@ -541,7 +531,6 @@ function renderLearningAdmin(){
   const refreshBtn = document.getElementById('learningAdminRefresh');
   if(refreshBtn) refreshBtn.addEventListener('click', () => { learningAdminDocs = null; renderLearningAdmin(); });
 
-  bindReportSettings();
   bindPendingChallenges(learningAdminView);
 
   const deptSelect = document.getElementById('learningAdminDeptSelect');
