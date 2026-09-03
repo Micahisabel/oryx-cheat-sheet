@@ -339,6 +339,8 @@
 }
 .lrn-level-title{ font-family:var(--font-display); font-weight:700; font-size:14px; color:var(--oryx-blue); letter-spacing:.02em; }
 .lrn-level-sub{ font-size:12.5px; color:var(--label); margin-top:8px; }
+.lrn-progress-row{ margin-top:12px; display:flex; flex-direction:column; gap:5px; }
+.lrn-progress-row-label{ font-size:12px; color:var(--label); }
 
 .lrn-next-lesson{
   background:var(--white); border:1px solid var(--line); border-left:4px solid var(--oryx-blue);
