@@ -72,6 +72,13 @@
   .recent-platform-tag{margin-top:0;}
   .recent-date{font-size:11px;color:var(--label);white-space:nowrap;}
 
+  /* ---------- Company AI Capability charts (AI Capability dashboard) ---------- */
+  .analytics-kpis--five{ grid-template-columns:repeat(5, 1fr); }
+  .lrn-admin-row-clickable{ cursor:pointer; }
+  .lrn-admin-row-clickable:hover{ background:var(--panel); }
+  .lrn-admin-activity-svg{ height:150px; }
+  .lrn-admin-activity-caption{ font-size:11px; color:var(--label); text-align:right; margin-top:4px; }
+
   /* ---------- Employee learning progress table (admin, AI Capability dashboard) ---------- */
   .lrn-admin-table-controls{
     display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;

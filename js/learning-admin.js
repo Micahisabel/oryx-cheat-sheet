@@ -97,6 +97,7 @@ function bindReportSettings(){
 let learningAdminSearch = '';
 let learningAdminStatusFilter = 'all'; // all | active | inactive | top | improved | encourage
 let learningAdminSort = { key: 'score', dir: 'desc' };
+let learningAdminDetailUid = null; // uid of the employee whose detail view is showing, or null for the dashboard
 const INACTIVE_DAYS_THRESHOLD = 14; // local display-only threshold for the "Inactive" status column — separate from the admin-configurable reminder threshold used by the scheduled ranking/reminder job
 
 // Every path total in one place — the ranking formula and the employee table
@@ -238,7 +239,6 @@ function employeeTableHtml(rows){
             ${col('progressPct', 'Progress')}
             ${col('lastActiveDate', 'Last Activity')}
             ${col('streak', 'Streak')}
-            ${col('improvement', 'Improvement')}
             ${col('rank', 'Rank')}
             ${col('score', 'Score')}
             ${col('statusLabel', 'Status')}
@@ -248,7 +248,7 @@ function employeeTableHtml(rows){
           ${rows.map(r => {
             const meta = r.level ? LEVEL_META[r.level] : null;
             return `
-              <tr>
+              <tr class="lrn-admin-row-clickable" data-uid="${escapeHtml(r.uid)}">
                 <td>${r.name ? `${escapeHtml(r.name)}<div class="lrn-admin-table-dim">${escapeHtml(r.email)}</div>` : escapeHtml(r.email)}<div class="lrn-admin-table-dept">${escapeHtml(r.department)}</div></td>
                 <td>${meta ? `${meta.emoji} ${escapeHtml(meta.label)}` : '—'}</td>
                 <td>${r.lessons}</td>
@@ -256,7 +256,6 @@ function employeeTableHtml(rows){
                 <td>${r.progressPct}%</td>
                 <td>${r.lastActiveDate ? new Date(r.lastActiveDate).toLocaleDateString() : '—'}${r.daysSinceActive != null ? ` <span class="lrn-admin-table-dim">(${r.daysSinceActive}d ago)</span>` : ''}</td>
                 <td>${r.streak}</td>
-                <td>${r.improvement != null ? '+' + r.improvement : '—'}</td>
                 <td>${r.rank != null ? '#' + r.rank + (r.rankTotal ? ' of ' + r.rankTotal : '') : '—'}</td>
                 <td>${r.score}${r.scoreIsEstimate ? ' <span class="lrn-admin-table-dim" title="Official ranking not computed yet — this is a rough estimate from what we can see today.">(est.)</span>' : ''}</td>
                 <td><span class="lrn-admin-status lrn-admin-status--${r.statusKey}">${escapeHtml(r.statusLabel)}</span></td>
@@ -300,6 +299,7 @@ function docCurrentGapLabels(doc){
 function computeLearningStats(docs){
   const assessed = docs.filter(d => d.assessmentResult);
   const total = assessed.length;
+  const notAssessedCount = docs.length - total;
 
   const byLevel = {};
   LEARNING_LEVEL_ORDER.forEach(lv => { byLevel[lv] = 0; });
@@ -307,6 +307,15 @@ function computeLearningStats(docs){
     const lv = d.currentLevel || d.assessmentResult.level;
     if(byLevel[lv] != null) byLevel[lv]++;
   });
+
+  let avgLevelKey = null;
+  if(total){
+    const avgIndex = assessed.reduce((sum, d) => {
+      const lv = d.currentLevel || d.assessmentResult.level;
+      return sum + Math.max(0, LEARNING_LEVEL_ORDER.indexOf(lv));
+    }, 0) / total;
+    avgLevelKey = LEARNING_LEVEL_ORDER[Math.round(avgIndex)];
+  }
 
   const resourceCompletions = [];
   docs.forEach(d => {
@@ -318,8 +327,7 @@ function computeLearningStats(docs){
   const completionRate = total ? Math.round((usersWithCompletion.size / total) * 100) : 0;
 
   const now = Date.now();
-  const activeRecent = docs.filter(d => d.lastActiveDate && (now - new Date(d.lastActiveDate).getTime()) <= 7 * 24 * 60 * 60 * 1000).length;
-  const activeMonth = docs.filter(d => d.lastActiveDate && (now - new Date(d.lastActiveDate).getTime()) <= 30 * 24 * 60 * 60 * 1000).length;
+  const activeCount = docs.filter(d => d.lastActiveDate && (now - new Date(d.lastActiveDate).getTime()) <= INACTIVE_DAYS_THRESHOLD * 24 * 60 * 60 * 1000).length;
 
   const avgProgress = total
     ? Math.round(assessed.reduce((sum, d) => {
@@ -344,7 +352,49 @@ function computeLearningStats(docs){
     .sort((a, b) => b.count - a.count)
     .slice(0, 8);
 
-  return { total, byLevel, completionRate, resourcesCompletedTotal: resourceCompletions.length, activeRecent, activeMonth, avgProgress, sortedGaps, sortedUsage };
+  return { total, notAssessedCount, avgLevelKey, byLevel, completionRate, resourcesCompletedTotal: resourceCompletions.length, activeCount, avgProgress, sortedGaps, sortedUsage };
+}
+
+// Average learning progress per department, always computed from the full
+// (department-unfiltered) doc set — the point is comparing departments
+// against each other, so it never uses the department-scoped subset.
+function departmentProgressStats(docs){
+  const depts = [...LIBRARY_DEPARTMENTS, 'Unassigned'];
+  return depts.map(dept => {
+    const deptDocs = docs.filter(d => (d.department || 'Unassigned') === dept);
+    if(!deptDocs.length) return null;
+    const avg = Math.round(deptDocs.reduce((sum, d) => sum + docOverallProgressPct(d), 0) / deptDocs.length);
+    return { dept, avgProgress: avg, count: deptDocs.length };
+  }).filter(Boolean).sort((a, b) => b.avgProgress - a.avgProgress);
+}
+
+function startOfWeekISO(d){
+  const dt = new Date(d);
+  const day = (dt.getDay() + 6) % 7; // Monday = 0
+  dt.setHours(0, 0, 0, 0);
+  dt.setDate(dt.getDate() - day);
+  return dt.toISOString().slice(0, 10);
+}
+
+// Aggregates real progressHistory snapshots (never invented data) across
+// every doc in scope into one weekly activity count. Returns null when
+// there's not enough real history to plot a meaningful trend.
+function activityOverTimeSeries(docs){
+  const events = docs.flatMap(d => (d.progressHistory || []).map(p => new Date(p.date))).filter(d => !isNaN(d));
+  if(events.length < 2) return null;
+  const tally = {};
+  events.forEach(d => { const k = startOfWeekISO(d); tally[k] = (tally[k] || 0) + 1; });
+  const sortedKeys = Object.keys(tally).sort();
+  if(sortedKeys.length < 2) return null;
+  const series = [];
+  const cursor = new Date(sortedKeys[0]);
+  const end = new Date(sortedKeys[sortedKeys.length - 1]);
+  while(cursor <= end){
+    const key = startOfWeekISO(cursor);
+    series.push({ weekStart: key, count: tally[key] || 0 });
+    cursor.setDate(cursor.getDate() + 7);
+  }
+  return series;
 }
 
 // Every submitted (not yet reviewed) level-up challenge across all fetched
@@ -426,18 +476,117 @@ function bindPendingChallenges(container){
   });
 }
 
-function levelBarRowsHtml(byLevel, total){
-  const max = Math.max(1, ...LEARNING_LEVEL_ORDER.map(lv => byLevel[lv] || 0));
-  return LEARNING_LEVEL_ORDER.map(lv => {
+function levelBarRowsHtml(byLevel, total, notAssessedCount){
+  const grandTotal = total + notAssessedCount;
+  const max = Math.max(1, ...LEARNING_LEVEL_ORDER.map(lv => byLevel[lv] || 0), notAssessedCount);
+  const rows = LEARNING_LEVEL_ORDER.map(lv => {
     const meta = LEVEL_META[lv];
     const count = byLevel[lv] || 0;
-    const pct = total ? Math.round((count / total) * 100) : 0;
+    const pct = grandTotal ? Math.round((count / grandTotal) * 100) : 0;
     return `
       <div class="analytics-cat-row">
         <div class="analytics-cat-top"><span>${meta.emoji} ${escapeHtml(meta.label)}</span><span>${count} (${pct}%)</span></div>
         <div class="analytics-bar-track"><div class="analytics-bar-fill" style="width:${Math.round((count / max) * 100)}%;background:${meta.color};"></div></div>
       </div>`;
   }).join('');
+  const notAssessedPct = grandTotal ? Math.round((notAssessedCount / grandTotal) * 100) : 0;
+  const notAssessedRow = `
+    <div class="analytics-cat-row">
+      <div class="analytics-cat-top"><span>⚪ Not Assessed</span><span>${notAssessedCount} (${notAssessedPct}%)</span></div>
+      <div class="analytics-bar-track"><div class="analytics-bar-fill" style="width:${Math.round((notAssessedCount / max) * 100)}%;background:var(--silver);"></div></div>
+    </div>`;
+  return rows + notAssessedRow;
+}
+
+function departmentProgressBarsHtml(deptStats){
+  if(!deptStats.length) return '<div class="s-empty">No department data yet.</div>';
+  return deptStats.map(d => `
+    <div class="analytics-cat-row">
+      <div class="analytics-cat-top"><span>${escapeHtml(d.dept)}</span><span>${d.avgProgress}% <span class="lrn-admin-table-dim">(${d.count})</span></span></div>
+      <div class="analytics-bar-track"><div class="analytics-bar-fill" style="width:${d.avgProgress}%;"></div></div>
+    </div>`).join('');
+}
+
+// Same hand-built inline-SVG approach as progressGraphSvg() in learning.js —
+// no charting library, no build step. Plots weekly activity-event counts;
+// empty state when there isn't enough real history yet.
+function activityOverTimeSvg(series){
+  if(!series){
+    return '<div class="s-empty">Not enough activity data yet.</div>';
+  }
+  const w = 900, h = 160, pad = 16;
+  const n = series.length;
+  const xs = series.map((_, i) => pad + (n === 1 ? 0 : (i / (n - 1)) * (w - pad * 2)));
+  const maxCount = Math.max(...series.map(p => p.count), 1);
+  const ys = series.map(p => h - pad - (p.count / maxCount) * (h - pad * 2));
+  const path = xs.map((x, i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
+  const lastX = xs[xs.length - 1], lastY = ys[ys.length - 1];
+  return `
+    <svg viewBox="0 0 ${w} ${h}" class="lrn-progress-graph-svg lrn-admin-activity-svg" preserveAspectRatio="none">
+      <path d="${path}" fill="none" stroke="var(--oryx-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+      <circle cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="4" fill="var(--oryx-blue)"></circle>
+    </svg>
+    <div class="lrn-admin-activity-caption">${escapeHtml(series[0].weekStart)} – ${escapeHtml(series[series.length - 1].weekStart)}</div>`;
+}
+
+// Mirrors progressGraphSvg()/recentActivityHtml() in learning.js, but reads
+// an arbitrary fetched employee doc instead of the signed-in user's own
+// module-level `progress` global (which isn't the right employee here).
+function employeeProgressGraphSvg(doc){
+  const points = doc.progressHistory || [];
+  if(points.length < 2){
+    return `<div class="s-empty">Not enough activity yet to show a progress graph.</div>`;
+  }
+  const w = 560, h = 140, pad = 12;
+  const xs = points.map((p, i) => pad + (i / (points.length - 1)) * (w - pad * 2));
+  const maxXp = Math.max(...points.map(p => p.xp), 1);
+  const ys = points.map(p => h - pad - (p.xp / maxXp) * (h - pad * 2));
+  const path = xs.map((x, i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
+  const lastX = xs[xs.length - 1], lastY = ys[ys.length - 1];
+  return `
+    <svg viewBox="0 0 ${w} ${h}" class="lrn-progress-graph-svg" preserveAspectRatio="none">
+      <path d="${path}" fill="none" stroke="var(--oryx-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+      <circle cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="4" fill="var(--oryx-blue)"></circle>
+    </svg>`;
+}
+
+function employeeRecentActivityHtml(doc){
+  const history = (doc.progressHistory || []).slice(-5).reverse();
+  if(!history.length){
+    return `<div class="s-empty">No activity recorded yet.</div>`;
+  }
+  return history.map(h => `
+    <div class="lrn-profile-activity-row">
+      <span class="lrn-profile-activity-icon">📈</span>
+      <div class="lrn-profile-activity-text">
+        <strong>${h.xp} points total</strong>
+        <span>${h.completedLessonsCount} lesson${h.completedLessonsCount === 1 ? '' : 's'} done · ${formatAssessmentDate(h.date)}</span>
+      </div>
+    </div>`).join('');
+}
+
+function employeeDetailHtml(doc, row){
+  const meta = row.level ? LEVEL_META[row.level] : null;
+  return `
+    <div class="analytics-page-head">
+      <button class="lrn-btn-text" id="lrnAdminDetailBack">&larr; Back to Employee Learning Progress</button>
+      <h2>${row.name ? escapeHtml(row.name) : escapeHtml(row.email)}</h2>
+      <p class="analytics-page-sub">${escapeHtml(row.email)} · ${escapeHtml(row.department)}</p>
+    </div>
+    <div class="lrn-profile-stats">
+      <div class="lrn-profile-stat"><div class="lrn-profile-stat-icon">${meta ? meta.emoji : '⚪'}</div><div class="lrn-profile-stat-text"><span>AI Level</span><strong>${meta ? escapeHtml(meta.label) : 'Not assessed'}</strong></div></div>
+      <div class="lrn-profile-stat"><div class="lrn-profile-stat-icon">📈</div><div class="lrn-profile-stat-text"><span>Progress</span><strong>${row.progressPct}%</strong></div></div>
+      <div class="lrn-profile-stat"><div class="lrn-profile-stat-icon">🏆</div><div class="lrn-profile-stat-text"><span>Score</span><strong>${row.score}${row.scoreIsEstimate ? ' (est.)' : ''}</strong></div></div>
+    </div>
+    <div class="lrn-profile-stats">
+      <div class="lrn-profile-stat"><div class="lrn-profile-stat-icon">📚</div><div class="lrn-profile-stat-text"><span>Lessons</span><strong>${row.lessons}</strong></div></div>
+      <div class="lrn-profile-stat"><div class="lrn-profile-stat-icon">🔥</div><div class="lrn-profile-stat-text"><span>Streak</span><strong>${row.streak}</strong></div></div>
+      <div class="lrn-profile-stat"><div class="lrn-profile-stat-icon">🥇</div><div class="lrn-profile-stat-text"><span>Rank</span><strong>${row.rank != null ? '#' + row.rank + (row.rankTotal ? ' of ' + row.rankTotal : '') : '—'}</strong></div></div>
+    </div>
+    <h3 class="analytics-section-head" style="margin-top:24px;">Progress Over Time</h3>
+    <div class="lrn-profile-graph">${employeeProgressGraphSvg(doc)}</div>
+    <h3 class="analytics-section-head" style="margin-top:24px;">Recent Learning Activity</h3>
+    <div>${employeeRecentActivityHtml(doc)}</div>`;
 }
 
 function renderLearningAdmin(){
@@ -448,10 +597,25 @@ function renderLearningAdmin(){
     });
     return;
   }
+  if(learningAdminDetailUid){
+    const doc = learningAdminDocs.find(d => d.uid === learningAdminDetailUid);
+    if(doc){
+      const row = employeeRows([doc])[0];
+      learningAdminView.innerHTML = employeeDetailHtml(doc, row);
+      const backBtn = document.getElementById('lrnAdminDetailBack');
+      if(backBtn) backBtn.addEventListener('click', () => { learningAdminDetailUid = null; renderLearningAdmin(); });
+      return;
+    }
+    learningAdminDetailUid = null; // doc no longer found — fall through to the dashboard
+  }
+
   const scopedDocs = learningAdminDept === 'all'
     ? learningAdminDocs
     : learningAdminDocs.filter(d => (d.department || 'Unassigned') === learningAdminDept);
   const stats = computeLearningStats(scopedDocs);
+  const deptStats = departmentProgressStats(learningAdminDocs);
+  const activitySeries = activityOverTimeSeries(scopedDocs);
+  const avgLevelMeta = stats.avgLevelKey ? LEVEL_META[stats.avgLevelKey] : null;
   const maxGap = Math.max(1, ...stats.sortedGaps.map(([, c]) => c));
   const maxUsage = Math.max(1, ...stats.sortedUsage.map(u => u.count));
   const pendingChallenges = pendingChallengeSubmissions(scopedDocs);
@@ -472,18 +636,29 @@ function renderLearningAdmin(){
       <h3>Department</h3>
       ${deptSelectHtml}
     </div>
-    <div class="analytics-kpis analytics-kpis--wide">
+    <h3 class="analytics-section-head" style="margin-top:24px;">Company AI Capability</h3>
+    <div class="analytics-kpis analytics-kpis--five">
       <div class="analytics-kpi"><span class="analytics-kpi-label">Employees Assessed</span><span class="analytics-kpi-value">${stats.total}</span></div>
+      <div class="analytics-kpi"><span class="analytics-kpi-label">Average AI Level</span><span class="analytics-kpi-value analytics-kpi-value--text">${avgLevelMeta ? avgLevelMeta.emoji + ' ' + escapeHtml(avgLevelMeta.label) : '—'}</span></div>
       <div class="analytics-kpi"><span class="analytics-kpi-label">Completion Rate</span><span class="analytics-kpi-value">${stats.completionRate}%</span></div>
-      <div class="analytics-kpi"><span class="analytics-kpi-label">Avg Progress</span><span class="analytics-kpi-value">${stats.avgProgress}%</span></div>
-      <div class="analytics-kpi"><span class="analytics-kpi-label">Resources Completed</span><span class="analytics-kpi-value">${stats.resourcesCompletedTotal}</span></div>
-    </div>
-    <div class="analytics-kpis analytics-kpis--wide" style="margin-top:10px;">
-      <div class="analytics-kpi"><span class="analytics-kpi-label">Active (7 days)</span><span class="analytics-kpi-value">${stats.activeRecent}</span></div>
-      <div class="analytics-kpi"><span class="analytics-kpi-label">Active (30 days)</span><span class="analytics-kpi-value">${stats.activeMonth}</span></div>
+      <div class="analytics-kpi"><span class="analytics-kpi-label">Average Progress</span><span class="analytics-kpi-value">${stats.avgProgress}%</span></div>
+      <div class="analytics-kpi"><span class="analytics-kpi-label">Active Employees</span><span class="analytics-kpi-value">${stats.activeCount}</span></div>
     </div>
 
-    <h3 class="analytics-section-head" style="margin-top:28px;">Employee Learning Progress</h3>
+    <h4 class="analytics-section-head" style="margin-top:24px;">AI Level Distribution</h4>
+    <div class="analytics-cats">${levelBarRowsHtml(stats.byLevel, stats.total, stats.notAssessedCount)}</div>
+
+    ${learningAdminDept === 'all' ? `
+      <h4 class="analytics-section-head" style="margin-top:24px;">Progress by Department</h4>
+      <div class="analytics-cats">${departmentProgressBarsHtml(deptStats)}</div>
+    ` : `
+      <p class="analytics-footnote" style="text-align:left;margin-top:16px;">Showing a single department — switch to "All Departments" to compare progress across departments.</p>
+    `}
+
+    <h4 class="analytics-section-head" style="margin-top:24px;">Learning Activity Over Time</h4>
+    <div class="lrn-profile-graph lrn-admin-activity-graph">${activityOverTimeSvg(activitySeries)}</div>
+
+    <h3 class="analytics-section-head" style="margin-top:32px;">Employee Learning Progress</h3>
     <div class="lrn-admin-table-controls">
       <input type="search" class="lrn-admin-search" id="learningAdminSearch" placeholder="Search by email…" value="${escapeHtml(learningAdminSearch)}">
       <select class="filter-select" id="learningAdminStatusFilter">
@@ -499,9 +674,6 @@ function renderLearningAdmin(){
 
     <h3 class="analytics-section-head" style="margin-top:28px;">Challenges Awaiting Review${pendingChallenges.length ? ` (${pendingChallenges.length})` : ''}</h3>
     <div id="learningAdminPendingChallenges">${pendingChallengesHtml(pendingChallenges)}</div>
-
-    <h3 class="analytics-section-head" style="margin-top:28px;">AI Knowledge Levels</h3>
-    <div class="analytics-cats">${levelBarRowsHtml(stats.byLevel, stats.total)}</div>
 
     <h3 class="analytics-section-head" style="margin-top:28px;">Most Common Knowledge Gaps</h3>
     <div class="analytics-cats">
@@ -561,6 +733,12 @@ function renderLearningAdmin(){
       }else{
         learningAdminSort = { key, dir: 'desc' };
       }
+      renderLearningAdmin();
+    });
+  });
+  learningAdminView.querySelectorAll('.lrn-admin-table tbody tr[data-uid]').forEach(tr => {
+    tr.addEventListener('click', () => {
+      learningAdminDetailUid = tr.dataset.uid;
       renderLearningAdmin();
     });
   });
