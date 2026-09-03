@@ -1190,6 +1190,16 @@ function renderLesson(){
       ${body}
     </div>`;
   bindTopbar(() => {
+    if(step === 'practice'){
+      activeLesson.step = 'learn';
+      renderLesson();
+      return;
+    }
+    if(step === 'quiz'){
+      activeLesson.step = 'practice';
+      renderLesson();
+      return;
+    }
     reviewLevel = activeLesson.levelKey;
     dashboardTab = 'path';
     learningScreen = 'dashboard';
