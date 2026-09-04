@@ -110,6 +110,53 @@ const ASSESSMENT_QUESTIONS = [
   }
 ];
 
+// ---- Expert Validation questions ---------------------------------------------
+// A raw Expert score from ASSESSMENT_QUESTIONS isn't trusted on its own — see
+// finishAssessment()/renderExpertValidation() in learning.js. One hard,
+// single-correct-answer question per level, expert down to basic (no
+// 'beginner' entry — it's the floor, nothing lower to test, same reasoning as
+// CHALLENGE_LIBRARY having no entry past 'advanced'). Each tests applied
+// understanding, not terminology, and every option carries plain-English
+// feedback so a wrong guess still teaches something.
+const LEVEL_VALIDATION_QUESTIONS = {
+  expert: {
+    prompt: "You're designing an AI agent that can read customer accounts and issue refunds automatically. What's the most important safeguard to put in place before it goes live?",
+    options: [
+      { text: 'Give it access to every customer field so it never gets stuck', correct: false, feedback: 'Wider access than the task needs makes any mistake more costly — the opposite of a safeguard.' },
+      { text: 'Require a person to approve any refund over a set amount before it goes through', correct: true, feedback: "Right — for real financial impact, a human approval step (and a record of what happened) matters more than how clever the AI's prompt is." },
+      { text: 'Tell it in the prompt to double-check its own maths', correct: false, feedback: "An instruction to 'double-check' doesn't give the AI a real way to verify itself — it can still be confidently wrong." },
+      { text: 'Skip logging so it runs faster', correct: false, feedback: "Removing the record of what the agent did removes your ability to catch or undo a mistake." }
+    ]
+  },
+  advanced: {
+    prompt: 'An AI tool gives you a confident, detailed, and completely wrong answer about a recent company policy. What most likely happened?',
+    options: [
+      { text: 'The AI is broken and needs to be reset', correct: false, feedback: "The AI isn't malfunctioning — this is normal behaviour for how it generates answers." },
+      { text: "It generated a plausible-sounding answer from patterns it learned, not a verified company fact — sometimes called a 'hallucination'", correct: true, feedback: 'Exactly — AI can sound completely confident while being wrong, especially about specific facts it was never actually given.' },
+      { text: 'You asked the question in the wrong order', correct: false, feedback: 'Question order can affect clarity, but it does not explain confidently wrong facts.' },
+      { text: 'The AI needs a longer prompt to be accurate', correct: false, feedback: 'A longer prompt can help, but length alone does not stop an AI from stating something false with confidence.' }
+    ]
+  },
+  intermediate: {
+    prompt: 'You want an AI tool to summarise a 40-page contract without missing key risks. What should you do first?',
+    options: [
+      { text: 'Paste the whole contract in and just ask it to "summarise this"', correct: false, feedback: "A vague instruction gets a vague summary — it won't know which risks matter to you." },
+      { text: 'Tell it exactly what to look for first — for example payment terms, liability, and termination clauses', correct: true, feedback: 'Right — giving AI a clear goal and specific things to check produces a far more useful summary than a vague instruction.' },
+      { text: 'Ask it to summarise the contract in one sentence', correct: false, feedback: 'A one-sentence summary of a 40-page contract will lose the detail you actually need.' },
+      { text: 'Convert the file to a picture first', correct: false, feedback: 'This makes the text harder for the AI to read, not easier.' }
+    ]
+  },
+  basic: {
+    prompt: 'Which of these is the safest way to use AI with sensitive customer information?',
+    options: [
+      { text: 'Paste customer names, emails and payment details in directly to save time', correct: false, feedback: 'Sensitive details can end up stored or used by the AI tool — this is the risky option, not the safe one.' },
+      { text: 'Remove or replace sensitive details before pasting anything into an AI tool', correct: true, feedback: 'Correct — taking sensitive details out first is the safe approach, since you cannot always control what an AI tool does with what you type.' },
+      { text: 'Only use AI with customer data on weekends', correct: false, feedback: 'The day of the week makes no difference to what happens to the data.' },
+      { text: 'Ask the AI to "keep this confidential" in the prompt', correct: false, feedback: "Asking it to 'keep something confidential' doesn't actually control how the tool stores or uses what you typed." }
+    ]
+  }
+};
+
 // ---- Recommended Hub resources, by level ------------------------------------
 // After the assessment (and on the dashboard), we point people at real
 // Knowledge Hub entries — not just the built-in lessons — matched to their

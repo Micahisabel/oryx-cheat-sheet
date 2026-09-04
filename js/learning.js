@@ -16,13 +16,20 @@ const viewLearning = document.getElementById('view-learning');
 const viewNotes = document.getElementById('view-notes');
 const openLearningNavBtn = document.getElementById('openLearningNav');
 
-let learningScreen = 'onboarding'; // onboarding | department | plan | assessment | results | dashboard | lesson
+let learningScreen = 'onboarding'; // onboarding | department | plan | assessment | expertValidation | results | dashboard | lesson | challenge
 let progress = null;              // the learner's saved progress object
 let learningUnsub = null;         // Firestore snapshot unsubscribe
 let learningLastUid = null;       // uid the in-memory `progress` currently belongs to
 
 // ---- Assessment run state (not persisted — only the final result is saved) ----
 let assessment = null; // { index, answers:[], selected:[] } — selected is the in-progress multi-select state
+
+// ---- Expert Validation run state (not persisted) — only entered when the main
+// assessment's raw score lands on Expert; steps down through lower levels until
+// one is answered correctly. pendingAssessmentData holds the score/known/gaps
+// already computed by finishAssessment() while validation plays out.
+let expertValidation = null; // { testingLevel, selected, confirmedLevel } — confirmedLevel set once an answer is correct, showing the confirmation message before Continue
+let pendingAssessmentData = null; // { score, known, gapOptions, toolsAnswer }
 
 // ---- Dashboard sub-navigation ----
 let dashboardTab = 'overview'; // overview | path | achievements
@@ -254,6 +261,7 @@ function renderLearning(){
   if(learningScreen === 'department') return renderDepartmentScreen();
   if(learningScreen === 'plan') return renderPlanScreen();
   if(learningScreen === 'assessment') return renderAssessment();
+  if(learningScreen === 'expertValidation') return renderExpertValidation();
   if(learningScreen === 'results') return renderResults();
   if(learningScreen === 'dashboard') return renderDashboard();
   if(learningScreen === 'lesson') return renderLesson();
@@ -627,13 +635,52 @@ function finishAssessment(){
     .filter(o => selectedCapIds.includes(o.id) && !o.exclusive)
     .map(o => o.text);
   const gapOptions = capQuestion.options
-    .filter(o => !selectedCapIds.includes(o.id) && !o.exclusive)
-    .sort((a, b) => {
-      const da = Math.abs(a.levelIndex - levelIndex), db = Math.abs(b.levelIndex - levelIndex);
-      if(da !== db) return da - db;
-      // Tie-break: prefer the next step forward over one that's actually behind them.
-      return (a.levelIndex >= levelIndex ? 0 : 1) - (b.levelIndex >= levelIndex ? 0 : 1);
-    });
+    .filter(o => !selectedCapIds.includes(o.id) && !o.exclusive);
+  const toolsAnswer = byId['tools-used'];
+
+  // A raw Expert score isn't trusted on its own — one extra, genuinely hard
+  // question must be answered correctly first (see LEVEL_VALIDATION_QUESTIONS
+  // in learning-data.js). A wrong answer steps down through lower levels
+  // (renderExpertValidation()/answerExpertValidation()) until one is
+  // confirmed. Every other level skips straight to finalizeAssessmentResult(),
+  // completely unchanged from before this feature existed.
+  if(level === 'expert'){
+    pendingAssessmentData = { score, known, gapOptions, toolsAnswer };
+    expertValidation = { testingLevel: 'expert', selected: null, confirmedLevel: null };
+    learningScreen = 'expertValidation';
+    renderLearning();
+    return;
+  }
+  finalizeAssessmentResult(level, score, known, gapOptions, toolsAnswer);
+}
+
+// Sorts gap options by closeness to a level index — split out of
+// finishAssessment() so finalizeAssessmentResult() can re-run it against the
+// FINAL level (which may differ from the raw-score level after Expert
+// Validation steps someone down).
+function sortGapOptionsByLevel(gapOptions, levelIndex){
+  return gapOptions.slice().sort((a, b) => {
+    const da = Math.abs(a.levelIndex - levelIndex), db = Math.abs(b.levelIndex - levelIndex);
+    if(da !== db) return da - db;
+    // Tie-break: prefer the next step forward over one that's actually behind them.
+    return (a.levelIndex >= levelIndex ? 0 : 1) - (b.levelIndex >= levelIndex ? 0 : 1);
+  });
+}
+
+// The tail end of scoring an assessment — archiving history, saving the
+// result, awarding badges, and moving to the results screen. Split out of
+// finishAssessment() so both the normal (non-Expert) path and the Expert
+// Validation path funnel through one place. `level` here is always the
+// FINAL confirmed level, not necessarily the level the raw score implied.
+function finalizeAssessmentResult(level, score, known, gapOptions, toolsAnswer){
+  const levelIndex = LEARNING_LEVEL_ORDER.indexOf(level);
+  const sortedGaps = sortGapOptionsByLevel(gapOptions, levelIndex);
+
+  // If Expert Validation stepped the level down, the raw score (which was in
+  // Expert range) would contradict a lower level shown right next to it —
+  // clamp it to the top of the final level's own range instead.
+  const rawLevel = levelFromScore(score);
+  const finalScore = rawLevel === level ? score : LEVEL_THRESHOLDS.find(t => t.level === level).max;
 
   // Archive the previous result (if any) before overwriting it, so a retake can
   // show a before/after comparison. progress.assessmentResult itself is always
@@ -648,12 +695,11 @@ function finishAssessment(){
     });
   }
 
-  const toolsAnswer = byId['tools-used'];
   progress.assessmentResult = {
-    level, score,
+    level, score: finalScore,
     known: known.length ? known : ['Just getting started — no worries, that\'s what this path is for'],
-    gaps: gapOptions.slice(0, 3).map(o => o.gapLabel),
-    gapCategories: gapOptions.slice(0, 3).map(o => o.gapCategory).filter(Boolean),
+    gaps: sortedGaps.slice(0, 3).map(o => o.gapLabel),
+    gapCategories: sortedGaps.slice(0, 3).map(o => o.gapCategory).filter(Boolean),
     otherToolDetail: (toolsAnswer && toolsAnswer.otherDetail) || null
   };
   progress.currentLevel = level;
@@ -662,6 +708,106 @@ function finishAssessment(){
   logProgressSnapshot();
   saveProgress();
   learningScreen = 'results';
+  renderLearning();
+}
+
+// ---------------------------------------------------------------------------
+// 2b. Expert Validation — a raw Expert score must be confirmed with one hard
+// question before it's trusted. Wrong answers step down through lower levels
+// (LEVEL_VALIDATION_QUESTIONS in learning-data.js) until one is answered
+// correctly, or Basic is also wrong, in which case the floor is Beginner —
+// no question needed there since there's nothing lower to test.
+// ---------------------------------------------------------------------------
+function renderExpertValidation(){
+  const ev = expertValidation;
+  const question = LEVEL_VALIDATION_QUESTIONS[ev.testingLevel];
+  const meta = LEVEL_META[ev.testingLevel];
+  const hasAnswered = ev.selected !== null && ev.selected !== undefined;
+  const selectedOpt = hasAnswered ? question.options[ev.selected] : null;
+
+  const introText = ev.testingLevel === 'expert'
+    ? "One more question before we confirm your level. You have been assessed as Expert. Let's check your understanding with one challenging question."
+    : "Let's check the level below.";
+
+  let confirmBlock = '';
+  if(hasAnswered && selectedOpt.correct){
+    const strength = ev.testingLevel === 'expert' ? 'strong' : 'solid';
+    const levelPhrase = ev.testingLevel === 'expert' ? '' : ` at the ${escapeHtml(meta.label)} level`;
+    confirmBlock = `
+      <div class="lrn-q-card" style="margin-top:16px;">
+        <div class="lrn-q-mascot"><img src="assets/images/mascot/cat-sunglasses.png" alt="Ginger the cat"></div>
+        <div class="lrn-q-bubble">
+          🎉 ${escapeHtml(meta.label)} confirmed!<br>
+          Your answers show that you have a ${strength} understanding of AI${levelPhrase}.<br>
+          Your AI Level: ${escapeHtml(meta.label)}
+        </div>
+      </div>
+      <button class="lrn-btn-primary" id="lrnExpertValidationContinue">See my results</button>`;
+  }else if(hasAnswered){
+    confirmBlock = `<button class="lrn-btn-primary" id="lrnExpertValidationContinue">Continue</button>`;
+  }
+
+  learningRoot.innerHTML = `
+    <div class="lrn-screen lrn-assessment">
+      ${topbar({ showBackToApp: true })}
+      <div class="lrn-q-card">
+        <div class="lrn-q-mascot"><img src="assets/images/mascot/cat-sunglasses.png" alt="Ginger the cat"></div>
+        <div class="lrn-q-bubble">${escapeHtml(introText)}</div>
+      </div>
+      <div class="lrn-lesson-section">
+        <p>${escapeHtml(question.prompt)}</p>
+        <div class="lrn-options">
+          ${question.options.map((opt, i) => {
+            let cls = 'lrn-option-btn';
+            if(hasAnswered && i === ev.selected) cls += opt.correct ? ' lrn-option-correct' : ' lrn-option-incorrect';
+            return `<button class="${cls}" data-i="${i}" ${hasAnswered ? 'disabled' : ''}>${escapeHtml(opt.text)}</button>`;
+          }).join('')}
+        </div>
+        ${hasAnswered ? `
+          <div class="lrn-quiz-feedback ${selectedOpt.correct ? 'lrn-quiz-feedback--correct' : 'lrn-quiz-feedback--incorrect'}">
+            <span class="lrn-quiz-feedback-label">${selectedOpt.correct ? 'Correct' : 'Not quite'}</span>
+            ${escapeHtml(selectedOpt.feedback || (selectedOpt.correct ? 'Well done.' : 'Not quite right.'))}
+          </div>` : ''}
+      </div>
+      ${confirmBlock}
+    </div>`;
+  bindTopbar();
+
+  if(!hasAnswered){
+    learningRoot.querySelectorAll('.lrn-option-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        expertValidation.selected = Number(btn.dataset.i);
+        renderExpertValidation();
+      });
+    });
+  }
+  const contBtn = document.getElementById('lrnExpertValidationContinue');
+  if(contBtn) contBtn.addEventListener('click', advanceExpertValidation);
+}
+
+function advanceExpertValidation(){
+  const ev = expertValidation;
+  const question = LEVEL_VALIDATION_QUESTIONS[ev.testingLevel];
+  const selectedOpt = question.options[ev.selected];
+  const { score, known, gapOptions, toolsAnswer } = pendingAssessmentData;
+
+  if(selectedOpt.correct){
+    const confirmedLevel = ev.testingLevel;
+    expertValidation = null;
+    pendingAssessmentData = null;
+    finalizeAssessmentResult(confirmedLevel, score, known, gapOptions, toolsAnswer);
+    return;
+  }
+
+  if(ev.testingLevel === 'basic'){
+    expertValidation = null;
+    pendingAssessmentData = null;
+    finalizeAssessmentResult('beginner', score, known, gapOptions, toolsAnswer);
+    return;
+  }
+
+  const nextLevel = LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(ev.testingLevel) - 1];
+  expertValidation = { testingLevel: nextLevel, selected: null, confirmedLevel: null };
   renderLearning();
 }
 
