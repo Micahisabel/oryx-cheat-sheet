@@ -28,7 +28,7 @@ let assessment = null; // { index, answers:[], selected:[] } — selected is the
 // assessment's raw score lands on Expert; steps down through lower levels until
 // one is answered correctly. pendingAssessmentData holds the score/known/gaps
 // already computed by finishAssessment() while validation plays out.
-let expertValidation = null; // { testingLevel, selected, confirmedLevel } — confirmedLevel set once an answer is correct, showing the confirmation message before Continue
+let expertValidation = null; // { testingLevel, question, selected } — question is picked at random from that level's pool each time a level is (re-)entered
 let pendingAssessmentData = null; // { score, known, gapOptions, toolsAnswer }
 
 // ---- Dashboard sub-navigation ----
@@ -646,7 +646,7 @@ function finishAssessment(){
   // completely unchanged from before this feature existed.
   if(level === 'expert'){
     pendingAssessmentData = { score, known, gapOptions, toolsAnswer };
-    expertValidation = { testingLevel: 'expert', selected: null, confirmedLevel: null };
+    expertValidation = { testingLevel: 'expert', question: pickValidationQuestion('expert'), selected: null };
     learningScreen = 'expertValidation';
     renderLearning();
     return;
@@ -718,9 +718,17 @@ function finalizeAssessmentResult(level, score, known, gapOptions, toolsAnswer){
 // correctly, or Basic is also wrong, in which case the floor is Beginner —
 // no question needed there since there's nothing lower to test.
 // ---------------------------------------------------------------------------
+// Picks one question at random from a level's pool — each attempt (and each
+// step-down) gets a possibly-different question so people can't just
+// memorise or share "the" answer to a fixed question.
+function pickValidationQuestion(level){
+  const pool = LEVEL_VALIDATION_QUESTIONS[level];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 function renderExpertValidation(){
   const ev = expertValidation;
-  const question = LEVEL_VALIDATION_QUESTIONS[ev.testingLevel];
+  const question = ev.question;
   const meta = LEVEL_META[ev.testingLevel];
   const hasAnswered = ev.selected !== null && ev.selected !== undefined;
   const selectedOpt = hasAnswered ? question.options[ev.selected] : null;
@@ -787,8 +795,7 @@ function renderExpertValidation(){
 
 function advanceExpertValidation(){
   const ev = expertValidation;
-  const question = LEVEL_VALIDATION_QUESTIONS[ev.testingLevel];
-  const selectedOpt = question.options[ev.selected];
+  const selectedOpt = ev.question.options[ev.selected];
   const { score, known, gapOptions, toolsAnswer } = pendingAssessmentData;
 
   if(selectedOpt.correct){
@@ -807,7 +814,7 @@ function advanceExpertValidation(){
   }
 
   const nextLevel = LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(ev.testingLevel) - 1];
-  expertValidation = { testingLevel: nextLevel, selected: null, confirmedLevel: null };
+  expertValidation = { testingLevel: nextLevel, question: pickValidationQuestion(nextLevel), selected: null };
   renderLearning();
 }
 

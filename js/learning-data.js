@@ -119,42 +119,158 @@ const ASSESSMENT_QUESTIONS = [
 // understanding, not terminology, and every option carries plain-English
 // feedback so a wrong guess still teaches something.
 const LEVEL_VALIDATION_QUESTIONS = {
-  expert: {
-    prompt: "You're designing an AI agent that can read customer accounts and issue refunds automatically. What's the most important safeguard to put in place before it goes live?",
-    options: [
-      { text: 'Give it access to every customer field so it never gets stuck', correct: false, feedback: 'Wider access than the task needs makes any mistake more costly — the opposite of a safeguard.' },
-      { text: 'Require a person to approve any refund over a set amount before it goes through', correct: true, feedback: "Right — for real financial impact, a human approval step (and a record of what happened) matters more than how clever the AI's prompt is." },
-      { text: 'Tell it in the prompt to double-check its own maths', correct: false, feedback: "An instruction to 'double-check' doesn't give the AI a real way to verify itself — it can still be confidently wrong." },
-      { text: 'Skip logging so it runs faster', correct: false, feedback: "Removing the record of what the agent did removes your ability to catch or undo a mistake." }
-    ]
-  },
-  advanced: {
-    prompt: 'An AI tool gives you a confident, detailed, and completely wrong answer about a recent company policy. What most likely happened?',
-    options: [
-      { text: 'The AI is broken and needs to be reset', correct: false, feedback: "The AI isn't malfunctioning — this is normal behaviour for how it generates answers." },
-      { text: "It generated a plausible-sounding answer from patterns it learned, not a verified company fact — sometimes called a 'hallucination'", correct: true, feedback: 'Exactly — AI can sound completely confident while being wrong, especially about specific facts it was never actually given.' },
-      { text: 'You asked the question in the wrong order', correct: false, feedback: 'Question order can affect clarity, but it does not explain confidently wrong facts.' },
-      { text: 'The AI needs a longer prompt to be accurate', correct: false, feedback: 'A longer prompt can help, but length alone does not stop an AI from stating something false with confidence.' }
-    ]
-  },
-  intermediate: {
-    prompt: 'You want an AI tool to summarise a 40-page contract without missing key risks. What should you do first?',
-    options: [
-      { text: 'Paste the whole contract in and just ask it to "summarise this"', correct: false, feedback: "A vague instruction gets a vague summary — it won't know which risks matter to you." },
-      { text: 'Tell it exactly what to look for first — for example payment terms, liability, and termination clauses', correct: true, feedback: 'Right — giving AI a clear goal and specific things to check produces a far more useful summary than a vague instruction.' },
-      { text: 'Ask it to summarise the contract in one sentence', correct: false, feedback: 'A one-sentence summary of a 40-page contract will lose the detail you actually need.' },
-      { text: 'Convert the file to a picture first', correct: false, feedback: 'This makes the text harder for the AI to read, not easier.' }
-    ]
-  },
-  basic: {
-    prompt: 'Which of these is the safest way to use AI with sensitive customer information?',
-    options: [
-      { text: 'Paste customer names, emails and payment details in directly to save time', correct: false, feedback: 'Sensitive details can end up stored or used by the AI tool — this is the risky option, not the safe one.' },
-      { text: 'Remove or replace sensitive details before pasting anything into an AI tool', correct: true, feedback: 'Correct — taking sensitive details out first is the safe approach, since you cannot always control what an AI tool does with what you type.' },
-      { text: 'Only use AI with customer data on weekends', correct: false, feedback: 'The day of the week makes no difference to what happens to the data.' },
-      { text: 'Ask the AI to "keep this confidential" in the prompt', correct: false, feedback: "Asking it to 'keep something confidential' doesn't actually control how the tool stores or uses what you typed." }
-    ]
-  }
+  expert: [
+    {
+      prompt: "You're designing an AI agent that can read customer accounts and issue refunds automatically. What's the most important safeguard to put in place before it goes live?",
+      options: [
+        { text: 'Give it access to every customer field so it never gets stuck', correct: false, feedback: 'Wider access than the task needs makes any mistake more costly — the opposite of a safeguard.' },
+        { text: 'Require a person to approve any refund over a set amount before it goes through', correct: true, feedback: "Right — for real financial impact, a human approval step (and a record of what happened) matters more than how clever the AI's prompt is." },
+        { text: 'Tell it in the prompt to double-check its own maths', correct: false, feedback: "An instruction to 'double-check' doesn't give the AI a real way to verify itself — it can still be confidently wrong." },
+        { text: 'Skip logging so it runs faster', correct: false, feedback: 'Removing the record of what the agent did removes your ability to catch or undo a mistake.' }
+      ]
+    },
+    {
+      prompt: "You're setting up an AI agent that can browse the internet and send emails on your behalf. What's the biggest risk if you don't limit what it's allowed to do?",
+      options: [
+        { text: 'It might send too many emails and slow the system down', correct: false, feedback: "That's a minor inconvenience, not the real risk here." },
+        { text: 'It could take an action you never intended — like sending information to the wrong person — with no one checking first', correct: true, feedback: "Exactly — an unlimited agent can act on its own judgement, and a wrong judgement call goes out before anyone catches it." },
+        { text: 'It will simply refuse to work without limits set', correct: false, feedback: 'Agents do not refuse to run just because permissions are broad — if anything the opposite is true.' },
+        { text: 'Nothing — AI agents are safe by default', correct: false, feedback: 'No AI agent is safe by default; safety comes from the limits and checks you design in.' }
+      ]
+    },
+    {
+      prompt: "You ask an AI to always use your company's latest pricing before answering customer questions. What's the most reliable way to make sure it actually does that?",
+      options: [
+        { text: "Tell it in the prompt to 'always be accurate about pricing'", correct: false, feedback: 'An instruction alone gives the AI no actual access to real, current prices.' },
+        { text: 'Connect it to your live pricing data so it checks the real source, not what it remembers', correct: true, feedback: "Right — an AI can only be reliably accurate about changing facts if it's actually looking them up, not recalling them from memory." },
+        { text: 'Ask it more firmly to get it right', correct: false, feedback: 'Tone of the instruction has no effect on whether the AI has the real data.' },
+        { text: 'Type this month\'s prices into the prompt and hope nobody changes them', correct: false, feedback: 'This works only until prices change, and depends on someone remembering to update it every time.' }
+      ]
+    },
+    {
+      prompt: 'An AI agent completes 5 of the 6 steps in a task, then the 6th step fails silently with no output. What is the safest system design?',
+      options: [
+        { text: 'Assume the whole task succeeded since most steps worked', correct: false, feedback: 'A task that fails partway through is not the same as one that finished — assuming success hides the problem.' },
+        { text: 'Have the agent report exactly which steps completed and flag the failed step so a person can check', correct: true, feedback: 'Right — clear reporting on what actually happened (and what did not) is what makes a multi-step agent trustworthy.' },
+        { text: 'Automatically retry the whole task forever until it works', correct: false, feedback: 'Endless silent retries can repeat the same mistake, or take actions multiple times without anyone knowing.' },
+        { text: 'Ignore the failure since AI usually gets it right', correct: false, feedback: '"Usually" is not good enough when a step can fail without any warning.' }
+      ]
+    }
+  ],
+  advanced: [
+    {
+      prompt: 'An AI tool gives you a confident, detailed, and completely wrong answer about a recent company policy. What most likely happened?',
+      options: [
+        { text: 'The AI is broken and needs to be reset', correct: false, feedback: "The AI isn't malfunctioning — this is normal behaviour for how it generates answers." },
+        { text: "It generated a plausible-sounding answer from patterns it learned, not a verified company fact — sometimes called a 'hallucination'", correct: true, feedback: 'Exactly — AI can sound completely confident while being wrong, especially about specific facts it was never actually given.' },
+        { text: 'You asked the question in the wrong order', correct: false, feedback: 'Question order can affect clarity, but it does not explain confidently wrong facts.' },
+        { text: 'The AI needs a longer prompt to be accurate', correct: false, feedback: 'A longer prompt can help, but length alone does not stop an AI from stating something false with confidence.' }
+      ]
+    },
+    {
+      prompt: "You're comparing two AI chatbot answers to the same question, and one sounds far more confident than the other. What should you actually judge them on?",
+      options: [
+        { text: 'Whichever one sounds more confident is more likely correct', correct: false, feedback: 'Confidence in tone has nothing to do with whether an AI answer is actually accurate.' },
+        { text: 'Whether the answer can be checked against a real source and is actually accurate', correct: true, feedback: "Right — how an answer sounds tells you nothing about whether it's true; checking it against a real source does." },
+        { text: 'Whichever answer is longer', correct: false, feedback: 'Length has no bearing on accuracy.' },
+        { text: 'Whichever answer uses more technical language', correct: false, feedback: 'Technical-sounding language can just as easily wrap around a wrong answer.' }
+      ]
+    },
+    {
+      prompt: 'You give an AI the exact same instruction twice, in two separate conversations, and get two different answers. What does this tell you?',
+      options: [
+        { text: 'The AI is broken', correct: false, feedback: 'Getting different answers to the same prompt is normal, not a sign of a fault.' },
+        { text: 'AI responses can vary each time, even for an identical prompt — so anything important should be checked, not assumed consistent', correct: true, feedback: "Right — this variability is exactly why anything that matters needs a check, rather than trusting one output blindly." },
+        { text: 'You must have typed the prompt differently the second time', correct: false, feedback: 'Even a truly identical prompt can produce a different answer — that is just how these tools work.' },
+        { text: 'Only paid AI tools are reliable enough to trust', correct: false, feedback: 'Pricing tier has nothing to do with this kind of variation.' }
+      ]
+    },
+    {
+      prompt: "You want to compare two AI tools to decide which is better for writing customer emails. What's the fairest way to test them?",
+      options: [
+        { text: 'Try each one once and pick whichever sounds nicer to you', correct: false, feedback: 'One try each, judged only on feel, will not reliably tell you which is actually better.' },
+        { text: 'Give both the same set of real example tasks, judge the results against clear criteria, and compare', correct: true, feedback: 'Right — the same real tasks and clear, consistent criteria are what make a comparison fair and useful.' },
+        { text: "Just use whichever tool the company already pays for", correct: false, feedback: 'That answers a cost question, not which tool actually performs better.' },
+        { text: 'Ask each AI tool which one is better', correct: false, feedback: 'An AI tool judging its own competition is not a reliable test.' }
+      ]
+    }
+  ],
+  intermediate: [
+    {
+      prompt: 'You want an AI tool to summarise a 40-page contract without missing key risks. What should you do first?',
+      options: [
+        { text: 'Paste the whole contract in and just ask it to "summarise this"', correct: false, feedback: "A vague instruction gets a vague summary — it won't know which risks matter to you." },
+        { text: 'Tell it exactly what to look for first — for example payment terms, liability, and termination clauses', correct: true, feedback: 'Right — giving AI a clear goal and specific things to check produces a far more useful summary than a vague instruction.' },
+        { text: 'Ask it to summarise the contract in one sentence', correct: false, feedback: 'A one-sentence summary of a 40-page contract will lose the detail you actually need.' },
+        { text: 'Convert the file to a picture first', correct: false, feedback: 'This makes the text harder for the AI to read, not easier.' }
+      ]
+    },
+    {
+      prompt: 'You ask an AI to write a customer apology email, but the tone comes out too casual. What is the best next step?',
+      options: [
+        { text: 'Give up and write the whole thing yourself', correct: false, feedback: "The tone can be fixed with a clearer instruction — there's no need to start from scratch." },
+        { text: "Tell the AI specifically what tone you want (for example 'formal, apologetic, no jokes') and ask it to rewrite", correct: true, feedback: 'Right — being specific about tone is usually all it takes to get a much better result on the next try.' },
+        { text: 'Ask it a completely unrelated question to reset it', correct: false, feedback: "An unrelated question won't change how it approaches the email." },
+        { text: 'Accept the casual version since tone cannot be controlled', correct: false, feedback: 'Tone is one of the easiest things to control with a clear instruction.' }
+      ]
+    },
+    {
+      prompt: "You're using AI to help draft a report, and it includes a statistic that sounds real but isn't in any of your source material. What should you do?",
+      options: [
+        { text: 'Keep it, since it sounds convincing', correct: false, feedback: 'How convincing something sounds says nothing about whether it is actually true.' },
+        { text: 'Remove it and only keep facts you can trace back to your actual source material', correct: true, feedback: 'Right — anything you cannot trace back to a real source should not go in the report.' },
+        { text: 'Ask the AI if it is sure, and trust whatever it says', correct: false, feedback: "Asking an AI to confirm its own made-up fact doesn't make it any more reliable." },
+        { text: 'Round the number to make it sound more careful', correct: false, feedback: 'Rounding a made-up number does not make it a real one.' }
+      ]
+    },
+    {
+      prompt: "You want AI to help you compare three suppliers' quotes. What will get you the most useful comparison?",
+      options: [
+        { text: 'Paste all three quotes in and ask "what do you think?"', correct: false, feedback: 'A vague question like this gives the AI no criteria to compare against.' },
+        { text: 'Tell it exactly what to compare — price, delivery time, and terms — and ask for the results side by side', correct: true, feedback: 'Right — naming the specific things to compare gets you a clear, useful side-by-side result.' },
+        { text: 'Ask it to pick only the cheapest one', correct: false, feedback: 'Price alone ignores delivery time and terms, which usually matter too.' },
+        { text: 'Ask it to summarise each quote in one word', correct: false, feedback: 'One word per quote loses the detail needed to actually compare them.' }
+      ]
+    }
+  ],
+  basic: [
+    {
+      prompt: 'Which of these is the safest way to use AI with sensitive customer information?',
+      options: [
+        { text: 'Paste customer names, emails and payment details in directly to save time', correct: false, feedback: 'Sensitive details can end up stored or used by the AI tool — this is the risky option, not the safe one.' },
+        { text: 'Remove or replace sensitive details before pasting anything into an AI tool', correct: true, feedback: 'Correct — taking sensitive details out first is the safe approach, since you cannot always control what an AI tool does with what you type.' },
+        { text: 'Only use AI with customer data on weekends', correct: false, feedback: 'The day of the week makes no difference to what happens to the data.' },
+        { text: 'Ask the AI to "keep this confidential" in the prompt', correct: false, feedback: "Asking it to 'keep something confidential' doesn't actually control how the tool stores or uses what you typed." }
+      ]
+    },
+    {
+      prompt: "You're not sure whether something you typed into an AI tool could be seen or stored by that company. What's the safest approach?",
+      options: [
+        { text: 'Assume it stays private and type anything', correct: false, feedback: 'Assuming privacy without checking is exactly how sensitive details end up somewhere they should not be.' },
+        { text: 'Treat anything you type as something that might be stored, and avoid putting in sensitive information', correct: true, feedback: 'Correct — treating everything you type as potentially stored is the safe default.' },
+        { text: 'Only worry about it if you are using a free plan', correct: false, feedback: 'Plan tier is not a reliable guide to what happens with your data.' },
+        { text: 'It does not matter, all AI tools work the same way', correct: false, feedback: 'Different tools have different data policies — it always matters.' }
+      ]
+    },
+    {
+      prompt: 'An AI gives you an answer that looks useful for a work task. What should you do before relying on it fully?',
+      options: [
+        { text: 'Use it immediately without checking anything', correct: false, feedback: 'Using it straight away skips the one step that catches mistakes.' },
+        { text: 'Quickly check that it makes sense and is accurate for your situation', correct: true, feedback: 'Right — a quick sense-check before relying on it is the safe habit.' },
+        { text: 'Only check it if it looks obviously wrong', correct: false, feedback: 'Not every mistake looks obviously wrong — some sound completely reasonable.' },
+        { text: 'Assume it is correct because it sounds confident', correct: false, feedback: 'Confidence in an AI answer says nothing about whether it is actually correct.' }
+      ]
+    },
+    {
+      prompt: "What's the best reason to double-check an AI's output before sending it to a customer?",
+      options: [
+        { text: 'AI can sound confident even when it is inaccurate or has made something up', correct: true, feedback: 'Exactly — confident wording is not proof of accuracy, which is why a check matters.' },
+        { text: 'AI always uses bad grammar', correct: false, feedback: 'Grammar is not usually the issue, and this is not a reliable reason.' },
+        { text: 'Customers dislike anything written with AI', correct: false, feedback: "This isn't about how the email was written — it's about whether it's accurate." },
+        { text: 'It takes too long to write without AI', correct: false, feedback: 'This is a reason to use AI, not a reason to double-check it.' }
+      ]
+    }
+  ]
 };
 
 // ---- Recommended Hub resources, by level ------------------------------------
