@@ -277,7 +277,7 @@ function topbar({ showProgress = null, showBackToApp = true } = {}){
     <div class="lrn-topbar">
       ${showBackToApp ? `<button class="lrn-icon-btn" id="lrnExitBtn" aria-label="Back to Knowledge Hub">&larr;</button>` : '<span></span>'}
       ${showProgress !== null ? `<div class="lrn-progress-track"><div class="lrn-progress-fill" style="width:${showProgress}%"></div></div>` : '<div></div>'}
-      <div class="lrn-topbar-stats">${streakHtml}<span class="lrn-xp-pill" title="Your Points Level goes up every 200 points you earn. It's separate from your AI Knowledge Level.">⭐ ${xp} points · Points Level ${lvl}</span></div>
+      <div class="lrn-topbar-stats">${streakHtml}<span class="lrn-xp-pill" title="Your Points Level goes up every 200 points you earn. It's separate from your AI Level.">⭐ ${xp} points · Points Level ${lvl}</span></div>
     </div>`;
 }
 
