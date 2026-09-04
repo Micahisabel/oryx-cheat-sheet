@@ -163,6 +163,20 @@ function docStatusLabel(doc){
 
 // Builds the row data every filter/sort/search operates on — computed once
 // per render from whatever docs are already in scope (department-filtered).
+// Surfaces an in-progress Level-Up challenge next to the AI Level column so
+// an admin isn't confused by a level that looks "stuck" (e.g. lessons done
+// but level unchanged) without knowing a challenge is awaiting review/redo.
+function docPendingChallengeInfo(doc){
+  const entries = Object.entries(doc.levelChallenges || {});
+  for(const [levelKey, state] of entries){
+    if(state && state.status === 'submitted') return { levelKey, status: 'submitted' };
+  }
+  for(const [levelKey, state] of entries){
+    if(state && state.status === 'needs_improvement') return { levelKey, status: 'needs_improvement' };
+  }
+  return null;
+}
+
 function employeeRows(docs){
   return docs.map(d => {
     const hasOfficialScore = d.rankingScore != null;
@@ -175,6 +189,7 @@ function employeeRows(docs){
       email: d.userEmail || d.uid,
       department: d.department || 'Unassigned',
       level: d.currentLevel || (d.assessmentResult && d.assessmentResult.level) || null,
+      pendingChallenge: docPendingChallengeInfo(d),
       lessons: (d.completedLessons || []).length,
       assessmentScore: d.assessmentResult ? d.assessmentResult.score : null,
       progressPct: Math.round(docOverallProgressPct(d)),
@@ -270,10 +285,17 @@ function employeeTableHtml(rows){
         <tbody>
           ${rows.map(r => {
             const meta = r.level ? LEVEL_META[r.level] : null;
+            const pc = r.pendingChallenge;
+            const pcMeta = pc ? LEVEL_META[pc.levelKey] : null;
+            const pcBadge = pc
+              ? (pc.status === 'submitted'
+                  ? `<span class="lrn-admin-pending-badge lrn-admin-pending-badge--submitted" title="${escapeHtml(pcMeta ? pcMeta.label : pc.levelKey)} challenge submitted, awaiting review">⏳ Awaiting review</span>`
+                  : `<span class="lrn-admin-pending-badge lrn-admin-pending-badge--needs-improvement" title="${escapeHtml(pcMeta ? pcMeta.label : pc.levelKey)} challenge sent back for improvement">⏳ Needs improvement</span>`)
+              : '';
             return `
               <tr class="lrn-admin-row-clickable" data-uid="${escapeHtml(r.uid)}">
                 <td>${r.name ? `${escapeHtml(r.name)}<div class="lrn-admin-table-dim">${escapeHtml(r.email)}</div>` : escapeHtml(r.email)}<div class="lrn-admin-table-dept">${escapeHtml(r.department)}</div></td>
-                <td>${meta ? `${meta.emoji} ${escapeHtml(meta.label)}` : '—'}</td>
+                <td>${meta ? `${meta.emoji} ${escapeHtml(meta.label)}` : '—'}${pcBadge ? `<div>${pcBadge}</div>` : ''}</td>
                 <td>${r.lessons}</td>
                 <td>${r.assessmentScore != null ? r.assessmentScore + '%' : '—'}</td>
                 <td>${r.progressPct}%</td>
