@@ -177,16 +177,26 @@ function docPendingChallengeInfo(doc){
   return null;
 }
 
+// Falls back to a readable name derived from the email's local part when no
+// userName is set, so the table never shows a bare email as the primary
+// label — e.g. "leveluptest@oryxdoors.com" -> "Leveluptest".
+function displayNameFromEmail(email){
+  const local = (email || '').split('@')[0];
+  if(!local) return email;
+  return local.split(/[._-]+/).filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
 function employeeRows(docs){
   return docs.map(d => {
     const hasOfficialScore = d.rankingScore != null;
     const score = hasOfficialScore ? d.rankingScore : docQuickScoreEstimate(d);
     const improvement = docLevelImprovement(d);
     const status = docStatusLabel(d);
+    const email = d.userEmail || d.uid;
     return {
       uid: d.uid,
-      name: d.userName || null,
-      email: d.userEmail || d.uid,
+      name: d.userName || displayNameFromEmail(email),
+      email,
       department: d.department || 'Unassigned',
       level: d.currentLevel || (d.assessmentResult && d.assessmentResult.level) || null,
       pendingChallenge: docPendingChallengeInfo(d),
@@ -294,7 +304,7 @@ function employeeTableHtml(rows){
               : '';
             return `
               <tr class="lrn-admin-row-clickable" data-uid="${escapeHtml(r.uid)}">
-                <td>${r.name ? `${escapeHtml(r.name)}<div class="lrn-admin-table-dim">${escapeHtml(r.email)}</div>` : escapeHtml(r.email)}<div class="lrn-admin-table-dept">${escapeHtml(r.department)}</div></td>
+                <td>${escapeHtml(r.name)}<div class="lrn-admin-table-dim">${escapeHtml(r.email)}</div><div class="lrn-admin-table-dept">${escapeHtml(r.department)}</div></td>
                 <td>${meta ? `${meta.emoji} ${escapeHtml(meta.label)}` : '—'}${pcBadge ? `<div>${pcBadge}</div>` : ''}</td>
                 <td>${r.lessons}</td>
                 <td>${r.assessmentScore != null ? r.assessmentScore + '%' : '—'}</td>
