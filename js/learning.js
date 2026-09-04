@@ -216,7 +216,6 @@ async function enterLearning(){
   }
 
   ensureProgressForCurrentUser();
-  bumpStreak();
   applyNewBadges();
   saveProgress();
   learningScreen = progress.assessmentResult ? 'dashboard' : 'onboarding';
@@ -1243,6 +1242,8 @@ function renderAchievementsTab(){
 // ---------------------------------------------------------------------------
 function openLesson(levelKey, lessonId){
   activeLesson = { levelKey, lessonId, step: 'learn', wrongAttempt: false, practiceAttempt: '', practiceRevealed: false, quizSelected: null };
+  bumpStreak();
+  saveProgress();
   learningScreen = 'lesson';
   renderLearning();
 }
@@ -1703,6 +1704,7 @@ function markResourceInProgress(entryId){
   progress.resourceProgress = progress.resourceProgress || {};
   if(progress.resourceProgress[entryId]) return; // already started or completed
   progress.resourceProgress[entryId] = { status: 'in-progress', startedAt: new Date().toISOString(), completedAt: null, quizPassed: null };
+  bumpStreak();
   saveProgress();
 }
 
@@ -2037,7 +2039,6 @@ function enterLearningAsEntrance(){
   if(typeof exitLearningAdminMode === 'function') exitLearningAdminMode();
   viewNotes.classList.remove('active');
   viewLearning.classList.add('active');
-  bumpStreak();
   saveProgress();
   learningScreen = 'onboarding';
   renderLearning();
