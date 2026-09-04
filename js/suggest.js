@@ -458,12 +458,28 @@ const accountMenuEmail = document.getElementById('accountMenuEmail');
 
 function closeAccountMenu(){ accountMenu.classList.remove('open'); }
 
+// Anchors the fixed-position flyout to the sign-in pill's real on-screen spot.
+// Skipped below the sidebar's mobile-drawer breakpoint, where CSS switches
+// the menu back to a plain static block stacked under the pill.
+function positionAccountMenu(){
+  if(window.matchMedia('(max-width:900px)').matches){
+    accountMenu.style.left = '';
+    accountMenu.style.bottom = '';
+    return;
+  }
+  const rect = staffSignInToggle.getBoundingClientRect();
+  accountMenu.style.left = (rect.right + 10) + 'px';
+  accountMenu.style.bottom = (window.innerHeight - rect.bottom) + 'px';
+}
+
 staffSignInToggle.addEventListener('click', async () => {
   const user = firebase.auth().currentUser;
   if(user){
     accountMenuName.textContent = user.displayName || 'Signed in';
     accountMenuEmail.textContent = user.email;
+    const opening = !accountMenu.classList.contains('open');
     accountMenu.classList.toggle('open');
+    if(opening) positionAccountMenu();
   }else{
     await ensureStaffSignedIn();
   }
