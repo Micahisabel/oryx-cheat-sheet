@@ -98,6 +98,8 @@ let learningAdminSearch = '';
 let learningAdminStatusFilter = 'all'; // all | active | inactive | top | improved | encourage
 let learningAdminSort = { key: 'score', dir: 'desc' };
 let learningAdminDetailUid = null; // uid of the employee whose detail view is showing, or null for the dashboard
+let learningAdminPage = 1; // 1-based — reset to 1 whenever search/filter/sort/department changes
+const LEARNING_ADMIN_PAGE_SIZE = 10;
 const INACTIVE_DAYS_THRESHOLD = 14; // local display-only threshold for the "Inactive" status column — separate from the admin-configurable reminder threshold used by the scheduled ranking/reminder job
 
 // Every path total in one place — the ranking formula and the employee table
@@ -284,6 +286,24 @@ function employeeTableHtml(rows){
           }).join('')}
         </tbody>
       </table>
+    </div>`;
+}
+
+// Prev/Next pager for the employee table — `page` is 1-based. Returns '' when
+// everything fits on one page, so no empty control bar shows up for small teams.
+function employeeTablePaginationHtml(totalCount, page, pageSize){
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  if(totalPages <= 1) return '';
+  const start = (page - 1) * pageSize + 1;
+  const end = Math.min(totalCount, page * pageSize);
+  return `
+    <div class="lrn-admin-pagination">
+      <span class="lrn-admin-pagination-info">Showing ${start}–${end} of ${totalCount}</span>
+      <div class="lrn-admin-pagination-controls">
+        <button class="lrn-btn-text" id="lrnAdminPagePrev" ${page <= 1 ? 'disabled' : ''}>&larr; Previous</button>
+        <span class="lrn-admin-pagination-page">Page ${page} of ${totalPages}</span>
+        <button class="lrn-btn-text" id="lrnAdminPageNext" ${page >= totalPages ? 'disabled' : ''}>Next &rarr;</button>
+      </div>
     </div>`;
 }
 
@@ -809,7 +829,14 @@ function renderLearningAdmin(){
         <option value="encourage"${learningAdminStatusFilter === 'encourage' ? ' selected' : ''}>Needs encouragement</option>
       </select>
     </div>
-    ${employeeTableHtml(filterAndSortEmployeeRows(allRows))}
+    ${(() => {
+      const filteredRows = filterAndSortEmployeeRows(allRows);
+      const totalPages = Math.max(1, Math.ceil(filteredRows.length / LEARNING_ADMIN_PAGE_SIZE));
+      if(learningAdminPage > totalPages) learningAdminPage = totalPages;
+      const pageStart = (learningAdminPage - 1) * LEARNING_ADMIN_PAGE_SIZE;
+      const pageRows = filteredRows.slice(pageStart, pageStart + LEARNING_ADMIN_PAGE_SIZE);
+      return employeeTableHtml(pageRows) + employeeTablePaginationHtml(filteredRows.length, learningAdminPage, LEARNING_ADMIN_PAGE_SIZE);
+    })()}
 
     <h3 class="analytics-section-head" style="margin-top:28px;">Challenges Awaiting Review${pendingChallenges.length ? ` (${pendingChallenges.length})` : ''}</h3>
     <div id="learningAdminPendingChallenges">${pendingChallengesHtml(pendingChallenges)}</div>
@@ -848,6 +875,7 @@ function renderLearningAdmin(){
   const deptSelect = document.getElementById('learningAdminDeptSelect');
   if(deptSelect) deptSelect.addEventListener('change', () => {
     learningAdminDept = deptSelect.value;
+    learningAdminPage = 1;
     renderLearningAdmin();
   });
 
@@ -855,6 +883,7 @@ function renderLearningAdmin(){
   if(searchInput){
     searchInput.addEventListener('input', () => {
       learningAdminSearch = searchInput.value;
+      learningAdminPage = 1;
       renderLearningAdmin();
       const el = document.getElementById('learningAdminSearch');
       if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
@@ -863,11 +892,23 @@ function renderLearningAdmin(){
   const statusFilter = document.getElementById('learningAdminStatusFilter');
   if(statusFilter) statusFilter.addEventListener('change', () => {
     learningAdminStatusFilter = statusFilter.value;
+    learningAdminPage = 1;
+    renderLearningAdmin();
+  });
+  const pagePrevBtn = document.getElementById('lrnAdminPagePrev');
+  if(pagePrevBtn) pagePrevBtn.addEventListener('click', () => {
+    learningAdminPage = Math.max(1, learningAdminPage - 1);
+    renderLearningAdmin();
+  });
+  const pageNextBtn = document.getElementById('lrnAdminPageNext');
+  if(pageNextBtn) pageNextBtn.addEventListener('click', () => {
+    learningAdminPage += 1;
     renderLearningAdmin();
   });
   learningAdminView.querySelectorAll('.lrn-admin-table th[data-sort-key]').forEach(th => {
     th.addEventListener('click', () => {
       const key = th.dataset.sortKey;
+      learningAdminPage = 1;
       if(learningAdminSort.key === key){
         learningAdminSort.dir = learningAdminSort.dir === 'asc' ? 'desc' : 'asc';
       }else{
