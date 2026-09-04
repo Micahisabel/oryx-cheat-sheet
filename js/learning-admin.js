@@ -99,7 +99,7 @@ let learningAdminStatusFilter = 'all'; // all | active | inactive | top | improv
 let learningAdminSort = { key: 'score', dir: 'desc' };
 let learningAdminDetailUid = null; // uid of the employee whose detail view is showing, or null for the dashboard
 let learningAdminPage = 1; // 1-based — reset to 1 whenever search/filter/sort/department changes
-const LEARNING_ADMIN_PAGE_SIZE = 10;
+const LEARNING_ADMIN_PAGE_SIZE = 5;
 const INACTIVE_DAYS_THRESHOLD = 14; // local display-only threshold for the "Inactive" status column — separate from the admin-configurable reminder threshold used by the scheduled ranking/reminder job
 
 // Every path total in one place — the ranking formula and the employee table
