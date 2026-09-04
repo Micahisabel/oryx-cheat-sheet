@@ -476,14 +476,23 @@ function pendingChallengeSubmissions(docs){
   return rows.sort((a, b) => new Date(b.attempt.submittedAt) - new Date(a.attempt.submittedAt));
 }
 
+// Rough heuristic only, used purely to flag likely QA/test submissions for
+// an admin's attention — never used to filter or hide anything, since a
+// false positive here should never hide a real employee's work.
+function isLikelyTestEmail(email){
+  if(!email) return false;
+  return /test|sample|rulecheck|qa\+|demo/i.test(email);
+}
+
 function pendingChallengesHtml(rows){
   if(!rows.length) return '<div class="s-empty">No challenges awaiting review.</div>';
   return rows.map(r => {
     const meta = LEVEL_META[r.levelKey];
     const challenge = challengeFor(r.levelKey, r.department);
+    const testTag = isLikelyTestEmail(r.userEmail) ? ' <span class="lrn-admin-test-tag" title="Email looks like a QA/test account, not a real employee">TEST ACCOUNT</span>' : '';
     return `
       <div class="suggestion-item" data-uid="${escapeHtml(r.uid)}" data-level="${escapeHtml(r.levelKey)}" data-attempt="${r.attemptIndex}">
-        <div class="s-meta">${escapeHtml(r.userEmail || r.uid)} · ${escapeHtml(r.department || 'Unassigned')} · ${meta.emoji} ${escapeHtml(meta.label)} · ${escapeHtml(new Date(r.attempt.submittedAt).toLocaleDateString())}</div>
+        <div class="s-meta">${escapeHtml(r.userEmail || r.uid)} · ${escapeHtml(r.department || 'Unassigned')} · ${meta.emoji} ${escapeHtml(meta.label)} · ${escapeHtml(new Date(r.attempt.submittedAt).toLocaleDateString())}${testTag}</div>
         <div class="s-text">${escapeHtml(challenge ? challenge.prompt : 'Challenge prompt unavailable')}</div>
         <div class="s-text"><strong>Evidence:</strong> ${
           r.attempt.evidenceUrl
