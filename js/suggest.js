@@ -455,18 +455,27 @@ firebase.auth().onAuthStateChanged(refreshSignInPill);
 const accountMenu = document.getElementById('accountMenu');
 const accountMenuName = document.getElementById('accountMenuName');
 const accountMenuEmail = document.getElementById('accountMenuEmail');
+const accountWrapEl = document.getElementById('accountWrap');
 
 function closeAccountMenu(){ accountMenu.classList.remove('open'); }
 
-// Anchors the fixed-position flyout to the sign-in pill's real on-screen spot.
-// Skipped below the sidebar's mobile-drawer breakpoint, where CSS switches
-// the menu back to a plain static block stacked under the pill.
+// Anchors the fixed-position flyout to the sign-in pill's real on-screen spot,
+// and — on desktop — moves it out to a direct child of <body>. Fixed
+// positioning alone only escapes the sidebar's overflow clipping, not its
+// stacking context: .platform-sidebar is position:sticky, which creates a
+// stacking context that caps any z-index inside it below unrelated content
+// (like a note card) that paints later in the document. Reparenting to
+// <body> escapes that ceiling entirely. Skipped below the sidebar's
+// mobile-drawer breakpoint, where CSS switches the menu back to a plain
+// static block stacked under the pill inside its original spot.
 function positionAccountMenu(){
   if(window.matchMedia('(max-width:900px)').matches){
+    if(accountMenu.parentElement !== accountWrapEl) accountWrapEl.appendChild(accountMenu);
     accountMenu.style.left = '';
     accountMenu.style.bottom = '';
     return;
   }
+  if(accountMenu.parentElement !== document.body) document.body.appendChild(accountMenu);
   const rect = staffSignInToggle.getBoundingClientRect();
   accountMenu.style.left = (rect.right + 10) + 'px';
   accountMenu.style.bottom = (window.innerHeight - rect.bottom) + 'px';
@@ -486,7 +495,7 @@ staffSignInToggle.addEventListener('click', async () => {
 });
 
 document.addEventListener('click', (ev) => {
-  if(!document.getElementById('accountWrap').contains(ev.target)) closeAccountMenu();
+  if(!accountWrapEl.contains(ev.target) && !accountMenu.contains(ev.target)) closeAccountMenu();
 });
 
 document.getElementById('accountSignOut').addEventListener('click', async () => {
