@@ -16,7 +16,7 @@ const viewLearning = document.getElementById('view-learning');
 const viewNotes = document.getElementById('view-notes');
 const openLearningNavBtn = document.getElementById('openLearningNav');
 
-let learningScreen = 'onboarding'; // onboarding | department | plan | assessment | expertValidation | results | dashboard | lesson | challenge
+let learningScreen = 'onboarding'; // onboarding | department | plan | assessment | expertValidation | expertValidationEvidence | results | dashboard | lesson | challenge
 let progress = null;              // the learner's saved progress object
 let learningUnsub = null;         // Firestore snapshot unsubscribe
 let learningLastUid = null;       // uid the in-memory `progress` currently belongs to
@@ -28,7 +28,8 @@ let assessment = null; // { index, answers:[], selected:[] } — selected is the
 // assessment's raw score lands on Expert; steps down through lower levels until
 // one is answered correctly. pendingAssessmentData holds the score/known/gaps
 // already computed by finishAssessment() while validation plays out.
-let expertValidation = null; // { testingLevel, question, selected } — question is picked at random from that level's pool each time a level is (re-)entered
+let expertValidation = null; // { testingLevel, questions, qIndex, selected, correctCount } — 3 distinct questions sampled fresh each time a level is (re-)entered; passing needs a majority (2 of 3) correct
+let activeLevelValidationEvidence = null; // { levelKey, evidenceType:'file'|'link', file, link, explanation, pendingResult } — extra proof asked for after passing a level's validation questions, before the result is finalized
 let pendingAssessmentData = null; // { score, known, gapOptions, toolsAnswer }
 
 // ---- Dashboard sub-navigation ----
@@ -261,6 +262,7 @@ function renderLearning(){
   if(learningScreen === 'plan') return renderPlanScreen();
   if(learningScreen === 'assessment') return renderAssessment();
   if(learningScreen === 'expertValidation') return renderExpertValidation();
+  if(learningScreen === 'expertValidationEvidence') return renderExpertValidationEvidence();
   if(learningScreen === 'results') return renderResults();
   if(learningScreen === 'dashboard') return renderDashboard();
   if(learningScreen === 'lesson') return renderLesson();
@@ -637,15 +639,15 @@ function finishAssessment(){
     .filter(o => !selectedCapIds.includes(o.id) && !o.exclusive);
   const toolsAnswer = byId['tools-used'];
 
-  // A raw Expert score isn't trusted on its own — one extra, genuinely hard
-  // question must be answered correctly first (see LEVEL_VALIDATION_QUESTIONS
-  // in learning-data.js). A wrong answer steps down through lower levels
-  // (renderExpertValidation()/answerExpertValidation()) until one is
-  // confirmed. Every other level skips straight to finalizeAssessmentResult(),
-  // completely unchanged from before this feature existed.
+  // A raw Expert score isn't trusted on its own — 3 genuinely hard questions
+  // must be answered, with at least 2 correct, before it's confirmed (see
+  // LEVEL_VALIDATION_QUESTIONS in learning-data.js). Missing 2 or more steps
+  // down through lower levels (renderExpertValidation()/advanceExpertValidation())
+  // until one is confirmed. Every other level skips straight to
+  // finalizeAssessmentResult(), completely unchanged from before this feature existed.
   if(level === 'expert'){
     pendingAssessmentData = { score, known, gapOptions, toolsAnswer };
-    expertValidation = { testingLevel: 'expert', question: pickValidationQuestion('expert'), selected: null };
+    expertValidation = { testingLevel: 'expert', questions: pickValidationQuestionSet('expert', EXPERT_VALIDATION_QUESTION_COUNT), qIndex: 0, selected: null, correctCount: 0 };
     learningScreen = 'expertValidation';
     renderLearning();
     return;
@@ -711,57 +713,58 @@ function finalizeAssessmentResult(level, score, known, gapOptions, toolsAnswer){
 }
 
 // ---------------------------------------------------------------------------
-// 2b. Expert Validation — a raw Expert score must be confirmed with one hard
-// question before it's trusted. Wrong answers step down through lower levels
-// (LEVEL_VALIDATION_QUESTIONS in learning-data.js) until one is answered
-// correctly, or Basic is also wrong, in which case the floor is Beginner —
-// no question needed there since there's nothing lower to test.
+// 2b. Expert Validation — a raw Expert score must be confirmed with 3 hard
+// questions (majority — at least 2 of 3 — correct) before it's trusted.
+// Failing a level's set steps down through lower levels
+// (LEVEL_VALIDATION_QUESTIONS in learning-data.js) until one is passed, or
+// Basic is also failed, in which case the floor is Beginner — no question
+// needed there since there's nothing lower to test. Passing a level's set
+// then asks for one extra piece of real-world proof (renderExpertValidationEvidence())
+// before the result is finalized.
 // ---------------------------------------------------------------------------
-// Picks one question at random from a level's pool — each attempt (and each
-// step-down) gets a possibly-different question so people can't just
-// memorise or share "the" answer to a fixed question.
-function pickValidationQuestion(level){
-  const pool = LEVEL_VALIDATION_QUESTIONS[level];
-  return pool[Math.floor(Math.random() * pool.length)];
+const EXPERT_VALIDATION_QUESTION_COUNT = 3;
+
+// Samples N distinct questions at random from a level's pool — each attempt
+// (and each step-down) gets a possibly-different set so people can't just
+// memorise or share "the" answers.
+function pickValidationQuestionSet(level, count){
+  const pool = LEVEL_VALIDATION_QUESTIONS[level].slice();
+  const picked = [];
+  const n = Math.min(count, pool.length);
+  for(let i = 0; i < n; i++){
+    const idx = Math.floor(Math.random() * pool.length);
+    picked.push(pool.splice(idx, 1)[0]);
+  }
+  return picked;
 }
 
 function renderExpertValidation(){
   const ev = expertValidation;
-  const question = ev.question;
-  const meta = LEVEL_META[ev.testingLevel];
+  const question = ev.questions[ev.qIndex];
   const hasAnswered = ev.selected !== null && ev.selected !== undefined;
   const selectedOpt = hasAnswered ? question.options[ev.selected] : null;
+  const isLastQuestion = ev.qIndex === ev.questions.length - 1;
 
-  const introText = ev.testingLevel === 'expert'
-    ? "One more question before we confirm your level. You have been assessed as Expert. Let's check your understanding with one challenging question."
-    : "Let's check the level below.";
+  const introText = ev.qIndex > 0
+    ? null // continuing through the same level's set — the progress label below is enough
+    : (ev.testingLevel === 'expert'
+      ? `One more step before we confirm your level. You have been assessed as Expert. Let's check your understanding with ${ev.questions.length} short questions — you'll need to get at least ${Math.ceil(ev.questions.length / 2)} right.`
+      : "Let's check the level below.");
 
-  let confirmBlock = '';
-  if(hasAnswered && selectedOpt.correct){
-    const strength = ev.testingLevel === 'expert' ? 'strong' : 'solid';
-    const levelPhrase = ev.testingLevel === 'expert' ? '' : ` at the ${escapeHtml(meta.label)} level`;
-    confirmBlock = `
-      <div class="lrn-q-card" style="margin-top:16px;">
-        <div class="lrn-q-mascot"><img src="assets/images/mascot/cat-sunglasses.png" alt="Ginger the cat"></div>
-        <div class="lrn-q-bubble">
-          🎉 ${escapeHtml(meta.label)} confirmed!<br>
-          Your answers show that you have a ${strength} understanding of AI${levelPhrase}.<br>
-          Your AI Level: ${escapeHtml(meta.label)}
-        </div>
-      </div>
-      <button class="lrn-btn-primary" id="lrnExpertValidationContinue">See my results</button>`;
-  }else if(hasAnswered){
-    confirmBlock = `<button class="lrn-btn-primary" id="lrnExpertValidationContinue">Continue</button>`;
-  }
+  const contBtn = hasAnswered
+    ? `<button class="lrn-btn-primary" id="lrnExpertValidationContinue">${isLastQuestion ? 'Continue' : 'Next question'}</button>`
+    : '';
 
   learningRoot.innerHTML = `
     <div class="lrn-screen lrn-assessment">
       ${topbar({ showBackToApp: true })}
-      <div class="lrn-q-card">
-        <div class="lrn-q-mascot"><img src="assets/images/mascot/cat-sunglasses.png" alt="Ginger the cat"></div>
-        <div class="lrn-q-bubble">${escapeHtml(introText)}</div>
-      </div>
+      ${introText ? `
+        <div class="lrn-q-card">
+          <div class="lrn-q-mascot"><img src="assets/images/mascot/cat-sunglasses.png" alt="Ginger the cat"></div>
+          <div class="lrn-q-bubble">${escapeHtml(introText)}</div>
+        </div>` : ''}
       <div class="lrn-lesson-section">
+        <p class="lrn-practice-hint">Question ${ev.qIndex + 1} of ${ev.questions.length}</p>
         <p>${escapeHtml(question.prompt)}</p>
         <div class="lrn-options">
           ${question.options.map((opt, i) => {
@@ -776,7 +779,7 @@ function renderExpertValidation(){
             ${escapeHtml(selectedOpt.feedback || (selectedOpt.correct ? 'Well done.' : 'Not quite right.'))}
           </div>` : ''}
       </div>
-      ${confirmBlock}
+      ${contBtn}
     </div>`;
   bindTopbar();
 
@@ -788,20 +791,36 @@ function renderExpertValidation(){
       });
     });
   }
-  const contBtn = document.getElementById('lrnExpertValidationContinue');
-  if(contBtn) contBtn.addEventListener('click', advanceExpertValidation);
+  const btn = document.getElementById('lrnExpertValidationContinue');
+  if(btn) btn.addEventListener('click', advanceExpertValidation);
 }
 
 function advanceExpertValidation(){
   const ev = expertValidation;
-  const selectedOpt = ev.question.options[ev.selected];
-  const { score, known, gapOptions, toolsAnswer } = pendingAssessmentData;
+  const question = ev.questions[ev.qIndex];
+  const selectedOpt = question.options[ev.selected];
+  const correctCount = ev.correctCount + (selectedOpt.correct ? 1 : 0);
+  const isLastQuestion = ev.qIndex === ev.questions.length - 1;
 
-  if(selectedOpt.correct){
+  if(!isLastQuestion){
+    expertValidation = { testingLevel: ev.testingLevel, questions: ev.questions, qIndex: ev.qIndex + 1, selected: null, correctCount };
+    renderLearning();
+    return;
+  }
+
+  const { score, known, gapOptions, toolsAnswer } = pendingAssessmentData;
+  const passed = correctCount >= Math.ceil(ev.questions.length / 2);
+
+  if(passed){
     const confirmedLevel = ev.testingLevel;
     expertValidation = null;
     pendingAssessmentData = null;
-    finalizeAssessmentResult(confirmedLevel, score, known, gapOptions, toolsAnswer);
+    activeLevelValidationEvidence = {
+      levelKey: confirmedLevel, evidenceType: 'file', file: null, link: '', explanation: '',
+      pendingResult: { score, known, gapOptions, toolsAnswer }
+    };
+    learningScreen = 'expertValidationEvidence';
+    renderLearning();
     return;
   }
 
@@ -813,8 +832,149 @@ function advanceExpertValidation(){
   }
 
   const nextLevel = LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(ev.testingLevel) - 1];
-  expertValidation = { testingLevel: nextLevel, question: pickValidationQuestion(nextLevel), selected: null };
+  expertValidation = { testingLevel: nextLevel, questions: pickValidationQuestionSet(nextLevel, EXPERT_VALIDATION_QUESTION_COUNT), qIndex: 0, selected: null, correctCount: 0 };
   renderLearning();
+}
+
+// ---------------------------------------------------------------------------
+// 2c. Expert Validation evidence — one piece of real-world proof required
+// after passing a level's validation questions, before the result is
+// finalized. Reuses the exact same evidence/explanation UI and
+// progress.levelChallenges storage as the Level-Up Challenges below, so it
+// shows up in the admin's existing "Challenges Awaiting Review" panel with
+// no separate admin UI needed — attempt.source distinguishes it from a
+// lesson-completion challenge attempt for anyone reading the raw data.
+// ---------------------------------------------------------------------------
+function renderExpertValidationEvidence(){
+  const ev = activeLevelValidationEvidence;
+  const meta = LEVEL_META[ev.levelKey];
+
+  learningRoot.innerHTML = `
+    <div class="lrn-screen lrn-assessment">
+      ${topbar({ showBackToApp: true })}
+      <div class="lrn-q-card">
+        <div class="lrn-q-mascot"><img src="assets/images/mascot/cat-sunglasses.png" alt="Ginger the cat"></div>
+        <div class="lrn-q-bubble">
+          🎉 ${escapeHtml(meta.label)} confirmed!<br>
+          One last step — show a real example of you using AI at this level, so your manager can see it too.
+        </div>
+      </div>
+      <div class="lrn-challenge-card">
+        <h3>Your proof <span class="lrn-required-mark">*</span></h3>
+        <div class="lrn-evidence-picker">
+          <button class="lrn-evidence-picker-btn ${ev.evidenceType === 'file' ? 'active' : ''}" data-type="file">Upload file/screenshot</button>
+          <button class="lrn-evidence-picker-btn ${ev.evidenceType === 'link' ? 'active' : ''}" data-type="link">Link</button>
+        </div>
+        ${ev.evidenceType === 'file' ? `
+          <div class="lrn-evidence-upload">
+            <input type="file" id="lrnLevelValidationFile" accept="image/*,.pdf,.doc,.docx,.txt">
+            ${ev.file ? `<span class="lrn-file-chip">${escapeHtml(ev.file.name)}</span>` : ''}
+          </div>` : ''}
+        ${ev.evidenceType === 'link' ? `
+          <input type="url" class="lrn-explanation-input" id="lrnLevelValidationLink" placeholder="https://…" value="${escapeHtml(ev.link || '')}">` : ''}
+        <div id="lrnLevelValidationEvidenceError" class="lrn-field-error" style="display:none;"></div>
+
+        <h3>Explanation <span class="lrn-required-mark">*</span></h3>
+        <p class="lrn-practice-hint">Briefly explain what you did and how you used AI.</p>
+        <textarea class="lrn-explanation-input" id="lrnLevelValidationExplanation" placeholder="Explain what you did and how you used AI…">${escapeHtml(ev.explanation || '')}</textarea>
+        <div id="lrnLevelValidationExplanationError" class="lrn-field-error" style="display:none;"></div>
+
+        <button class="lrn-btn-primary" id="lrnLevelValidationSubmit">Submit proof</button>
+      </div>
+    </div>`;
+  bindTopbar();
+  bindExpertValidationEvidence();
+}
+
+function bindExpertValidationEvidence(){
+  learningRoot.querySelectorAll('.lrn-evidence-picker-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeLevelValidationEvidence.evidenceType = btn.dataset.type;
+      renderExpertValidationEvidence();
+    });
+  });
+
+  const fileInput = document.getElementById('lrnLevelValidationFile');
+  if(fileInput) fileInput.addEventListener('change', () => {
+    activeLevelValidationEvidence.file = fileInput.files[0] || null;
+    renderExpertValidationEvidence();
+  });
+
+  const linkInput = document.getElementById('lrnLevelValidationLink');
+  if(linkInput) linkInput.addEventListener('input', () => { activeLevelValidationEvidence.link = linkInput.value; });
+
+  const explanationInput = document.getElementById('lrnLevelValidationExplanation');
+  if(explanationInput) explanationInput.addEventListener('input', () => { activeLevelValidationEvidence.explanation = explanationInput.value; });
+
+  const submitBtn = document.getElementById('lrnLevelValidationSubmit');
+  if(submitBtn) submitBtn.addEventListener('click', submitLevelValidationEvidence);
+}
+
+async function submitLevelValidationEvidence(){
+  const ev = activeLevelValidationEvidence;
+  const evidenceError = document.getElementById('lrnLevelValidationEvidenceError');
+  const explanationError = document.getElementById('lrnLevelValidationExplanationError');
+  evidenceError.style.display = 'none';
+  explanationError.style.display = 'none';
+
+  const explanation = (ev.explanation || '').trim();
+  if(explanation.length < 20){
+    explanationError.textContent = 'Please explain briefly how you used AI.';
+    explanationError.style.display = 'block';
+    return;
+  }
+  if(ev.evidenceType === 'file' && !ev.file){
+    evidenceError.textContent = 'Please upload a screenshot or file as proof.';
+    evidenceError.style.display = 'block';
+    return;
+  }
+  if(ev.evidenceType === 'link'){
+    try{ new URL((ev.link || '').trim()); }
+    catch(e){
+      evidenceError.textContent = 'Enter a valid link (must start with http:// or https://).';
+      evidenceError.style.display = 'block';
+      return;
+    }
+  }
+
+  const submitBtn = document.getElementById('lrnLevelValidationSubmit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting…';
+
+  try{
+    let evidenceUrl = null, evidenceFileName = null;
+    if(ev.evidenceType === 'file'){
+      const user = firebase.auth().currentUser;
+      evidenceUrl = await uploadChallengeEvidence(ev.file, user.uid);
+      evidenceFileName = ev.file.name;
+    }else if(ev.evidenceType === 'link'){
+      evidenceUrl = ev.link.trim();
+    }
+
+    const attempt = {
+      submittedAt: new Date().toISOString(),
+      evidenceType: ev.evidenceType,
+      evidenceUrl, evidenceFileName,
+      explanation,
+      source: 'expert-validation',
+      reviewedAt: null, reviewedBy: null, reviewStatus: null, reviewNote: null
+    };
+    progress.levelChallenges = progress.levelChallenges || {};
+    const existing = progress.levelChallenges[ev.levelKey] || { status: 'submitted', attempts: [] };
+    existing.attempts = existing.attempts.concat(attempt);
+    existing.status = 'submitted';
+    progress.levelChallenges[ev.levelKey] = existing;
+
+    const { score, known, gapOptions, toolsAnswer } = ev.pendingResult;
+    const levelKey = ev.levelKey;
+    activeLevelValidationEvidence = null;
+    finalizeAssessmentResult(levelKey, score, known, gapOptions, toolsAnswer);
+  }catch(e){
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit proof';
+    evidenceError.textContent = 'Could not submit — check your connection and try again.';
+    evidenceError.style.display = 'block';
+  }
 }
 
 // ---------------------------------------------------------------------------
