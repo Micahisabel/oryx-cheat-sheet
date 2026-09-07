@@ -105,6 +105,7 @@ const ASSESSMENT_QUESTIONS = [
       { id: 'create-content', text: 'Create images or other content', levelIndex: 2, gapCategory: 'commands', gapLabel: 'creating images or content with AI' },
       { id: 'automate-tasks', text: 'Automate tasks', levelIndex: 3, gapCategory: 'mcps', gapLabel: 'automating tasks with AI' },
       { id: 'build-agents', text: 'Build AI workflows or agents', levelIndex: 4, gapCategory: 'agents', gapLabel: 'building AI workflows or agents' },
+      { id: 'other-capability', text: 'Other', requiresDetail: true },
       { id: 'not-sure', text: "I'm not sure yet", levelIndex: -1, exclusive: true }
     ]
   }

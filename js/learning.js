@@ -632,11 +632,16 @@ function finishAssessment(){
   const capQuestion = ASSESSMENT_QUESTIONS.find(q => q.kind === 'capabilities');
   const capAnswer = byId[capQuestion.id];
   const selectedCapIds = capAnswer ? capAnswer.optionIndexes.map(i => capQuestion.options[i].id) : [];
+  // "Other" shows what was actually typed instead of the bare option label —
+  // otherwise "What you already know" would just show the word "Other".
   const known = capQuestion.options
     .filter(o => selectedCapIds.includes(o.id) && !o.exclusive)
-    .map(o => o.text);
+    .map(o => (o.requiresDetail && capAnswer.otherDetail) ? capAnswer.otherDetail : o.text);
+  // "Other" has no gapCategory/gapLabel (there's nothing sensible to
+  // recommend for free text), so it's excluded here the same way exclusive
+  // options are — without this it could surface as a "gap" with blank text.
   const gapOptions = capQuestion.options
-    .filter(o => !selectedCapIds.includes(o.id) && !o.exclusive);
+    .filter(o => !selectedCapIds.includes(o.id) && !o.exclusive && o.gapLabel);
   const toolsAnswer = byId['tools-used'];
 
   // A raw Expert score isn't trusted on its own — 3 genuinely hard questions
