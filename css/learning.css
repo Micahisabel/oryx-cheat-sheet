@@ -741,3 +741,28 @@
   .lrn-hero-badge{ width:84px; height:84px; font-size:38px; }
   .lrn-hero h2{ font-size:24px; }
 }
+
+/* ---------- Exit-during-assessment confirmation ----------
+   Appended inside #view-learning at runtime (see showLrnConfirmModal() in
+   learning.js) so it inherits the --lrn-* custom properties .lrn-btn-primary
+   depends on. */
+.lrn-confirm-overlay{
+  position:fixed; inset:0; z-index:500; display:none;
+  align-items:center; justify-content:center; padding:20px;
+  background:rgba(2,42,58,0.45);
+}
+.lrn-confirm-overlay.open{ display:flex; }
+.lrn-confirm-card{
+  background:var(--white); border-radius:16px; padding:28px;
+  width:100%; max-width:380px; text-align:center;
+  box-shadow:0 20px 50px rgba(2,42,58,0.3);
+}
+.lrn-confirm-card h3{
+  font-family:var(--font-display); font-size:18px; color:var(--oryx-blue);
+  margin:0 0 10px; line-height:1.35;
+}
+.lrn-confirm-card p{ font-size:13.5px; color:var(--label); line-height:1.6; margin:0 0 22px; }
+.lrn-confirm-actions{ display:flex; flex-direction:column; gap:6px; }
+.lrn-confirm-actions .lrn-btn-primary{ width:100%; justify-content:center; }
+.lrn-btn-text-danger{ color:var(--danger); }
+.lrn-btn-text-danger:hover{ border-bottom-color:var(--danger); }

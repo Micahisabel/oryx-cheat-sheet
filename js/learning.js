@@ -288,6 +288,57 @@ function bindTopbar(onBack){
 }
 
 // ---------------------------------------------------------------------------
+// Exit-during-assessment confirmation — guards the topbar's back button on
+// the two screens where real, not-yet-saved assessment progress (the raw
+// quiz result, Expert Validation answers, or evidence being typed) would
+// otherwise be silently discarded by exitLearningView(). Every other screen
+// (dashboard, lesson, challenge, results, etc.) already has its progress
+// saved via saveProgress(), so the default unconfirmed exit stays as-is there.
+// ---------------------------------------------------------------------------
+let lrnConfirmModalEl = null;
+function showLrnConfirmModal({ title, message, confirmLabel, cancelLabel, onConfirm }){
+  if(!lrnConfirmModalEl){
+    lrnConfirmModalEl = document.createElement('div');
+    lrnConfirmModalEl.className = 'lrn-confirm-overlay';
+    // Appended inside #view-learning (not <body>) so it inherits the
+    // --lrn-* custom properties .lrn-btn-primary depends on — those are
+    // scoped to #view-learning and would be undefined outside it. Being
+    // position:fixed, it still renders full-viewport regardless of nesting.
+    viewLearning.appendChild(lrnConfirmModalEl);
+  }
+  lrnConfirmModalEl.innerHTML = `
+    <div class="lrn-confirm-card">
+      <h3>${escapeHtml(title)}</h3>
+      <p>${escapeHtml(message)}</p>
+      <div class="lrn-confirm-actions">
+        <button class="lrn-btn-primary" id="lrnConfirmCancel">${escapeHtml(cancelLabel)}</button>
+        <button class="lrn-btn-text lrn-btn-text-danger" id="lrnConfirmOk">${escapeHtml(confirmLabel)}</button>
+      </div>
+    </div>`;
+  lrnConfirmModalEl.classList.add('open');
+  document.getElementById('lrnConfirmCancel').addEventListener('click', hideLrnConfirmModal);
+  document.getElementById('lrnConfirmOk').addEventListener('click', () => { hideLrnConfirmModal(); onConfirm(); });
+}
+function hideLrnConfirmModal(){
+  if(lrnConfirmModalEl) lrnConfirmModalEl.classList.remove('open');
+}
+
+function confirmExitDuringAssessment(){
+  showLrnConfirmModal({
+    title: 'Are you sure you want to leave the assessment?',
+    message: 'Your current answers and assessment progress will be lost if you go back to the main page.',
+    cancelLabel: 'Continue Assessment',
+    confirmLabel: 'Exit Assessment',
+    onConfirm: () => {
+      pendingAssessmentData = null;
+      expertValidation = null;
+      activeLevelValidationEvidence = null;
+      exitLearningView();
+    }
+  });
+}
+
+// ---------------------------------------------------------------------------
 // 1. Onboarding
 // ---------------------------------------------------------------------------
 function renderOnboarding(){
@@ -786,7 +837,7 @@ function renderExpertValidation(){
       </div>
       ${contBtn}
     </div>`;
-  bindTopbar();
+  bindTopbar(confirmExitDuringAssessment);
 
   if(!hasAnswered){
     learningRoot.querySelectorAll('.lrn-option-btn').forEach(btn => {
@@ -887,7 +938,7 @@ function renderExpertValidationEvidence(){
         <button class="lrn-btn-primary" id="lrnLevelValidationSubmit">Submit proof</button>
       </div>
     </div>`;
-  bindTopbar();
+  bindTopbar(confirmExitDuringAssessment);
   bindExpertValidationEvidence();
 }
 
