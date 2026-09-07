@@ -1490,7 +1490,10 @@ function renderLesson(){
       <button class="lrn-btn-primary" id="lrnNextStep">Continue</button>`;
   }else if(step === 'practice'){
     const hasExample = !!lesson.practiceExample;
-    const canContinue = !hasExample || activeLesson.practiceRevealed;
+    // Mandatory: they must actually type an attempt, not just view an example
+    // (or, when there's no example, just click straight through).
+    const attemptFilled = (activeLesson.practiceAttempt || '').trim().length > 0;
+    const canContinue = attemptFilled && (!hasExample || activeLesson.practiceRevealed);
     body = `
       <div class="lrn-lesson-section">
         <h3>Practice</h3>
@@ -1498,6 +1501,7 @@ function renderLesson(){
         ${lesson.practiceChecklist && lesson.practiceChecklist.length ? `
           <ul class="lrn-practice-checklist">${lesson.practiceChecklist.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>` : ''}
         <textarea class="lrn-practice-input" id="lrnPracticeInput" placeholder="Type your attempt here — a prompt, a note, whatever fits this task…">${escapeHtml(activeLesson.practiceAttempt || '')}</textarea>
+        <div id="lrnPracticeError" class="lrn-field-error" style="display:${attemptFilled ? 'none' : 'block'};">Please type your attempt before continuing.</div>
         ${hasExample ? `
           <button class="lrn-btn-text lrn-reveal-btn" id="lrnRevealExample">Show me a strong example</button>
           ${activeLesson.practiceRevealed ? `
@@ -1585,6 +1589,10 @@ function renderLesson(){
     if(practiceInput){
       practiceInput.addEventListener('input', () => {
         activeLesson.practiceAttempt = practiceInput.value;
+        const filled = practiceInput.value.trim().length > 0;
+        const errorEl = document.getElementById('lrnPracticeError');
+        if(errorEl) errorEl.style.display = filled ? 'none' : 'block';
+        if(nextBtn) nextBtn.disabled = !(filled && (!lesson.practiceExample || activeLesson.practiceRevealed));
       });
     }
     if(revealBtn){
