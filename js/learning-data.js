@@ -440,8 +440,8 @@ const LESSON_LIBRARY = {
       'Confidence in the wording is not proof of accuracy.',
       'Always verify dates, numbers, and rules that matter before you rely on them.'
     ],
-    practice: 'AI tells you: "Oryx\'s standard delivery time is 6 weeks." You don\'t actually know if that\'s correct. Write one sentence explaining what you\'d do next, before repeating that figure to a customer.',
-    practiceExample: '"I\'d check this against the real delivery schedule or ask a colleague before quoting it to a customer — I wouldn\'t repeat an AI answer as fact without checking it first."',
+    practice: 'AI tells you: "The Eiffel Tower was built in 1887." You don\'t actually know if that\'s correct. Write one sentence explaining what you\'d do next, before repeating that fact to someone else.',
+    practiceExample: '"I\'d quickly search to confirm the date before repeating it — I wouldn\'t pass on an AI answer as fact without checking it first."',
     quiz: {
       question: 'AI answers instantly and confidently. What does that tell you?',
       options: [
