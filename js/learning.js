@@ -67,6 +67,7 @@ function defaultProgress(){
     userEmail: null,              // mirrored from firebase.auth() so the admin dashboard can label rows
     userName: null,               // mirrored from firebase.auth() (display name, if set) so reports can show a real name
     levelChallenges: {},          // { [levelKey]: { status:'submitted'|'passed'|'needs_improvement', attempts:[{submittedAt,evidenceType,evidenceUrl,evidenceFileName,explanation,reviewedAt,reviewedBy,reviewStatus,reviewNote}] } } — see CHALLENGE_LIBRARY in learning-data.js
+    levelStartedAt: {},            // { [levelKey]: ISO date string } — stamped the first time a level's lessons become viewable; powers the one-lesson-per-week pacing gate (see weekUnlockDate())
     activityDates: [],            // rolling log of 'YYYY-MM-DD' days the learner was active, trimmed to the last 90 — powers the ranking system's consistency score (see bumpStreak())
     progressHistory: [],          // [{date, xp, completedLessonsCount, score}] — capped snapshot log powering the personal progress graph
     rankingScore: null,           // 0-100, written only by the scheduled ranking job — null/"Not available" until enough data exists. Never set this from client code.
@@ -1407,24 +1408,52 @@ function prevLevelDone(lv){
   return !!(progress.pathCompleted && progress.pathCompleted[prevLevel]);
 }
 
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+// One lesson unlocks per week per level, on top of the existing "finish the one
+// before it" gate — so people can't binge a whole level in one sitting. The
+// clock starts the first time this level's lessons become viewable at all
+// (stamped into progress.levelStartedAt the first time we need it), and lesson
+// index i (0-based) unlocks i weeks after that.
+function levelStartDate(level){
+  progress.levelStartedAt = progress.levelStartedAt || {};
+  if(!progress.levelStartedAt[level]){
+    progress.levelStartedAt[level] = new Date().toISOString();
+    saveProgress();
+  }
+  return new Date(progress.levelStartedAt[level]);
+}
+
+function weekUnlockDate(level, lessonIndex){
+  return new Date(levelStartDate(level).getTime() + lessonIndex * WEEK_MS);
+}
+
 function renderPathTab(){
   const done = progress.completedLessons || [];
   const levelReady = prevLevelDone(reviewLevel);
+  const now = new Date();
   return `
     <div class="lrn-level-switch">
       ${LEARNING_LEVEL_ORDER.map(lv => `<button class="lrn-level-switch-btn ${reviewLevel === lv ? 'active' : ''}" data-lv="${lv}">${LEVEL_META[lv].emoji} ${LEVEL_META[lv].label}</button>`).join('')}
     </div>
-    ${!levelReady ? `<div class="lrn-level-locked-note">🔒 Finish the ${escapeHtml(LEVEL_META[LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(reviewLevel) - 1]].label)} path first to unlock these lessons.</div>` : ''}
+    ${!levelReady ? `<div class="lrn-level-locked-note">🔒 Finish the ${escapeHtml(LEVEL_META[LEARNING_LEVEL_ORDER[LEARNING_LEVEL_ORDER.indexOf(reviewLevel) - 1]].label)} path first to unlock these lessons.</div>` : `<div class="lrn-week-pace-note">📅 One new lesson unlocks each week — come back next week for the next one.</div>`}
     <div class="lrn-path-list">
       ${LEARNING_PATHS[reviewLevel].map((id, i) => {
         const lesson = LESSON_LIBRARY[id];
         const isDone = done.includes(id);
         const prevDone = (i === 0 ? levelReady : done.includes(LEARNING_PATHS[reviewLevel][i - 1]));
-        const locked = !isDone && !prevDone;
+        const unlockDate = levelReady ? weekUnlockDate(reviewLevel, i) : null;
+        const weekWait = levelReady && !isDone && unlockDate && now < unlockDate;
+        const locked = !isDone && (!prevDone || weekWait);
+        const weekLabel = `Week ${i + 1}`;
         return `
           <button class="lrn-path-item ${isDone ? 'done' : ''} ${locked ? 'locked' : ''}" data-id="${id}" ${locked ? 'disabled' : ''}>
             <span class="lrn-path-num">${isDone ? '✓' : locked ? '🔒' : i + 1}</span>
-            <span class="lrn-path-title">${escapeHtml(lesson.title)}</span>
+            <span class="lrn-path-title-wrap">
+              <span class="lrn-path-week">${weekLabel}</span>
+              <span class="lrn-path-title">${escapeHtml(lesson.title)}</span>
+              ${weekWait ? `<span class="lrn-path-wait">Unlocks ${unlockDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>` : ''}
+            </span>
           </button>`;
       }).join('')}
     </div>`;
