@@ -63,7 +63,51 @@ function reportSettingsHtml(){
       </label>
       <p class="lrn-admin-settings-note">Rankings, achievements, and reminders update overnight — not instantly. Settings saved here apply on the next scheduled run.</p>
       <div id="lrnSettingsSaveStatus" class="lrn-admin-settings-status"></div>
+      <div class="lrn-admin-settings-row lrn-admin-settings-row--action">
+        <button class="lrn-admin-btn-secondary" id="lrnRefreshLeaderboardBtn" type="button">Refresh leaderboard now</button>
+        <p class="lrn-admin-settings-note">Fills the staff Leaderboard tab immediately using today's estimated scores, instead of waiting for the overnight job. Safe to click any time — the overnight job (once it's running) will overwrite this with the official scores.</p>
+        <div id="lrnRefreshLeaderboardStatus" class="lrn-admin-settings-status"></div>
+      </div>
     </div>`;
+}
+
+// One-off, on-demand version of the ranking job's leaderboard step — lets an
+// admin populate adminState/publicLeaderboard right now (client-side, using
+// the same quick estimate already shown "(est.)" elsewhere) instead of
+// waiting for the scheduled Make automation to exist and run. That job, once
+// built, is the real source of truth and simply overwrites this doc nightly
+// with the official rankingScore — this button never conflicts with it.
+async function refreshPublicLeaderboardNow(){
+  const docs = await fetchLearningAdminDocs();
+  const rows = employeeRows(docs)
+    .filter(r => r.score != null)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
+  await adminStateCollection.doc('publicLeaderboard').set({
+    visible: !!learningReportSettings.leaderboardVisible,
+    updatedAt: new Date().toISOString(),
+    entries: rows.map(r => ({ uid: r.uid, name: r.name, score: r.score }))
+  }, { merge: true });
+  return rows.length;
+}
+
+function bindRefreshLeaderboardButton(){
+  const btn = document.getElementById('lrnRefreshLeaderboardBtn');
+  if(!btn) return;
+  btn.addEventListener('click', async () => {
+    const status = document.getElementById('lrnRefreshLeaderboardStatus');
+    btn.disabled = true;
+    if(status) status.textContent = 'Refreshing…';
+    try{
+      const count = await refreshPublicLeaderboardNow();
+      if(status) status.textContent = count
+        ? `Done — leaderboard updated with ${count} ${count === 1 ? 'person' : 'people'}.`
+        : 'No scored employees yet — nothing to show.';
+    }catch(e){
+      if(status) status.textContent = 'Could not refresh — check your connection and try again.';
+    }
+    btn.disabled = false;
+  });
 }
 
 function bindReportSettings(){
@@ -1002,6 +1046,7 @@ const SETTINGS_CATEGORY_RENDERERS = {
   reportReminder: (container) => {
     container.innerHTML = reportSettingsHtml();
     bindReportSettings();
+    bindRefreshLeaderboardButton();
   }
 };
 

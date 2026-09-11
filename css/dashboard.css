@@ -182,3 +182,11 @@
   .lrn-admin-checkbox{width:18px;height:18px;accent-color:var(--oryx-blue);cursor:pointer;flex-shrink:0;}
   .lrn-admin-settings-note{font-size:11.5px;color:var(--label);margin:2px 0 0;line-height:1.5;}
   .lrn-admin-settings-status{font-size:11.5px;color:var(--oryx-blue);min-height:14px;}
+  .lrn-admin-settings-row--action{border-top:1px solid var(--line);padding-top:14px;margin-top:4px;gap:6px;}
+  .lrn-admin-btn-secondary{
+    align-self:flex-start;font-family:var(--font-display);font-weight:600;font-size:13px;
+    color:var(--oryx-blue);background:var(--white);border:1px solid var(--oryx-blue);
+    border-radius:var(--r-pill,999px);padding:8px 16px;cursor:pointer;
+  }
+  .lrn-admin-btn-secondary:hover{background:var(--panel);}
+  .lrn-admin-btn-secondary:disabled{opacity:.6;cursor:default;}
