@@ -33,8 +33,15 @@ let activeLevelValidationEvidence = null; // { levelKey, evidenceType:'file'|'li
 let pendingAssessmentData = null; // { score, known, gapOptions, toolsAnswer }
 
 // ---- Dashboard sub-navigation ----
-let dashboardTab = 'overview'; // overview | path | achievements
+let dashboardTab = 'overview'; // overview | path | achievements | leaderboard
 let reviewLevel = null;        // level being viewed in the Learning Path tab
+
+// ---- Public leaderboard (adminState/publicLeaderboard) — written only by the
+// scheduled ranking job, gated by the admin's "Show a public leaderboard to
+// all staff" setting. null until first fetched; the tab itself only appears
+// once loaded and visible is true, so there's no flash of an empty tab. ----
+let publicLeaderboard = null;
+let publicLeaderboardLoading = false;
 
 // ---- Plan selection screen (transient — null until a plan's been clicked this visit) ----
 let planSelectStep = null; // null | 'free' | 'paid' — set once they've picked, before Continue is shown
@@ -1290,6 +1297,15 @@ function renderDashboard(){
   const nextId = nextLessonFor(level);
   const xpInfo = xpProgressInLevel(progress.xp || 0);
 
+  if(publicLeaderboard === null && !publicLeaderboardLoading){
+    publicLeaderboardLoading = true;
+    adminStateCollection.doc('publicLeaderboard').get()
+      .then(snap => { publicLeaderboard = snap.exists ? snap.data() : { visible: false, entries: [] }; })
+      .catch(() => { publicLeaderboard = { visible: false, entries: [] }; })
+      .finally(() => { publicLeaderboardLoading = false; if(learningScreen === 'dashboard') renderDashboard(); });
+  }
+  const showLeaderboardTab = !!(publicLeaderboard && publicLeaderboard.visible);
+
   learningRoot.innerHTML = `
     <div class="lrn-screen lrn-dashboard">
       ${topbar({ showBackToApp: true })}
@@ -1306,6 +1322,7 @@ function renderDashboard(){
         <button class="lrn-tab-btn ${dashboardTab === 'overview' ? 'active' : ''}" data-tab="overview">Continue Learning</button>
         <button class="lrn-tab-btn ${dashboardTab === 'path' ? 'active' : ''}" data-tab="path">Learning Path</button>
         <button class="lrn-tab-btn ${dashboardTab === 'achievements' ? 'active' : ''}" data-tab="achievements">Achievements</button>
+        ${showLeaderboardTab ? `<button class="lrn-tab-btn ${dashboardTab === 'leaderboard' ? 'active' : ''}" data-tab="leaderboard">Leaderboard</button>` : ''}
       </div>
 
       <div id="lrnTabBody"></div>
@@ -1328,7 +1345,35 @@ function renderDashboard(){
     bindPathTab();
   }else if(dashboardTab === 'achievements'){
     body.innerHTML = renderAchievementsTab();
+  }else if(dashboardTab === 'leaderboard'){
+    body.innerHTML = showLeaderboardTab ? renderLeaderboardTab() : '';
+    if(!showLeaderboardTab) dashboardTab = 'overview'; // setting turned off elsewhere mid-visit — fall back rather than show a dead tab
   }
+}
+
+// Company-wide top 10, from adminState/publicLeaderboard (written nightly by
+// the scheduled ranking job — see docs/make-automation-learning-reports.md).
+// "Your Rank" reuses rankCardHtml() since that's already sourced from this
+// account's own progress doc, which everyone can already read.
+function renderLeaderboardTab(){
+  const user = firebase.auth().currentUser;
+  const entries = (publicLeaderboard && publicLeaderboard.entries) || [];
+  const medals = ['🥇', '🥈', '🥉'];
+  const rows = entries.map((e, i) => `
+    <div class="lrn-leaderboard-row ${user && e.uid === user.uid ? 'lrn-leaderboard-row--you' : ''}">
+      <span class="lrn-leaderboard-rank">${medals[i] || (i + 1)}</span>
+      <div class="lrn-leaderboard-name">
+        <strong>${escapeHtml(e.name || 'Someone')}</strong>
+        ${user && e.uid === user.uid ? '<span class="lrn-leaderboard-you-tag">You</span>' : ''}
+      </div>
+      <span class="lrn-leaderboard-score">${e.score}</span>
+    </div>`).join('');
+  return `
+    <div class="lrn-leaderboard-tab">
+      ${rankCardHtml()}
+      <h3 class="lrn-leaderboard-heading">Top 10 company-wide</h3>
+      ${entries.length ? `<div class="lrn-leaderboard">${rows}</div>` : '<div class="s-empty">No rankings yet — check back after the next update.</div>'}
+    </div>`;
 }
 
 function renderOverviewTab(level, meta, done, total, nextId, xpInfo){
